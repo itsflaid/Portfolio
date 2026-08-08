@@ -1,0 +1,370 @@
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { gsap } from 'gsap';
+	import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+	type Entry = {
+		side: 'left' | 'right';
+		date: string;
+		type: string;
+		title: string;
+		org: string;
+		desc?: string;
+	};
+
+	const entries: Entry[] = [
+		{
+			side: 'left',
+			date: 'JUL 2021 — MAR 2024',
+			type: 'EDUCATION',
+			title: 'SMK Muhammadiyah Loa Janan',
+			org: 'Teknik Komputer dan Jaringan (TKJ)'
+		},
+		{
+			side: 'right',
+			date: 'JUL — DES 2022',
+			type: 'WORK EXPERIENCE',
+			title: 'Praktik Kerja Industri',
+			org: 'Logistik · PT. Anugerah Bara Kaltim'
+		},
+		{
+			side: 'left',
+			date: 'AGU 2024 — PRESENT',
+			type: 'EDUCATION',
+			title: 'UIN Sultan Aji Muhammad Idris',
+			org: 'Information System (S1) · Samarinda'
+		},
+		{
+			side: 'right',
+			date: 'SEP 2024 — PRESENT',
+			type: 'SELF-TAUGHT',
+			title: 'Full-Stack Development',
+			org: 'Independent · Otodidak',
+			desc: 'Learning by shipping — DevMap, ChatMe, and other tools, in public.'
+		}
+	];
+
+	let sectionEl: HTMLElement;
+	let spineEl: HTMLElement;
+	let entryEls: HTMLElement[] = [];
+	let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+
+	onMount(() => {
+		gsap.registerPlugin(ScrollTrigger);
+		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+		if (reduceMotion) {
+			gsap.set(spineEl, { scaleY: 1 });
+			gsap.set(entryEls, { opacity: 1, x: 0 });
+			return;
+		}
+
+		const tl = gsap.timeline({
+			scrollTrigger: {
+				trigger: sectionEl,
+				start: 'top 70%',
+				end: 'bottom 75%',
+				scrub: 0.8
+			}
+		});
+
+		// The spine draws itself top-to-bottom across the whole scrub range;
+		// each entry lights up right as the line reaches it.
+		tl.fromTo(spineEl, { scaleY: 0 }, { scaleY: 1, ease: 'none', duration: entries.length }, 0);
+
+		entryEls.forEach((entry, i) => {
+			const fromX = entries[i].side === 'right' ? -18 : 18;
+			const body = entry.querySelector('.xp__body');
+			if (!body) return;
+			tl.fromTo(
+				body,
+				{ opacity: 0, x: fromX },
+				{ opacity: 1, x: 0, ease: 'power1.out', duration: 0.6 },
+				i
+			);
+		});
+
+		return () => tl.scrollTrigger?.kill();
+	});
+</script>
+
+<section class="xp" bind:this={sectionEl}>
+	<span class="xp__mark xp__mark--edu" aria-hidden="true">EDU</span>
+	<span class="xp__mark xp__mark--exp" aria-hidden="true">EXP</span>
+	<span class="xp__dots" aria-hidden="true">
+		{#each dots as _}<i></i>{/each}
+	</span>
+	<span class="xp__spin" aria-hidden="true"></span>
+	<div class="xp__head">
+		<span class="xp__eyebrow">// BACKGROUND</span>
+		<h2 class="xp__heading">Experience &amp; Education</h2>
+	</div>
+
+	<div class="xp__timeline">
+		<div class="xp__spine" bind:this={spineEl}></div>
+		<ul class="xp__list">
+			{#each entries as entry, i (entry.title)}
+				<li class="xp__entry xp__entry--{entry.side}" bind:this={entryEls[i]}>
+					<span class="xp__tick" aria-hidden="true"></span>
+					<div class="xp__body">
+						<span class="xp__date">{entry.date} · {entry.type}</span>
+						<span class="xp__title">{entry.title}</span>
+						<span class="xp__org">{entry.org}</span>
+						{#if entry.desc}
+							<p class="xp__desc">{entry.desc}</p>
+						{/if}
+					</div>
+				</li>
+			{/each}
+		</ul>
+	</div>
+</section>
+
+<style>
+	.xp {
+		position: relative;
+		background: var(--white);
+		color: var(--black);
+		z-index: 3;
+		padding: clamp(5rem, 12vh, 9rem) clamp(1.5rem, 5vw, 4rem) clamp(7rem, 16vh, 11rem);
+		overflow: hidden;
+	}
+	/* Siluet watermark "EDU"/"EXP" — same treatment as the hero's FLAID mark. */
+	.xp__mark {
+		position: absolute;
+		font-family: var(--ff-display);
+		font-weight: 400;
+		letter-spacing: 0.01em;
+		font-size: clamp(6rem, 16vw, 13rem);
+		color: var(--black);
+		opacity: 0.065;
+		white-space: nowrap;
+		z-index: 0;
+		user-select: none;
+		pointer-events: none;
+	}
+	.xp__mark--edu {
+		top: -3vw;
+		right: -2vw;
+	}
+	.xp__mark--exp {
+		bottom: -3vw;
+		left: -2vw;
+	}
+	/* Dot grid + spinning cross, same treatment as the hero's decor. */
+	.xp__dots {
+		position: absolute;
+		right: clamp(1.5rem, 4vw, 3rem);
+		bottom: clamp(2rem, 5vw, 3.5rem);
+		display: grid;
+		grid-template-columns: repeat(3, 8px);
+		grid-template-rows: repeat(3, 8px);
+		gap: 9px;
+		z-index: 0;
+		pointer-events: none;
+	}
+	.xp__dots i {
+		display: block;
+		width: 8px;
+		height: 8px;
+		background: var(--black);
+		font-style: normal;
+		opacity: 0.06;
+		animation: dot-blink 3s ease-in-out infinite;
+	}
+	.xp__dots i:nth-child(2) { animation-delay: 0.3s; }
+	.xp__dots i:nth-child(3) { animation-delay: 0.6s; }
+	.xp__dots i:nth-child(4) { animation-delay: 0.9s; }
+	.xp__dots i:nth-child(5) { animation-delay: 1.2s; }
+	.xp__dots i:nth-child(6) { animation-delay: 1.5s; }
+	.xp__dots i:nth-child(7) { animation-delay: 1.8s; }
+	.xp__dots i:nth-child(8) { animation-delay: 2.1s; }
+	.xp__dots i:nth-child(9) { animation-delay: 2.4s; }
+	.xp__spin {
+		position: absolute;
+		left: clamp(2rem, 5vw, 4rem);
+		top: 50%;
+		margin-top: -13px;
+		width: 26px;
+		height: 26px;
+		z-index: 0;
+		pointer-events: none;
+		opacity: 0.35;
+		animation: spin 10s linear infinite;
+	}
+	.xp__spin::before,
+	.xp__spin::after {
+		content: '';
+		position: absolute;
+		background: var(--black);
+	}
+	.xp__spin::before {
+		left: 50%;
+		top: 0;
+		bottom: 0;
+		width: 1px;
+		transform: translateX(-50%);
+	}
+	.xp__spin::after {
+		top: 50%;
+		left: 0;
+		right: 0;
+		height: 1px;
+		transform: translateY(-50%);
+	}
+	.xp__head {
+		position: relative;
+		z-index: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		margin-bottom: clamp(3rem, 8vh, 5rem);
+	}
+	.xp__eyebrow {
+		font-family: var(--ff-mono);
+		font-size: 0.8rem;
+		letter-spacing: 0.08em;
+		color: var(--gray);
+	}
+	.xp__heading {
+		margin: 0;
+		font-family: var(--ff-display);
+		font-weight: 400;
+		line-height: 1;
+		letter-spacing: 0.005em;
+		font-size: clamp(2rem, 5vw, 3.5rem);
+	}
+	.xp__timeline {
+		position: relative;
+		z-index: 1;
+		max-width: 60rem;
+		margin: 0 auto;
+	}
+	.xp__spine {
+		position: absolute;
+		left: 50%;
+		margin-left: -1px;
+		top: 6px;
+		bottom: 6px;
+		width: 2px;
+		background: rgba(10, 10, 10, 0.16);
+		transform-origin: top;
+	}
+	.xp__list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: clamp(2.5rem, 6vh, 4rem);
+	}
+	.xp__entry {
+		position: relative;
+		display: grid;
+		grid-template-columns: 1fr 2rem 1fr;
+		column-gap: clamp(1rem, 3vw, 2rem);
+		align-items: start;
+	}
+	.xp__tick {
+		grid-column: 2;
+		justify-self: center;
+		align-self: start;
+		margin-top: 0.4em;
+		width: 9px;
+		height: 9px;
+		background: var(--black);
+		position: relative;
+		z-index: 1;
+	}
+	.xp__body {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+	}
+	.xp__entry--left .xp__body {
+		grid-column: 1;
+		text-align: right;
+		align-items: flex-end;
+	}
+	.xp__entry--right .xp__body {
+		grid-column: 3;
+		text-align: left;
+		align-items: flex-start;
+	}
+	.xp__date {
+		font-family: var(--ff-mono);
+		font-size: 0.75rem;
+		letter-spacing: 0.06em;
+		color: var(--gray);
+	}
+	.xp__title {
+		font-family: var(--ff-display);
+		font-weight: 400;
+		line-height: 1.05;
+		font-size: clamp(1.4rem, 3vw, 2.1rem);
+	}
+	.xp__org {
+		font-family: var(--ff-body);
+		font-size: 0.95rem;
+		color: var(--ink-soft);
+	}
+	.xp__desc {
+		margin: 0.15rem 0 0;
+		font-family: var(--ff-body);
+		font-size: 0.9rem;
+		color: var(--ink-soft);
+		opacity: 0.75;
+		max-width: 34rem;
+		line-height: 1.5;
+	}
+
+	@media (max-width: 700px) {
+		.xp__timeline {
+			max-width: none;
+		}
+		.xp__spine {
+			left: calc(0.75rem - 1px);
+			margin-left: 0;
+		}
+		.xp__entry {
+			grid-template-columns: 1.5rem 1fr;
+			column-gap: 1rem;
+		}
+		.xp__tick {
+			grid-column: 1;
+		}
+		.xp__entry--left .xp__body,
+		.xp__entry--right .xp__body {
+			grid-column: 2;
+			text-align: left;
+			align-items: flex-start;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.xp__dots i {
+			animation: none;
+			opacity: 0.2;
+		}
+		.xp__spin {
+			animation: none;
+		}
+	}
+
+	@keyframes dot-blink {
+		0%,
+		100% {
+			opacity: 0.06;
+		}
+		50% {
+			opacity: 0.32;
+		}
+	}
+	@keyframes spin {
+		from {
+			transform: rotate(0);
+		}
+		to {
+			transform: rotate(360deg);
+		}
+	}
+</style>

@@ -3,6 +3,7 @@
 	import Lenis from 'lenis';
 	import { gsap } from 'gsap';
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
+	import { setLenis } from '$lib/scroll';
 
 	let lenis: Lenis | null = null;
 
@@ -15,6 +16,7 @@
 			duration: 1.1,
 			easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
 		});
+		setLenis(lenis);
 
 		lenis.on('scroll', ScrollTrigger.update);
 
@@ -28,6 +30,7 @@
 			gsap.ticker.remove(raf);
 			lenis?.destroy();
 			lenis = null;
+			setLenis(null);
 		};
 	});
 </script>

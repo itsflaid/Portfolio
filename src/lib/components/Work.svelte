@@ -59,76 +59,42 @@
 
 		if (reduceMotion) return;
 
-		const mm = gsap.matchMedia();
+		const setSpacing = () => {
+			const card = trackEl.querySelector('.work__card') as HTMLElement | null;
+			if (!card) return;
+			const gap = Math.max(0, (viewportEl.clientWidth - card.offsetWidth) / 2);
+			trackEl.style.paddingLeft = `${gap}px`;
+			trackEl.style.paddingRight = `${gap}px`;
+		};
+		setSpacing();
+		ScrollTrigger.addEventListener('refreshInit', setSpacing);
 
-		mm.add('(min-width: 901px)', () => {
-			const setSpacing = () => {
-				const card = trackEl.querySelector('.work__card') as HTMLElement | null;
-				if (!card) return;
-				const gap = Math.max(0, (viewportEl.clientWidth - card.offsetWidth) / 2);
-				trackEl.style.paddingLeft = `${gap}px`;
-				trackEl.style.paddingRight = `${gap}px`;
-			};
-			setSpacing();
-			ScrollTrigger.addEventListener('refreshInit', setSpacing);
+		const getScroll = () => Math.max(0, trackEl.scrollWidth - viewportEl.clientWidth);
+		const imgs = gsap.utils.toArray<HTMLElement>(trackEl.querySelectorAll('.card__media img'));
 
-			const getScroll = () => Math.max(0, trackEl.scrollWidth - viewportEl.clientWidth);
-			const imgs = gsap.utils.toArray<HTMLElement>(trackEl.querySelectorAll('.card__media img'));
-
-			const tl = gsap.timeline({
-				scrollTrigger: {
-					trigger: workEl,
-					start: 'top top',
-					end: () => '+=' + getScroll(),
-					pin: true,
-					scrub: 1,
-					invalidateOnRefresh: true,
-					onUpdate: (self) => {
-						activeIndex = Math.round(self.progress * (projects.length - 1));
-					}
+		const tl = gsap.timeline({
+			scrollTrigger: {
+				trigger: workEl,
+				start: 'top top',
+				end: () => '+=' + getScroll(),
+				pin: true,
+				scrub: 1,
+				invalidateOnRefresh: true,
+				onUpdate: (self) => {
+					activeIndex = Math.round(self.progress * (projects.length - 1));
 				}
-			});
-
-			tl.to(trackEl, { x: () => -getScroll(), ease: 'none' }, 0);
-
-			imgs.forEach((img, i) => {
-				tl.fromTo(
-					img,
-					{ xPercent: i % 2 === 0 ? 6 : -6 },
-					{ xPercent: i % 2 === 0 ? -6 : 6, ease: 'none' },
-					0
-				);
-			});
-
-			return () => {
-				ScrollTrigger.removeEventListener('refreshInit', setSpacing);
-				tl.scrollTrigger?.kill();
-				tl.kill();
-			};
+			}
 		});
 
-		mm.add('(max-width: 900px)', () => {
-			const cards = gsap.utils.toArray<HTMLElement>(trackEl.querySelectorAll('.work__card'));
-			const tl = gsap.timeline({
-				scrollTrigger: {
-					trigger: workEl,
-					start: 'top 75%',
-					end: 'bottom 25%',
-					scrub: 1
-				}
-			});
-			cards.forEach((card, i) => {
-				tl.fromTo(
-					card,
-					{ opacity: 0, y: 40 },
-					{ opacity: 1, y: 0, duration: 0.4, ease: 'power1.out' },
-					i * 0.1
-				);
-			});
-			return () => {
-				tl.scrollTrigger?.kill();
-				tl.kill();
-			};
+		tl.to(trackEl, { x: () => -getScroll(), ease: 'none' }, 0);
+
+		imgs.forEach((img, i) => {
+			tl.fromTo(
+				img,
+				{ xPercent: i % 2 === 0 ? 6 : -6 },
+				{ xPercent: i % 2 === 0 ? -6 : 6, ease: 'none' },
+				0
+			);
 		});
 
 		const onLoad = () => ScrollTrigger.refresh();
@@ -136,7 +102,9 @@
 
 		return () => {
 			window.removeEventListener('load', onLoad);
-			mm.revert();
+			ScrollTrigger.removeEventListener('refreshInit', setSpacing);
+			tl.scrollTrigger?.kill();
+			tl.kill();
 		};
 	});
 </script>
@@ -194,7 +162,7 @@
 		color: var(--black);
 		z-index: 3;
 		overflow: hidden;
-		padding: clamp(4rem, 10vh, 7rem) 0 clamp(3rem, 8vh, 5rem);
+		padding: clamp(3rem, 8vh, 5.5rem) 0 clamp(3rem, 8vh, 5rem);
 	}
 	.work__dots {
 		display: grid;
@@ -360,17 +328,8 @@
 	}
 
 	@media (max-width: 900px) {
-		.work__viewport {
-			overflow: visible;
-			padding: 0 clamp(1.5rem, 5vw, 4rem);
-		}
-		.work__track {
-			flex-direction: column;
-			width: auto;
-			gap: clamp(2rem, 6vh, 4rem);
-		}
-		.work__card {
-			width: 100%;
+		.work {
+			padding-top: clamp(2.5rem, 6vh, 4rem);
 		}
 	}
 

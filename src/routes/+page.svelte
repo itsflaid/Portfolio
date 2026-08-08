@@ -4,6 +4,8 @@
 	import Hero from '$lib/components/Hero.svelte';
 	import About from '$lib/components/About.svelte';
 	import Work from '$lib/components/Work.svelte';
+	import Marquee from '$lib/components/Marquee.svelte';
+	import Experience from '$lib/components/Experience.svelte';
 </script>
 
 <svelte:head>
@@ -19,6 +21,8 @@
 <Hero />
 <About />
 <Work />
+<Marquee />
+<Experience />
 
 <section class="dummy" aria-hidden="true"></section>
 
