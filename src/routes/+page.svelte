@@ -3,6 +3,7 @@
 	import Nav from '$lib/components/Nav.svelte';
 	import Hero from '$lib/components/Hero.svelte';
 	import About from '$lib/components/About.svelte';
+	import Work from '$lib/components/Work.svelte';
 </script>
 
 <svelte:head>
@@ -17,3 +18,13 @@
 <Nav />
 <Hero />
 <About />
+<Work />
+
+<section class="dummy" aria-hidden="true"></section>
+
+<style>
+	.dummy {
+		height: 100vh;
+		background: var(--white);
+	}
+</style>

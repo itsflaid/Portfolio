@@ -4,8 +4,8 @@
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 	let aboutEl: HTMLElement;
-	let aboutWordEl: HTMLElement;
-	let myselfWordEl: HTMLElement;
+	let leftWordEl: HTMLElement;
+	let rightWordEl: HTMLElement;
 	let descWordEl: HTMLElement;
 	let compositionEl: HTMLElement;
 	let contentEl: HTMLElement;
@@ -16,20 +16,8 @@
 		gsap.registerPlugin(ScrollTrigger);
 		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-		function makeWord(el: HTMLElement, text: string) {
-			[...text].forEach((char) => {
-				const span = document.createElement('span');
-				span.className = 'letter';
-				span.textContent = char;
-				el.appendChild(span);
-			});
-		}
-		makeWord(aboutWordEl, 'ABOUT');
-		makeWord(myselfWordEl, 'MYSELF');
-
-		const L = gsap.utils.toArray<HTMLElement>(aboutWordEl.querySelectorAll('.letter'));
-		const R = gsap.utils.toArray<HTMLElement>(myselfWordEl.querySelectorAll('.letter'));
-		const sequence = [L[4], R[0], L[3], R[1], L[2], R[2], L[1], R[3], L[0], R[4], R[5]];
+		leftWordEl.textContent = 'ME BEHIND';
+		rightWordEl.textContent = 'THE CODE';
 
 		const descText = descWordEl.textContent?.trim() ?? '';
 		descWordEl.textContent = '';
@@ -45,11 +33,21 @@
 
 		if (reduceMotion) {
 			gsap.set(imageEl, { opacity: 1, scale: 1 });
-			gsap.set([...L, ...R], { opacity: 1 });
+			gsap.set([leftWordEl, rightWordEl], { opacity: 1, x: 0, y: 0 });
 			gsap.set(compositionEl, { gap: '0.25em' });
 			gsap.set(descriptionEl, { opacity: 1 });
 			gsap.set(descChars, { color: '#F1F1EF' });
 		} else {
+			const isMobile = window.matchMedia('(max-width: 700px)').matches;
+			// Each word starts off past the bottom-side edge of the pinned viewport, at full
+			// size and full opacity — the "reveal" comes from .stage's overflow:hidden clipping
+			// it, not from a letter-by-letter fade. That's what makes the slide read as one
+			// solid block sliding in, like monolog.com's "we close that gap" section.
+			const slideX = isMobile ? '80vw' : '30vw';
+			const slideY = isMobile ? '32vh' : '55vh';
+
+			gsap.set([leftWordEl, rightWordEl], { opacity: 1 });
+
 			const tl = gsap.timeline({
 				scrollTrigger: {
 					trigger: aboutEl,
@@ -60,35 +58,39 @@
 				}
 			});
 
-			tl.fromTo(contentEl, { y: '100vh' }, { y: 0, duration: 2.2, ease: 'power2.out' }, 0);
-
-			tl.to(imageEl, { opacity: 1, scale: 1, duration: 2.0, ease: 'power1.out' }, 0.4);
-
-			sequence.forEach((letter, index) => {
-				const t = 0.5 + index * 0.1;
-				tl.to(letter, { opacity: 1, duration: 0.3, ease: 'none' }, t);
-			});
-
-			const isMobile = window.matchMedia('(max-width: 700px)').matches;
-			const slideDist = isMobile ? '85vw' : '28vw';
+			// Diagonal entrance: both words travel bottom-corner -> center at the same time.
 			tl.fromTo(
-				aboutWordEl,
-				{ x: '-' + slideDist },
-				{ x: 0, duration: 1.0, ease: 'power2.out' },
-				0.6
+				leftWordEl,
+				{ x: '-' + slideX, y: slideY },
+				{ x: 0, y: 0, duration: 1.6, ease: 'power3.out' },
+				0
 			);
-			tl.fromTo(myselfWordEl, { x: slideDist }, { x: 0, duration: 1.0, ease: 'power2.out' }, 0.6);
+			tl.fromTo(
+				rightWordEl,
+				{ x: slideX, y: slideY },
+				{ x: 0, y: 0, duration: 1.6, ease: 'power3.out' },
+				0
+			);
 
-			tl.to(compositionEl, { gap: '0.25em', duration: 0.9, ease: 'power2.out' }, 1.0);
+			tl.fromTo(
+				imageEl,
+				{ opacity: 0, scale: 0.45 },
+				{ opacity: 1, scale: 1, duration: 1.4, ease: 'power2.out' },
+				0.2
+			);
 
-			tl.to(descriptionEl, { opacity: 1, duration: 0.9, ease: 'power1.out' }, 0.2);
+			// Words have landed -> close the gap so the line reads as one phrase.
+			tl.to(compositionEl, { gap: '0.25em', duration: 1.0, ease: 'power2.out' }, 1.5);
+
+			tl.to(descriptionEl, { opacity: 1, duration: 0.8, ease: 'power1.out' }, 1.6);
 
 			descChars.forEach((char, index) => {
-				const t = 2.8 + index * 0.02;
+				const t = 1.9 + index * 0.02;
 				tl.to(char, { color: '#F1F1EF', duration: 0.3, ease: 'none' }, t);
 			});
 
-			tl.to(contentEl, { y: '-60vh', duration: 2.6, ease: 'power1.inOut' }, 3.0);
+			// Hold, let the description finish revealing, then carry everything off upward.
+			tl.to(contentEl, { y: '-80vh', duration: 2.0, ease: 'power1.inOut' }, '+=0.3');
 
 			killTimeline = () => {
 				tl.scrollTrigger?.kill();
@@ -109,11 +111,11 @@
 <section class="about" bind:this={aboutEl}>
 	<div class="stage">
 		<div class="content" bind:this={contentEl}>
-			<h2 class="sr-only">About Myself</h2>
+			<h2 class="sr-only">Me Behind The Code</h2>
 			<div class="composition" bind:this={compositionEl} aria-hidden="true">
-				<div class="word about-word" bind:this={aboutWordEl}></div>
+				<div class="word left-word" bind:this={leftWordEl}></div>
 				<div class="image" bind:this={imageEl}></div>
-				<div class="word myself-word" bind:this={myselfWordEl}></div>
+				<div class="word right-word" bind:this={rightWordEl}></div>
 			</div>
 			<div class="description" bind:this={descriptionEl}>
 				<p>
@@ -130,7 +132,7 @@
 
 <style>
 	.about {
-		height: 320vh;
+		height: 250vh;
 		position: relative;
 		background: var(--black);
 		z-index: 2;
@@ -168,20 +170,13 @@
 		flex: 0 0 auto;
 		position: relative;
 		z-index: 2;
-	}
-
-	/* .letter dibuat lewat document.createElement di JS (bukan lewat markup
-	   Svelte), jadi harus :global supaya style-scoping Svelte tetap kena. */
-	:global(.about .letter) {
-		display: inline-block;
 		font-family: var(--ff-display);
 		font-size: clamp(72px, 12.5vw, 190px);
 		font-weight: 400;
 		line-height: 0.85;
 		letter-spacing: 0.005em;
 		color: var(--fg-dark);
-		opacity: 0;
-		will-change: opacity;
+		will-change: transform;
 	}
 	.image {
 		position: absolute;
@@ -240,8 +235,8 @@
 			gap: 4px;
 			padding-bottom: 8px;
 		}
-		:global(.about .letter) {
-			font-size: clamp(56px, 16vw, 110px);
+		.word {
+			font-size: clamp(40px, 12vw, 84px);
 		}
 		.image {
 			width: clamp(96px, 24vw, 150px);
