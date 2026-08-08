@@ -10,7 +10,7 @@
 	--gray: #8a8a85;
 	--ink-soft: #2a2a28;
 	--accent-ph: #3a3a38;
-	--heading-desc-gap: clamp(20px, 3.4vh, 40px);
+	--heading-desc-gap: clamp(48px, 7vh, 88px);
 
 	/* Font utama/display situs (Hero name + heading "About Myself") */
 	--ff-display: 'Bebas Neue', sans-serif;
@@ -24,10 +24,21 @@
 html {
 	scroll-behavior: auto;
 }
-@media (prefers-reduced-motion: no-preference) {
-	html {
-		scroll-behavior: smooth;
-	}
+html.lenis,
+html.lenis body {
+	height: auto;
+}
+.lenis.lenis-smooth {
+	scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+	overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+	overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+	pointer-events: none;
 }
 
 body {

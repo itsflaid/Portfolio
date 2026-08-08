@@ -45,9 +45,9 @@
 
 		if (reduceMotion) {
 			gsap.set(imageEl, { opacity: 1, scale: 1 });
-			gsap.set([...L, ...R], { opacity: 1, filter: 'blur(0px)' });
+			gsap.set([...L, ...R], { opacity: 1 });
 			gsap.set(compositionEl, { gap: '0.25em' });
-			gsap.set(descriptionEl, { opacity: 1, filter: 'blur(0px)' });
+			gsap.set(descriptionEl, { opacity: 1 });
 			gsap.set(descChars, { color: '#F1F1EF' });
 		} else {
 			const tl = gsap.timeline({
@@ -60,12 +60,13 @@
 				}
 			});
 
-			tl.to(imageEl, { opacity: 1, scale: 1, duration: 0.35, ease: 'none' }, 0);
+			tl.fromTo(contentEl, { y: '100vh' }, { y: 0, duration: 2.2, ease: 'power2.out' }, 0);
+
+			tl.to(imageEl, { opacity: 1, scale: 1, duration: 2.0, ease: 'power1.out' }, 0.4);
 
 			sequence.forEach((letter, index) => {
-				const t = 0.45 + index * 0.14;
-				tl.to(letter, { opacity: 0.35, filter: 'blur(6px)', duration: 0.08, ease: 'none' }, t);
-				tl.to(letter, { opacity: 1, filter: 'blur(0px)', duration: 0.14, ease: 'none' }, t + 0.08);
+				const t = 0.5 + index * 0.1;
+				tl.to(letter, { opacity: 1, duration: 0.3, ease: 'none' }, t);
 			});
 
 			const isMobile = window.matchMedia('(max-width: 700px)').matches;
@@ -73,23 +74,21 @@
 			tl.fromTo(
 				aboutWordEl,
 				{ x: '-' + slideDist },
-				{ x: 0, duration: 1.15, ease: 'power2.out' },
-				0.55
+				{ x: 0, duration: 1.0, ease: 'power2.out' },
+				0.6
 			);
-			tl.fromTo(myselfWordEl, { x: slideDist }, { x: 0, duration: 1.15, ease: 'power2.out' }, 0.55);
+			tl.fromTo(myselfWordEl, { x: slideDist }, { x: 0, duration: 1.0, ease: 'power2.out' }, 0.6);
 
-			tl.to(compositionEl, { gap: '0.25em', duration: 0.65, ease: 'power2.out' }, 1.65);
+			tl.to(compositionEl, { gap: '0.25em', duration: 0.9, ease: 'power2.out' }, 1.0);
 
-			tl.to({}, { duration: 0.5 }, 2.55);
-
-			tl.to(descriptionEl, { opacity: 1, filter: 'blur(0px)', duration: 0.45, ease: 'power1.out' }, 3.05);
-
-			tl.to(contentEl, { y: -28, duration: 2.6, ease: 'none' }, 3.05);
+			tl.to(descriptionEl, { opacity: 1, duration: 0.9, ease: 'power1.out' }, 0.2);
 
 			descChars.forEach((char, index) => {
-				const t = 3.35 + index * 0.018;
-				tl.to(char, { color: '#F1F1EF', duration: 0.2, ease: 'none' }, t);
+				const t = 2.8 + index * 0.02;
+				tl.to(char, { color: '#F1F1EF', duration: 0.3, ease: 'none' }, t);
 			});
+
+			tl.to(contentEl, { y: '-60vh', duration: 2.6, ease: 'power1.inOut' }, 3.0);
 
 			killTimeline = () => {
 				tl.scrollTrigger?.kill();
@@ -131,7 +130,7 @@
 
 <style>
 	.about {
-		height: 420vh;
+		height: 320vh;
 		position: relative;
 		background: var(--black);
 		z-index: 2;
@@ -143,6 +142,7 @@
 		overflow: hidden;
 		display: grid;
 		place-items: center;
+		z-index: 1;
 	}
 	.content {
 		display: flex;
@@ -181,8 +181,7 @@
 		letter-spacing: 0.005em;
 		color: var(--fg-dark);
 		opacity: 0;
-		filter: blur(10px);
-		will-change: opacity, filter;
+		will-change: opacity;
 	}
 	.image {
 		position: absolute;
@@ -206,8 +205,7 @@
 		justify-content: center;
 		padding: 0 8vw;
 		opacity: 0;
-		filter: blur(14px);
-		will-change: opacity, filter;
+		will-change: opacity;
 		pointer-events: none;
 	}
 	.description p {
@@ -234,7 +232,7 @@
 
 	@media (max-width: 700px) {
 		.about {
-			--heading-desc-gap: clamp(28px, 6vh, 56px);
+			--heading-desc-gap: clamp(40px, 8vh, 72px);
 		}
 		.composition {
 			flex-direction: column;

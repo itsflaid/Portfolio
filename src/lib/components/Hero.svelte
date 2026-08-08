@@ -4,6 +4,7 @@
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 	let heroEl: HTMLElement;
+	let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
 	onMount(() => {
 		gsap.registerPlugin(ScrollTrigger);
@@ -24,8 +25,12 @@
 </script>
 
 <section class="hero" bind:this={heroEl}>
-	<span class="hero__mark hero__mark--1" aria-hidden="true">FLAID</span>
-	<span class="hero__mark hero__mark--2" aria-hidden="true">FLAID</span>
+	<span class="hero__mark hero__mark--1" aria-hidden="true"><i>F</i><i>L</i><i>A</i><i>I</i><i>D</i></span>
+	<span class="hero__mark hero__mark--2" aria-hidden="true"><i>F</i><i>L</i><i>A</i><i>I</i><i>D</i></span>
+	<span class="hero__dots hero__dots--bl" aria-hidden="true">
+		{#each dots as _}<i></i>{/each}
+	</span>
+	<span class="hero__spin" aria-hidden="true"></span>
 	<div class="hero__content">
 		<span class="hero__eyebrow">FULLSTACK DEVELOPER — SAMARINDA, ID</span>
 		<h1>MUHAMMAD FADIL</h1>
@@ -65,8 +70,23 @@
 		user-select: none;
 		pointer-events: none;
 		font-size: clamp(6rem, 16vw, 13rem);
-		opacity: 0.065;
 	}
+	.hero__mark i {
+		font-style: normal;
+		display: inline-block;
+		opacity: 0.065;
+		animation: mark-glow 7.5s ease-in-out infinite;
+	}
+	.hero__mark--1 i:nth-child(1) { animation-delay: 0s; }
+	.hero__mark--1 i:nth-child(2) { animation-delay: -1.5s; }
+	.hero__mark--1 i:nth-child(3) { animation-delay: -3s; }
+	.hero__mark--1 i:nth-child(4) { animation-delay: -4.5s; }
+	.hero__mark--1 i:nth-child(5) { animation-delay: -6s; }
+	.hero__mark--2 i:nth-child(1) { animation-delay: -6s; }
+	.hero__mark--2 i:nth-child(2) { animation-delay: -4.5s; }
+	.hero__mark--2 i:nth-child(3) { animation-delay: -3s; }
+	.hero__mark--2 i:nth-child(4) { animation-delay: -1.5s; }
+	.hero__mark--2 i:nth-child(5) { animation-delay: 0s; }
 	.hero__mark--1 {
 		top: -3vw;
 		left: -2vw;
@@ -123,6 +143,7 @@
 		align-items: center;
 		gap: 0.75rem;
 		z-index: 2;
+		animation: scroll-float 2.2s ease-in-out infinite alternate;
 	}
 	.hero__scroll i {
 		display: inline-block;
@@ -130,6 +151,68 @@
 		height: 2rem;
 		background: var(--gray);
 		font-style: normal;
+	}
+
+	.hero__dots {
+		position: absolute;
+		bottom: clamp(1.5rem, 4vw, 3rem);
+		left: clamp(1.5rem, 4vw, 3rem);
+		display: grid;
+		grid-template-columns: repeat(3, 8px);
+		grid-template-rows: repeat(3, 8px);
+		gap: 9px;
+		z-index: 1;
+		pointer-events: none;
+	}
+	.hero__dots i {
+		display: block;
+		width: 8px;
+		height: 8px;
+		background: var(--black);
+		font-style: normal;
+		opacity: 0.06;
+		animation: dot-blink 3s ease-in-out infinite;
+	}
+	.hero__dots i:nth-child(2) { animation-delay: 0.3s; }
+	.hero__dots i:nth-child(3) { animation-delay: 0.6s; }
+	.hero__dots i:nth-child(4) { animation-delay: 0.9s; }
+	.hero__dots i:nth-child(5) { animation-delay: 1.2s; }
+	.hero__dots i:nth-child(6) { animation-delay: 1.5s; }
+	.hero__dots i:nth-child(7) { animation-delay: 1.8s; }
+	.hero__dots i:nth-child(8) { animation-delay: 2.1s; }
+	.hero__dots i:nth-child(9) { animation-delay: 2.4s; }
+
+	.hero__spin {
+		position: absolute;
+		right: clamp(2rem, 5vw, 4rem);
+		top: 50%;
+		width: 26px;
+		height: 26px;
+		z-index: 1;
+		pointer-events: none;
+		opacity: 0.35;
+		transform: translateY(-50%);
+		animation: spin 10s linear infinite;
+	}
+	.hero__spin::before,
+	.hero__spin::after {
+		content: '';
+		position: absolute;
+		background: var(--black);
+	}
+	.hero__spin::before {
+		left: 50%;
+		top: 0;
+		bottom: 0;
+		width: 1px;
+		transform: translateX(-50%);
+	}
+	.hero__spin::after {
+		top: 50%;
+		left: 0;
+		right: 0;
+		height: 1px;
+		transform: translateY(-50%);
 	}
 
 	@keyframes rise {
@@ -142,12 +225,62 @@
 			transform: translateY(0);
 		}
 	}
+	@keyframes scroll-float {
+		from {
+			transform: translate(-50%, 0);
+		}
+		to {
+			transform: translate(-50%, 8px);
+		}
+	}
+	@keyframes dot-blink {
+		0%,
+		100% {
+			opacity: 0.06;
+		}
+		50% {
+			opacity: 0.32;
+		}
+	}
+	@keyframes spin {
+		from {
+			transform: translateY(-50%) rotate(0);
+		}
+		to {
+			transform: translateY(-50%) rotate(360deg);
+		}
+	}
+	@keyframes mark-glow {
+		0%,
+		100% {
+			opacity: 0.065;
+		}
+		12% {
+			opacity: 0.34;
+		}
+		24% {
+			opacity: 0.065;
+		}
+	}
 	@media (prefers-reduced-motion: reduce) {
 		.hero__eyebrow,
 		.hero h1,
 		.hero__sub {
 			animation: none;
 			opacity: 1;
+		}
+		.hero__scroll {
+			animation: none;
+		}
+		.hero__dots i {
+			animation: none;
+			opacity: 0.2;
+		}
+		.hero__spin {
+			animation: none;
+		}
+		.hero__mark i {
+			animation: none;
 		}
 	}
 </style>
