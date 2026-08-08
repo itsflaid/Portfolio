@@ -75,18 +75,7 @@
 		font-style: normal;
 		display: inline-block;
 		opacity: 0.065;
-		animation: mark-glow 7.5s ease-in-out infinite;
 	}
-	.hero__mark--1 i:nth-child(1) { animation-delay: 0s; }
-	.hero__mark--1 i:nth-child(2) { animation-delay: -1.5s; }
-	.hero__mark--1 i:nth-child(3) { animation-delay: -3s; }
-	.hero__mark--1 i:nth-child(4) { animation-delay: -4.5s; }
-	.hero__mark--1 i:nth-child(5) { animation-delay: -6s; }
-	.hero__mark--2 i:nth-child(1) { animation-delay: -6s; }
-	.hero__mark--2 i:nth-child(2) { animation-delay: -4.5s; }
-	.hero__mark--2 i:nth-child(3) { animation-delay: -3s; }
-	.hero__mark--2 i:nth-child(4) { animation-delay: -1.5s; }
-	.hero__mark--2 i:nth-child(5) { animation-delay: 0s; }
 	.hero__mark--1 {
 		top: -3vw;
 		left: -2vw;
@@ -250,18 +239,6 @@
 			transform: translateY(-50%) rotate(360deg);
 		}
 	}
-	@keyframes mark-glow {
-		0%,
-		100% {
-			opacity: 0.065;
-		}
-		12% {
-			opacity: 0.34;
-		}
-		24% {
-			opacity: 0.065;
-		}
-	}
 	@media (prefers-reduced-motion: reduce) {
 		.hero__eyebrow,
 		.hero h1,
@@ -277,9 +254,6 @@
 			opacity: 0.2;
 		}
 		.hero__spin {
-			animation: none;
-		}
-		.hero__mark i {
 			animation: none;
 		}
 	}

@@ -3,142 +3,187 @@
 	import { gsap } from 'gsap';
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-	type Project = { index: string; title: string; tag: string; thumb: string };
+	type Project = {
+		index: string;
+		title: string;
+		tag: string;
+		thumb: string;
+		desc: string;
+		tech: string[];
+	};
 
-	// Placeholder copy — swap titles/tags once the real case-study text is ready.
 	const projects: Project[] = [
 		{
 			index: '01',
 			title: 'DEVMAP',
 			tag: 'Context layer that helps AI actually read a codebase',
-			thumb: '/devmap.webp'
+			thumb: '/devmap.webp',
+			desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+			tech: ['TypeScript', 'Node.js', 'AST', 'React', 'Docker']
 		},
 		{
 			index: '02',
 			title: 'CHATME',
 			tag: 'Self-chat & notes PWA — a place to remember things',
-			thumb: '/chatme.webp'
+			thumb: '/chatme.webp',
+			desc: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+			tech: ['SvelteKit', 'IndexedDB', 'Vite', 'WebPush', 'SQLite']
 		},
 		{
 			index: '03',
 			title: 'DAILYFIT',
 			tag: 'Training tracker with rolling PDF reports',
-			thumb: '/dailyfit.webp'
+			thumb: '/dailyfit.webp',
+			desc: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
+			tech: ['Python', 'FastAPI', 'React Native', 'PDFKit', 'Redis']
 		},
 		{
 			index: '04',
 			title: 'MUFADZ PORTAL',
 			tag: 'Daily Islamic companion, works offline-first',
-			thumb: '/mufadz.webp'
+			thumb: '/mufadz.webp',
+			desc: 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+			tech: ['Next.js', 'Tailwind', 'Firebase', 'PWA', 'Vercel']
 		}
 	];
 
 	let workEl: HTMLElement;
-	let listEl: HTMLElement;
-	let previewEl: HTMLElement;
-	let rowEls: HTMLElement[] = [];
+	let viewportEl: HTMLElement;
+	let trackEl: HTMLElement;
 	let activeIndex = 0;
-	let previewVisible = false;
 	let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-	let silChars = Array.from('PROJECTS');
 
 	onMount(() => {
 		gsap.registerPlugin(ScrollTrigger);
 		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-		const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-		const triggers: ScrollTrigger[] = [];
+		if (reduceMotion) return;
 
-		if (!reduceMotion) {
-			rowEls.forEach((row, i) => {
-				const tl = gsap.timeline({
-					scrollTrigger: {
-						trigger: row,
-						start: 'top bottom',
-						end: 'bottom top',
-						scrub: 1,
-						invalidateOnRefresh: true
+		const mm = gsap.matchMedia();
+
+		mm.add('(min-width: 901px)', () => {
+			const setSpacing = () => {
+				const card = trackEl.querySelector('.work__card') as HTMLElement | null;
+				if (!card) return;
+				const gap = Math.max(0, (viewportEl.clientWidth - card.offsetWidth) / 2);
+				trackEl.style.paddingLeft = `${gap}px`;
+				trackEl.style.paddingRight = `${gap}px`;
+			};
+			setSpacing();
+			ScrollTrigger.addEventListener('refreshInit', setSpacing);
+
+			const getScroll = () => Math.max(0, trackEl.scrollWidth - viewportEl.clientWidth);
+			const imgs = gsap.utils.toArray<HTMLElement>(trackEl.querySelectorAll('.card__media img'));
+
+			const tl = gsap.timeline({
+				scrollTrigger: {
+					trigger: workEl,
+					start: 'top top',
+					end: () => '+=' + getScroll(),
+					pin: true,
+					scrub: 1,
+					invalidateOnRefresh: true,
+					onUpdate: (self) => {
+						activeIndex = Math.round(self.progress * (projects.length - 1));
 					}
-				});
-				tl.fromTo(row, { opacity: 0 }, { opacity: 1, duration: 0.4, ease: 'power1.out' }, 0).fromTo(
-					row,
-					{ y: 140 + i * 30 },
-					{ y: -50, duration: 1, ease: 'none' },
+				}
+			});
+
+			tl.to(trackEl, { x: () => -getScroll(), ease: 'none' }, 0);
+
+			imgs.forEach((img, i) => {
+				tl.fromTo(
+					img,
+					{ xPercent: i % 2 === 0 ? 6 : -6 },
+					{ xPercent: i % 2 === 0 ? -6 : 6, ease: 'none' },
 					0
 				);
-				if (tl.scrollTrigger) triggers.push(tl.scrollTrigger);
 			});
-		}
 
-		let killMove: (() => void) | null = null;
-
-		if (canHover && !reduceMotion && previewEl) {
-			const xTo = gsap.quickTo(previewEl, 'x', { duration: 0.55, ease: 'power3' });
-			const yTo = gsap.quickTo(previewEl, 'y', { duration: 0.55, ease: 'power3' });
-
-			const onMove = (e: MouseEvent) => {
-				xTo(e.clientX + 28);
-				yTo(e.clientY - previewEl.offsetHeight / 2);
+			return () => {
+				ScrollTrigger.removeEventListener('refreshInit', setSpacing);
+				tl.scrollTrigger?.kill();
+				tl.kill();
 			};
-			listEl.addEventListener('mousemove', onMove);
-			killMove = () => listEl.removeEventListener('mousemove', onMove);
-		}
+		});
+
+		mm.add('(max-width: 900px)', () => {
+			const cards = gsap.utils.toArray<HTMLElement>(trackEl.querySelectorAll('.work__card'));
+			const tl = gsap.timeline({
+				scrollTrigger: {
+					trigger: workEl,
+					start: 'top 75%',
+					end: 'bottom 25%',
+					scrub: 1
+				}
+			});
+			cards.forEach((card, i) => {
+				tl.fromTo(
+					card,
+					{ opacity: 0, y: 40 },
+					{ opacity: 1, y: 0, duration: 0.4, ease: 'power1.out' },
+					i * 0.1
+				);
+			});
+			return () => {
+				tl.scrollTrigger?.kill();
+				tl.kill();
+			};
+		});
+
+		const onLoad = () => ScrollTrigger.refresh();
+		window.addEventListener('load', onLoad);
 
 		return () => {
-			killMove?.();
-			triggers.forEach((st) => st.kill());
+			window.removeEventListener('load', onLoad);
+			mm.revert();
 		};
 	});
-
-	function enter(i: number) {
-		activeIndex = i;
-		previewVisible = true;
-	}
-	function leave() {
-		previewVisible = false;
-	}
 </script>
 
 <section class="work" id="work" bind:this={workEl}>
-	<div class="work__sil" aria-hidden="true">
-		{#each silChars as char}<i>{char}</i>{/each}
-	</div>
-	<span class="work__dots" aria-hidden="true">
-		{#each dots as _}<i></i>{/each}
-	</span>
-
 	<div class="work__head">
 		<span class="work__eyebrow">(WORK)</span>
-		<span class="work__count">0{projects.length}</span>
+		<div class="work__head-right">
+			<span class="work__dots" aria-hidden="true">
+				{#each dots as _}<i></i>{/each}
+			</span>
+			<span class="work__count">0{activeIndex + 1} / 0{projects.length}</span>
+		</div>
 	</div>
 
-	<ul class="work__list" bind:this={listEl} on:mouseleave={leave}>
-		{#each projects as project, i}
-			<li>
-				<button
-					type="button"
-					class="row"
-					bind:this={rowEls[i]}
-					on:mouseenter={() => enter(i)}
-					on:focus={() => enter(i)}
-				>
-					<span class="row__index">{project.index}</span>
-					<span class="row__title">{project.title}</span>
-					<span class="row__tag">{project.tag}</span>
-					<span class="row__thumb" style="background-image:url({project.thumb})" aria-hidden="true"></span>
-				</button>
-			</li>
-		{/each}
-	</ul>
-
-	<div class="preview" bind:this={previewEl} class:is-visible={previewVisible} aria-hidden="true">
-		{#each projects as project, i}
-			<span
-				class="preview__panel"
-				style="background-image:url({project.thumb})"
-				class:is-active={i === activeIndex}
-			></span>
-		{/each}
+	<div class="work__viewport" bind:this={viewportEl}>
+		<ul class="work__track" bind:this={trackEl}>
+			{#each projects as project, i}
+				<li class="work__card">
+					<div class="card__media">
+						<img
+							src={project.thumb}
+							alt="{project.title} preview"
+							loading="lazy"
+							decoding="async"
+							draggable="false"
+						/>
+					</div>
+					<div class="card__info">
+						<div class="card__row">
+							<span class="card__index">{project.index}</span>
+							<h3 class="card__title">{project.title}</h3>
+						</div>
+						<p class="card__tag">{project.tag}</p>
+						<p class="card__desc">{project.desc}</p>
+						<div class="card__tech">
+							<span class="tech__label">STACK</span>
+							<ul class="tech__list">
+								{#each project.tech as tech}
+									<li>{tech}</li>
+								{/each}
+							</ul>
+						</div>
+					</div>
+				</li>
+			{/each}
+		</ul>
 	</div>
 </section>
 
@@ -148,35 +193,10 @@
 		background: var(--white);
 		color: var(--black);
 		z-index: 3;
-		padding: clamp(5rem, 12vh, 9rem) clamp(1.5rem, 5vw, 4rem) clamp(6rem, 14vh, 10rem);
-	}
-	.work__sil {
-		position: absolute;
-		top: 50%;
-		right: clamp(0.5rem, 2vw, 2rem);
-		z-index: 0;
-		writing-mode: vertical-rl;
-		transform: translateY(-50%) rotate(180deg);
-		font-family: var(--ff-display);
-		font-weight: 400;
-		font-size: clamp(2.6rem, 5vw, 4rem);
-		line-height: 0.85;
-		color: var(--black);
-		opacity: 0.06;
-		user-select: none;
-		pointer-events: none;
-		animation: work-sil-pulse 7.5s ease-in-out infinite;
-	}
-	.work__sil i {
-		display: inline-block;
-		font-style: normal;
-		transform: rotate(180deg);
+		overflow: hidden;
+		padding: clamp(4rem, 10vh, 7rem) 0 clamp(3rem, 8vh, 5rem);
 	}
 	.work__dots {
-		position: absolute;
-		top: clamp(1.2rem, 3.5vh, 2.2rem);
-		right: clamp(1.5rem, 5vw, 4rem);
-		z-index: 1;
 		display: grid;
 		grid-template-columns: repeat(3, 8px);
 		grid-template-rows: repeat(3, 8px);
@@ -204,13 +224,9 @@
 		display: flex;
 		align-items: baseline;
 		justify-content: space-between;
+		margin: 0 clamp(1.5rem, 5vw, 4rem);
 		padding-bottom: clamp(1.5rem, 4vh, 2.5rem);
 		border-bottom: 1px solid rgba(10, 10, 10, 0.14);
-	}
-	.work__head,
-	.work__list {
-		position: relative;
-		z-index: 1;
 	}
 	.work__eyebrow,
 	.work__count {
@@ -219,107 +235,120 @@
 		letter-spacing: 0.08em;
 		color: var(--gray);
 	}
-	.work__list {
+	.work__head-right {
+		display: flex;
+		align-items: center;
+		gap: clamp(1rem, 2vw, 1.5rem);
+	}
+	.work__viewport {
+		overflow: hidden;
+		margin-top: clamp(1.5rem, 4vh, 2.5rem);
+		padding: 0;
+	}
+	.work__track {
 		list-style: none;
 		margin: 0;
 		padding: 0;
+		display: flex;
+		align-items: stretch;
+		gap: clamp(1.5rem, 3vw, 3rem);
+		width: max-content;
+		will-change: transform;
 	}
-	.row {
-		width: 100%;
-		appearance: none;
-		background: none;
-		border: none;
-		border-bottom: 1px solid rgba(10, 10, 10, 0.14);
-		font: inherit;
-		color: inherit;
-		text-align: left;
+	.work__card {
+		flex: 0 0 auto;
+		width: clamp(300px, 42vw, 640px);
+	}
+	.card__media {
 		position: relative;
-		display: grid;
-		grid-template-columns: 3rem 1fr auto;
-		align-items: baseline;
-		column-gap: clamp(1rem, 3vw, 2.5rem);
-		padding: clamp(1.4rem, 3.4vh, 2.2rem) 0;
-		cursor: pointer;
-		outline: none;
+		width: 100%;
+		height: clamp(180px, 38vh, 360px);
+		overflow: hidden;
+		background: var(--accent-ph);
+		box-shadow: 0 24px 48px rgba(10, 10, 10, 0.1);
+		transition: transform 0.6s cubic-bezier(0.2, 0.6, 0.2, 1);
 	}
-	.row__index {
+	.card__media img {
+		display: block;
+		width: 115%;
+		max-width: none;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+		will-change: transform;
+	}
+	.work__card:hover .card__media {
+		transform: scale(1.02);
+	}
+	.card__info {
+		display: flex;
+		flex-direction: column;
+		gap: clamp(0.4rem, 1vh, 0.7rem);
+		padding-top: clamp(1rem, 2.5vh, 1.5rem);
+	}
+	.card__row {
+		display: flex;
+		align-items: baseline;
+		gap: clamp(0.9rem, 2vw, 1.5rem);
+	}
+	.card__index {
 		font-family: var(--ff-mono);
 		font-size: 0.85rem;
 		color: var(--gray);
 	}
-	.row__title {
+	.card__title {
 		font-family: var(--ff-display);
 		font-weight: 400;
 		letter-spacing: 0.005em;
-		font-size: clamp(2rem, 6vw, 4.2rem);
+		font-size: clamp(1.6rem, 2.6vw, 2.4rem);
 		line-height: 1;
-		transition:
-			opacity 0.3s ease,
-			transform 0.3s ease;
 	}
-	.row__tag {
-		grid-column: 2 / 3;
+	.card__tag {
 		font-family: var(--ff-body);
 		font-size: clamp(0.85rem, 1.1vw, 1rem);
 		color: var(--ink-soft);
-		opacity: 0.7;
-		max-width: 26rem;
+		opacity: 0.75;
+		max-width: 46ch;
 	}
-	.row__thumb {
-		display: none;
-		background-size: cover;
-		background-position: center;
+	.card__desc {
+		font-family: var(--ff-body);
+		font-size: clamp(0.9rem, 1.15vw, 1.05rem);
+		line-height: 1.55;
+		color: var(--gray);
+		max-width: 56ch;
 	}
-	.row:hover .row__title,
-	.row:focus-visible .row__title {
-		opacity: 0.45;
-		transform: translateX(0.4rem);
+	.card__tech {
+		display: flex;
+		align-items: center;
+		gap: clamp(0.9rem, 2vw, 1.5rem);
+		margin-top: clamp(0.6rem, 1.5vh, 1rem);
+		flex-wrap: wrap;
 	}
-	.row:focus-visible {
-		outline: 2px solid var(--black);
-		outline-offset: 6px;
+	.tech__label {
+		font-family: var(--ff-mono);
+		font-size: 0.7rem;
+		letter-spacing: 0.08em;
+		color: var(--gray);
 	}
-
-	.preview {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: clamp(320px, 26vw, 460px);
-		height: clamp(160px, 13vw, 230px);
-		pointer-events: none;
-		z-index: 40;
-		opacity: 0;
-		transform: translate(-9999px, -9999px);
-		transition: opacity 0.35s ease;
-		box-shadow: 0 30px 60px rgba(10, 10, 10, 0.18);
+	.tech__list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
 	}
-	.preview.is-visible {
-		opacity: 1;
-	}
-	.preview__panel {
-		position: absolute;
-		inset: 0;
-		background-size: cover;
-		background-position: center;
-		opacity: 0;
-		transition: opacity 0.45s ease;
-	}
-	.preview__panel.is-active {
-		opacity: 1;
+	.tech__list li {
+		font-family: var(--ff-mono);
+		font-size: 0.7rem;
+		letter-spacing: 0.03em;
+		color: var(--black);
+		border: 1px solid rgba(10, 10, 10, 0.25);
+		border-radius: 999px;
+		padding: 0.3rem 0.7rem;
+		white-space: nowrap;
 	}
 
-	@keyframes work-sil-pulse {
-		0%,
-		100% {
-			opacity: 0.06;
-		}
-		12% {
-			opacity: 0.32;
-		}
-		24% {
-			opacity: 0.06;
-		}
-	}
 	@keyframes work-dot-blink {
 		0%,
 		100% {
@@ -331,47 +360,26 @@
 	}
 
 	@media (max-width: 900px) {
-		.preview {
-			display: none;
+		.work__viewport {
+			overflow: visible;
+			padding: 0 clamp(1.5rem, 5vw, 4rem);
 		}
-		.row {
-			grid-template-columns: 2.4rem 1fr;
-			grid-template-areas: 'index thumb' 'title thumb' 'tag thumb';
+		.work__track {
+			flex-direction: column;
+			width: auto;
+			gap: clamp(2rem, 6vh, 4rem);
 		}
-		.row__index {
-			grid-area: index;
-		}
-		.row__title {
-			grid-area: title;
-			font-size: clamp(1.7rem, 8vw, 2.6rem);
-		}
-		.row__tag {
-			grid-area: tag;
-			grid-column: auto;
-		}
-		.row__thumb {
-			grid-area: thumb;
-			display: block;
-			align-self: center;
-			width: clamp(64px, 20vw, 96px);
-			height: clamp(64px, 20vw, 96px);
-		}
-		.row:hover .row__title,
-		.row:focus-visible .row__title {
-			opacity: 1;
-			transform: none;
+		.work__card {
+			width: 100%;
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.row__title {
-			transition: none;
-		}
-		.work__sil {
-			animation: none;
-		}
 		.work__dots i {
 			animation: none;
+		}
+		.card__media {
+			transition: none;
 		}
 	}
 </style>
