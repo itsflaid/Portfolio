@@ -49,11 +49,15 @@
 		if (reduceMotion) {
 			gsap.set(darkEl, { xPercent: 0, width: '100%' });
 			gsap.set([headingLine1El, headingLine2El], { y: '0%', x: '0rem' });
-			gsap.set([cursorEl, endingCursorEl], { opacity: 1 });
-			gsap.set([endingLine1El, endingLine2El], { y: '0%', x: '0rem' });
+			gsap.set(cursorEl, { opacity: 1 });
 			gsap.set(lightContent, { opacity: 1, y: 0 });
-			gsap.set(darkContent, { opacity: 0 });
-			gsap.set([endingEyebrowEl, endingCreditsEl, endingBackEl], { opacity: 1, y: 0 });
+			// Mobile: bg dark tetap ada, tapi tanpa fase ending.
+			gsap.set(darkContent, { opacity: isMobile ? 1 : 0 });
+			if (!isMobile) {
+				gsap.set(endingCursorEl, { opacity: 1 });
+				gsap.set([endingLine1El, endingLine2El], { y: '0%', x: '0rem' });
+				gsap.set([endingEyebrowEl, endingCreditsEl, endingBackEl], { opacity: 1, y: 0 });
+			}
 			return;
 		}
 
@@ -115,43 +119,43 @@
 		if (!isMobile) {
 			curtain.fromTo(darkEl, { width: '50%' }, { width: '100%', ease: 'none' }, 0);
 			curtain.to(lightContent, { opacity: 0, duration: 0.4, ease: 'power1.in' }, 0.2);
-		}
 
-		// Konten footer (LET'S TALK / BUILD SOMETHING_ / email) hilang DULU
-		// baru teks ending muncul, supaya tidak bertabrakan.
-		const revealOut = [...darkContent, headingLine1El, headingLine2El];
-		curtain.to(revealOut, { opacity: 0, y: -16, duration: 0.35, ease: 'power2.in' }, 0.4);
-		curtain.fromTo(
-			endingEyebrowEl,
-			{ opacity: 0, y: 12 },
-			{ opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' },
-			0.72
-		);
-		curtain.fromTo(
-			endingLine1El,
-			{ y: '105%', x: '-1.4rem' },
-			{ y: '0%', x: '0rem', duration: 0.7, ease: 'power3.out' },
-			0.75
-		);
-		curtain.fromTo(
-			endingLine2El,
-			{ y: '105%', x: '1.4rem' },
-			{ y: '0%', x: '0rem', duration: 0.7, ease: 'power3.out' },
-			0.82
-		);
-		curtain.to(endingCursorEl, { opacity: 1, duration: 0.2 }, 1.05);
-		curtain.fromTo(
-			endingCreditsEl,
-			{ opacity: 0, y: 16 },
-			{ opacity: 1, y: 0, duration: 0.4 },
-			0.95
-		);
-		curtain.fromTo(
-			endingBackEl,
-			{ opacity: 0, y: 16 },
-			{ opacity: 1, y: 0, duration: 0.4 },
-			1.02
-		);
+			// Konten footer (LET'S TALK / BUILD SOMETHING_ / email) hilang DULU
+			// baru teks ending muncul, supaya tidak bertabrakan.
+			const revealOut = [...darkContent, headingLine1El, headingLine2El];
+			curtain.to(revealOut, { opacity: 0, y: -16, duration: 0.35, ease: 'power2.in' }, 0.4);
+			curtain.fromTo(
+				endingEyebrowEl,
+				{ opacity: 0, y: 12 },
+				{ opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' },
+				0.72
+			);
+			curtain.fromTo(
+				endingLine1El,
+				{ y: '105%', x: '-1.4rem' },
+				{ y: '0%', x: '0rem', duration: 0.7, ease: 'power3.out' },
+				0.75
+			);
+			curtain.fromTo(
+				endingLine2El,
+				{ y: '105%', x: '1.4rem' },
+				{ y: '0%', x: '0rem', duration: 0.7, ease: 'power3.out' },
+				0.82
+			);
+			curtain.to(endingCursorEl, { opacity: 1, duration: 0.2 }, 1.05);
+			curtain.fromTo(
+				endingCreditsEl,
+				{ opacity: 0, y: 16 },
+				{ opacity: 1, y: 0, duration: 0.4 },
+				0.95
+			);
+			curtain.fromTo(
+				endingBackEl,
+				{ opacity: 0, y: 16 },
+				{ opacity: 1, y: 0, duration: 0.4 },
+				1.02
+			);
+		}
 
 		return () => {
 			tl.scrollTrigger?.kill();
@@ -167,16 +171,16 @@
 		<div class="footer__light">
 		<span class="footer__mark footer__mark--light" aria-hidden="true">FLAID</span>
 
-		<nav class="footer__col" data-reveal-light>
-			<span class="footer__label">MENU</span>
-			<ul class="footer__list">
-				{#each quickLinks as link}
-					<li><a href={link.href}>{link.label}</a></li>
-				{/each}
-			</ul>
-		</nav>
+			<nav class="footer__col footer__col--menu" data-reveal-light>
+				<span class="footer__label">MENU</span>
+				<ul class="footer__list">
+					{#each quickLinks as link}
+						<li><a href={link.href}>{link.label}</a></li>
+					{/each}
+				</ul>
+			</nav>
 
-		<div class="footer__col" data-reveal-light>
+			<div class="footer__col footer__col--connect" data-reveal-light>
 			<span class="footer__label">CONNECT</span>
 			<ul class="footer__list">
 				{#each socials as s}
@@ -513,7 +517,36 @@
 		.footer__light {
 			grid-column: 1;
 			margin-top: 60vh;
-			min-height: 70vh;
+			/* Kurangi tinggi & padding vertikal supaya tidak terlalu luas atas-bawah. */
+			min-height: auto;
+			padding: clamp(2rem, 8vh, 3.5rem) clamp(1.5rem, 6vw, 3rem);
+			/* MENU kiri, CONNECT kanan — dua kolom sejajar. */
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			align-content: center;
+			align-items: start;
+			gap: clamp(0.75rem, 2vh, 1.25rem) clamp(1.5rem, 6vw, 3rem);
+		}
+		.footer__col {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+		}
+		.footer__col--menu {
+			grid-column: 1;
+			justify-self: start;
+		}
+		.footer__col--connect {
+			grid-column: 2;
+			justify-self: start;
+		}
+		.footer__copy {
+			grid-column: 1 / -1;
+			text-align: left;
+		}
+		/* Mobile: tanpa fase ending (THANKS FOR SCROLLING). */
+		.footer__ending {
+			display: none;
 		}
 	}
 

@@ -463,6 +463,14 @@
 			height: 60vh;
 			bottom: auto;
 		}
+		.skills__dark-content {
+			align-items: center;
+			text-align: center;
+			max-width: none;
+		}
+		.skills__lead {
+			font-size: clamp(0.9rem, 1.2vw, 1rem);
+		}
 		.skills__light {
 			grid-column: 1;
 			margin-top: 60vh;
