@@ -63,3 +63,27 @@ span {
 	outline: 2px solid var(--black);
 	outline-offset: 4px;
 }
+
+/* Custom scrollbar */
+html {
+	scrollbar-width: thin;
+	scrollbar-color: #1c1c1a var(--white);
+}
+::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+::-webkit-scrollbar-track {
+	background: var(--white);
+}
+::-webkit-scrollbar-thumb {
+	background: #1c1c1a;
+	border-radius: 999px;
+	border: 2px solid var(--white);
+}
+::-webkit-scrollbar-thumb:hover {
+	background: var(--black);
+}
+::-webkit-scrollbar-corner {
+	background: var(--white);
+}

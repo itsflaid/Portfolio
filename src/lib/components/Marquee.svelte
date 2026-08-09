@@ -31,7 +31,7 @@
 			<div class="marquee__group">
 				{#each words as word (word)}
 					<span class="marquee__word">{word}</span>
-					<span class="marquee__sep"></span>
+					<img class="marquee__sep" src="/logo-nav.png" alt="" aria-hidden="true" draggable="false" />
 				{/each}
 			</div>
 		{/each}
@@ -68,35 +68,14 @@
 		white-space: nowrap;
 		padding: 0 clamp(1rem, 2.5vw, 2rem);
 	}
-	/* Same construction as .hero__spin in Hero.svelte, recolored for a dark
-	   background — a repeating touchpoint between the two sections. */
 	.marquee__sep {
-		position: relative;
-		display: inline-block;
-		width: 12px;
-		height: 12px;
+		display: block;
+		height: clamp(0.8rem, 1.7vw, 1.3rem);
+		width: auto;
 		flex: 0 0 auto;
+		user-select: none;
+		pointer-events: none;
 		animation: spin 10s linear infinite;
-	}
-	.marquee__sep::before,
-	.marquee__sep::after {
-		content: '';
-		position: absolute;
-		background: var(--fg-dark);
-	}
-	.marquee__sep::before {
-		left: 50%;
-		top: 0;
-		bottom: 0;
-		width: 2px;
-		transform: translateX(-50%);
-	}
-	.marquee__sep::after {
-		top: 50%;
-		left: 0;
-		right: 0;
-		height: 2px;
-		transform: translateY(-50%);
 	}
 
 	@keyframes scroll-left {

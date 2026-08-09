@@ -32,7 +32,7 @@
 	</span>
 	<span class="hero__spin" aria-hidden="true"></span>
 	<div class="hero__content">
-		<span class="hero__eyebrow">FULLSTACK DEVELOPER — SAMARINDA, ID</span>
+		<span class="hero__eyebrow">FULLSTACK DEVELOPER — KUTAI KARTANEGARA, ID</span>
 		<h1><span class="hero__name">MUHAMMAD</span><span class="hero__name">FADIL</span></h1>
 		<span class="hero__sub">
 			Self-taught full-stack developer, learning and building through real-world projects since late 2024.

@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { gsap } from 'gsap';
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
+	import { scrollToTarget } from '$lib/scroll';
 
 	type FooterLink = { label: string; href: string };
 
@@ -27,11 +28,18 @@
 	let headingLine1El: HTMLElement;
 	let headingLine2El: HTMLElement;
 	let cursorEl: HTMLElement;
+	let endingEyebrowEl: HTMLElement;
+	let endingLine1El: HTMLElement;
+	let endingLine2El: HTMLElement;
+	let endingCursorEl: HTMLElement;
+	let endingCreditsEl: HTMLElement;
+	let endingBackEl: HTMLElement;
 	let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
 	onMount(() => {
 		gsap.registerPlugin(ScrollTrigger);
 		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		const isMobile = window.innerWidth <= 860;
 
 		const darkContent = gsap.utils.toArray<HTMLElement>(darkEl.querySelectorAll('[data-reveal]'));
 		const lightContent = gsap.utils.toArray<HTMLElement>(
@@ -39,10 +47,13 @@
 		);
 
 		if (reduceMotion) {
-			gsap.set(darkEl, { xPercent: 0 });
+			gsap.set(darkEl, { xPercent: 0, width: '100%' });
 			gsap.set([headingLine1El, headingLine2El], { y: '0%', x: '0rem' });
-			gsap.set(cursorEl, { opacity: 1 });
-			gsap.set([...darkContent, ...lightContent], { opacity: 1, y: 0 });
+			gsap.set([cursorEl, endingCursorEl], { opacity: 1 });
+			gsap.set([endingLine1El, endingLine2El], { y: '0%', x: '0rem' });
+			gsap.set(lightContent, { opacity: 1, y: 0 });
+			gsap.set(darkContent, { opacity: 0 });
+			gsap.set([endingEyebrowEl, endingCreditsEl, endingBackEl], { opacity: 1, y: 0 });
 			return;
 		}
 
@@ -88,17 +99,73 @@
 		);
 		tl.to(cursorEl, { opacity: 1, duration: 0.2 }, 0.95);
 
+		// ==== FASE PENUTUP ====
+		// Footer dipin: posisinya diam, sisanya dihabiskan untuk membesarkan panel
+		// dark (kiri-bergerak) hingga full width, lalu konten ending muncul.
+		const curtain = gsap.timeline({
+			scrollTrigger: {
+				trigger: footerEl,
+				start: 'top top',
+				end: 'bottom bottom',
+				scrub: 1,
+				invalidateOnRefresh: true
+			}
+		});
+
+		if (!isMobile) {
+			curtain.fromTo(darkEl, { width: '50%' }, { width: '100%', ease: 'none' }, 0);
+			curtain.to(lightContent, { opacity: 0, duration: 0.4, ease: 'power1.in' }, 0.2);
+		}
+
+		// Konten footer (LET'S TALK / BUILD SOMETHING_ / email) hilang DULU
+		// baru teks ending muncul, supaya tidak bertabrakan.
+		const revealOut = [...darkContent, headingLine1El, headingLine2El];
+		curtain.to(revealOut, { opacity: 0, y: -16, duration: 0.35, ease: 'power2.in' }, 0.4);
+		curtain.fromTo(
+			endingEyebrowEl,
+			{ opacity: 0, y: 12 },
+			{ opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' },
+			0.72
+		);
+		curtain.fromTo(
+			endingLine1El,
+			{ y: '105%', x: '-1.4rem' },
+			{ y: '0%', x: '0rem', duration: 0.7, ease: 'power3.out' },
+			0.75
+		);
+		curtain.fromTo(
+			endingLine2El,
+			{ y: '105%', x: '1.4rem' },
+			{ y: '0%', x: '0rem', duration: 0.7, ease: 'power3.out' },
+			0.82
+		);
+		curtain.to(endingCursorEl, { opacity: 1, duration: 0.2 }, 1.05);
+		curtain.fromTo(
+			endingCreditsEl,
+			{ opacity: 0, y: 16 },
+			{ opacity: 1, y: 0, duration: 0.4 },
+			0.95
+		);
+		curtain.fromTo(
+			endingBackEl,
+			{ opacity: 0, y: 16 },
+			{ opacity: 1, y: 0, duration: 0.4 },
+			1.02
+		);
+
 		return () => {
 			tl.scrollTrigger?.kill();
 			tl.kill();
+			curtain.scrollTrigger?.kill();
+			curtain.kill();
 		};
 	});
 </script>
 
 <footer class="footer" id="site-footer" bind:this={footerEl}>
-	<div class="footer__light">
+	<div class="footer__stage">
+		<div class="footer__light">
 		<span class="footer__mark footer__mark--light" aria-hidden="true">FLAID</span>
-
 
 		<nav class="footer__col" data-reveal-light>
 			<span class="footer__label">MENU</span>
@@ -137,21 +204,46 @@
 					></span
 				>
 			</h2>
-			<!-- TODO: ganti email asli -->
 			<a class="footer__cta" href="mailto:hello@example.com" data-reveal>mfadil.coder@gmail.com →</a>
+		</div>
+
+		<div class="footer__ending">
+			<span class="footer__ending-eyebrow" bind:this={endingEyebrowEl}>// THE END</span>
+			<h2 class="footer__ending-heading">
+				<span class="line-mask"><span class="line" bind:this={endingLine1El}>THANKS FOR</span></span>
+				<span class="line-mask"
+					><span class="line" bind:this={endingLine2El}
+						>SCROLLING<span class="cursor" bind:this={endingCursorEl}>_</span></span
+					></span
+				>
+			</h2>
+			<span class="footer__ending-credits" bind:this={endingCreditsEl}
+				>DESIGNED &amp; BUILT BY MUHAMMAD FADIL — FLAID</span
+			>
+			<button class="footer__ending-back" bind:this={endingBackEl} onclick={() => scrollToTarget('#top')}>
+				BACK TO TOP ↑
+			</button>
+		</div>
 		</div>
 	</div>
 </footer>
 
 <style>
 	.footer {
-		height: 100vh;
 		position: relative;
+		height: 200vh;
+		background: var(--white);
+		z-index: 3;
+	}
+	/* Stage sticky — pola yang sama dengan About: section 200vh, stage menempel
+	   di viewport selama 100vh kedua, dan scrubbing menggerakkan panel dark. */
+	.footer__stage {
+		position: sticky;
+		top: 0;
+		height: 100vh;
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		overflow: hidden;
-		background: var(--white);
-		z-index: 3;
 	}
 
 	/* ===== LIGHT (kiri, info praktis) ===== */
@@ -223,7 +315,7 @@
 		justify-content: center;
 		padding: clamp(2rem, 6vw, 4rem);
 		overflow: hidden;
-		will-change: transform;
+		will-change: transform, width;
 	}
 	.footer__dark-content {
 		position: relative;
@@ -272,6 +364,69 @@
 	}
 	.footer__cta:hover {
 		border-color: var(--fg-dark);
+	}
+
+	/* ===== FASE ENDING (muncul saat panel dark full width) ===== */
+	.footer__ending {
+		position: absolute;
+		inset: 0;
+		z-index: 2;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		gap: clamp(1rem, 2.5vh, 1.6rem);
+		max-width: 40rem;
+		margin: 0 auto;
+		width: 100%;
+		pointer-events: none;
+	}
+	.footer__ending-eyebrow {
+		font-family: var(--ff-mono);
+		font-size: 0.8rem;
+		letter-spacing: 0.1em;
+		color: var(--gray);
+		opacity: 0;
+	}
+	.footer__ending-heading {
+		margin: 0;
+		font-family: var(--ff-display);
+		font-weight: 400;
+		line-height: 0.95;
+		letter-spacing: 0.01em;
+		font-size: clamp(2.6rem, 8vw, 6.5rem);
+	}
+	.footer__ending-credits {
+		font-family: var(--ff-mono);
+		font-size: clamp(0.72rem, 1.1vw, 0.85rem);
+		letter-spacing: 0.08em;
+		color: var(--gray);
+		opacity: 0;
+	}
+	.footer__ending-back {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-top: clamp(0.5rem, 2vh, 1rem);
+		padding: 0.55rem 1.1rem;
+		border: 1px solid rgba(241, 241, 239, 0.3);
+		background: transparent;
+		color: var(--fg-dark);
+		font-family: var(--ff-mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.08em;
+		cursor: pointer;
+		opacity: 0;
+		pointer-events: auto;
+		transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease,
+			transform 0.3s cubic-bezier(0.2, 0.6, 0.2, 1);
+	}
+	.footer__ending-back:hover {
+		background: var(--fg-dark);
+		color: var(--black);
+		border-color: var(--fg-dark);
+		transform: translateY(-2px);
 	}
 
 	/* ===== dekorasi (dot grid + ghost mark), reuse motif Skills/Work ===== */
@@ -339,6 +494,12 @@
 	@media (max-width: 860px) {
 		.footer {
 			height: auto;
+		}
+		.footer__stage {
+			position: relative;
+			top: auto;
+			height: auto;
+			display: block;
 		}
 		.footer__dark {
 			position: absolute;

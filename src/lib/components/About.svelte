@@ -159,7 +159,7 @@
 					<div class="facts__row">
 						<span class="facts__rule" aria-hidden="true"></span>
 						<dt>LOCATION</dt>
-						<dd>Samarinda, East Kalimantan</dd>
+						<dd>Kutai Kartanegara, East Kalimantan</dd>
 					</div>
 					<div class="facts__row">
 						<span class="facts__rule" aria-hidden="true"></span>
@@ -173,7 +173,7 @@
 					</div>
 					<div class="facts__row">
 						<span class="facts__rule" aria-hidden="true"></span>
-						<dt>Github</dt>
+						<dt>GITHUB</dt>
 						<dd>Itsflaid</dd>
 					</div>
 				</dl>

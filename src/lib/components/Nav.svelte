@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { gsap } from 'gsap';
-	import { scrollToTarget } from '$lib/scroll';
+	import { scrollToTarget, stopLenis, startLenis } from '$lib/scroll';
 
 	type MenuLink = {
 		label: string;
@@ -25,6 +25,7 @@
 	function go(e: MouseEvent, href: string) {
 		e.preventDefault();
 		closeMenu();
+		startLenis();
 		scrollToTarget(href);
 	}
 
@@ -37,6 +38,7 @@
 		open = true;
 		mounted = true;
 		document.body.style.overflow = 'hidden';
+		stopLenis();
 
 		await tick();
 
@@ -76,6 +78,7 @@
 			open = false;
 			mounted = false;
 			document.body.style.overflow = '';
+			startLenis();
 			return;
 		}
 		if (!mounted) return;
@@ -87,6 +90,7 @@
 				open = false;
 				mounted = false;
 				document.body.style.overflow = '';
+				startLenis();
 			}
 		});
 	}
@@ -108,7 +112,9 @@
 		<span class="nav__mark">FLAID</span>
 	</a>
 	<div class="nav__links">
+		<a href="#about" onclick={(e) => go(e, '#about')}>About</a>
 		<a href="#work" onclick={(e) => go(e, '#work')}>Work</a>
+		<a href="#experience" onclick={(e) => go(e, '#experience')}>Experience</a>
 		<a href="#skills" onclick={(e) => go(e, '#skills')}>Skills</a>
 		<a href="#contact" onclick={(e) => go(e, '#contact')}>Contact</a>
 	</div>
@@ -184,7 +190,7 @@
 	}
 	.nav__links {
 		display: flex;
-		gap: 2rem;
+		gap: clamp(1rem, 2.2vw, 2rem);
 	}
 	.nav__links a {
 		position: relative;
