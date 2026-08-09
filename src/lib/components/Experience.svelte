@@ -17,29 +17,29 @@
 			side: 'left',
 			date: 'JUL 2021 — MAR 2024',
 			type: 'EDUCATION',
-			title: 'SMK Muhammadiyah Loa Janan',
-			org: 'Teknik Komputer dan Jaringan (TKJ)'
+			title: 'COMPUTER ENGINEERING & NETWORKING (TKJ)',
+			org: 'SMK Muhammadiyah Loa Janan'
 		},
 		{
 			side: 'right',
-			date: 'JUL — DES 2022',
-			type: 'WORK EXPERIENCE',
-			title: 'Praktik Kerja Industri',
-			org: 'Logistik · PT. Anugerah Bara Kaltim'
+			date: 'JUL — DEC 2022',
+			type: 'EXPERIENCE',
+			title: 'PRAKTIK KERJA INDUSTRI - LOGISTICS',
+			org: 'PT. Anugerah Bara Kaltim'
 		},
 		{
 			side: 'left',
-			date: 'AGU 2024 — PRESENT',
+			date: 'AUG 2024 — PRESENT',
 			type: 'EDUCATION',
-			title: 'UIN Sultan Aji Muhammad Idris',
-			org: 'Information System (S1) · Samarinda'
+			title: 'INFORMATION SYSTEM (S1)',
+			org: 'UIN Sultan Aji Muhammad Idris Samarinda'
 		},
 		{
 			side: 'right',
 			date: 'SEP 2024 — PRESENT',
 			type: 'SELF-TAUGHT',
 			title: 'Full-Stack Development',
-			org: 'Independent · Otodidak',
+			org: 'Independent',
 			desc: 'Learning by shipping — DevMap, ChatMe, and other tools, in public.'
 		}
 	];

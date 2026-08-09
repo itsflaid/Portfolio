@@ -2,6 +2,34 @@
 	import { onMount } from 'svelte';
 	import { gsap } from 'gsap';
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
+	import {
+		siTypescript,
+		siNodedotjs,
+		siAstro,
+		siNextdotjs,
+		siPostgresql,
+		siPrisma,
+		siCodemirror,
+		siUpstash,
+		siReact,
+		siExpress,
+		siMysql,
+		siTailwindcss
+	} from 'simple-icons';
+	import type { SimpleIcon } from 'simple-icons';
+	import { groqIcon } from './icons';
+	import type { SkillIcon } from './icons';
+
+	function si(icon: SimpleIcon): SkillIcon {
+		return { hex: `#${icon.hex}`, path: icon.path };
+	}
+
+	// Tools without a simple-icons entry (ts-morph, Commander, Recharts, Fonnte)
+	// render as text-only pills — omit `icon` rather than guessing a logo.
+	type TechItem = {
+		name: string;
+		icon?: SkillIcon;
+	};
 
 	type Project = {
 		index: string;
@@ -9,7 +37,10 @@
 		tag: string;
 		thumb: string;
 		desc: string;
-		tech: string[];
+		tech: TechItem[];
+		// Optional proof-of-work badges. Only fill these in with numbers you can
+		// actually stand behind — leave undefined rather than inventing stats.
+		metrics?: string[];
 		demo: string;
 		repo: string;
 	};
@@ -21,7 +52,14 @@ const projects: Project[] = [
         tag: 'Analyze once, reuse context everywhere',
         thumb: '/devmap.webp',
         desc: 'Maps your codebase through static analysis to give AI agents structured context and a clearer understanding of your project.',
-        tech: ['TypeScript', 'Node.js', 'ts-morph', 'Commander', 'Astro'],
+        tech: [
+            { name: 'TypeScript', icon: si(siTypescript) },
+            { name: 'Node.js', icon: si(siNodedotjs) },
+            { name: 'ts-morph' },
+            { name: 'Commander' },
+            { name: 'Astro', icon: si(siAstro) }
+        ],
+        metrics: ['175/175 tests passing', '3 audit bugs fixed'],
         demo: 'https://devmap-web.vercel.app',
         repo: 'https://github.com/itsflaid/devmap'
     },
@@ -31,7 +69,13 @@ const projects: Project[] = [
         tag: 'A platform for developers to manage and organize code, snippets, resources, and knowledge.',
         thumb: '/devnote.webp',
         desc: 'Keep your technical knowledge organized in one place, from reusable snippets and resources to notes and collections.',
-        tech: ['Next.js', 'TypeScript', 'PostgreSQL', 'Prisma', 'CodeMirror'],
+        tech: [
+            { name: 'Next.js', icon: si(siNextdotjs) },
+            { name: 'TypeScript', icon: si(siTypescript) },
+            { name: 'PostgreSQL', icon: si(siPostgresql) },
+            { name: 'Prisma', icon: si(siPrisma) },
+        ],
+        metrics: ['40 languages supported', '17 GitHub stars'],
         demo: 'https://devnote-five.vercel.app',
         repo: 'https://github.com/itsflaid/devnote'
     },
@@ -41,7 +85,13 @@ const projects: Project[] = [
         tag: 'Chat-UI-based personal notes and reminders web application',
         thumb: '/chatme.webp',
         desc: 'A simple way to capture thoughts, save notes, and manage reminders through a familiar chat-based interface.',
-        tech: ['Next.js', 'TypeScript', 'PostgreSQL', 'Prisma', 'Upstash'],
+        tech: [
+            { name: 'Next.js', icon: si(siNextdotjs) },
+            { name: 'TypeScript', icon: si(siTypescript) },
+            { name: 'PostgreSQL', icon: si(siPostgresql) },
+            { name: 'Prisma', icon: si(siPrisma) },
+        ],
+        metrics: ['0 missed reminders since fix', '4 months of daily use'],
         demo: 'https://chatme-jet.vercel.app',
         repo: 'https://github.com/itsflaid/chatme'
     },
@@ -51,18 +101,30 @@ const projects: Project[] = [
         tag: 'Simple daily home workout web application',
         thumb: '/dailyfit.webp',
         desc: 'Follow daily workouts, track completed activities, and keep an eye on your progress through a simple fitness experience.',
-        tech: ['Next.js', 'TypeScript', 'PostgreSQL', 'Prisma', 'Recharts'],
+        tech: [
+            { name: 'Next.js', icon: si(siNextdotjs) },
+            { name: 'TypeScript', icon: si(siTypescript) },
+            { name: 'PostgreSQL', icon: si(siPostgresql) },
+            { name: 'Prisma', icon: si(siPrisma) },
+        ],
+        metrics: ['4 months of daily use', '12 GitHub stars'],
         demo: 'https://dailyfit-alpha.vercel.app',
         repo: 'https://github.com/itsflaid/dailyfit'
     },
     {
         index: '05',
         title: 'MUFADZ PORTAL',
-        tag: 'An all-in-one platform for Islamic services and features.',
+        tag: 'An all-in-one platform for Islamic services, from Quran to prayer schedule.',
         thumb: '/mufadz.webp',
-        desc: 'Brings useful Islamic services and features together in one accessible platform designed for everyday use.',
-        tech: ['React', 'TypeScript', 'Express', 'MySQL', 'Groq'],
-        demo: '#',
+        desc: 'Brings Islamic services together in one platform — Quran reader and prayer schedule anchor daily use, alongside dzikir, zakat calculator, and an AI chatbot.',
+        tech: [
+            { name: 'React', icon: si(siReact) },
+            { name: 'TypeScript', icon: si(siTypescript) },
+            { name: 'Express', icon: si(siExpress) },
+            { name: 'MySQL', icon: si(siMysql) },
+        ],
+        metrics: ['8 months of daily use', '7 Islamic service modules'],
+        demo: 'https://mufadz-app.vercel.app',
         repo: 'https://github.com/itsflaid/mufadz-portal'
     },
     {
@@ -71,7 +133,13 @@ const projects: Project[] = [
         tag: 'An AI-powered home spa platform for personalized treatment recommendations and guidance.',
         thumb: '/de-home-spa.webp',
         desc: 'Get personalized home spa recommendations based on your needs through guided selections or direct conversations with AI.',
-        tech: ['Next.js', 'TypeScript', 'Groq', 'Fonnte', 'Tailwind CSS'],
+        tech: [
+            { name: 'Next.js', icon: si(siNextdotjs) },
+            { name: 'TypeScript', icon: si(siTypescript) },
+            { name: 'Groq', icon: groqIcon },
+            { name: 'Fonnte' },
+        ],
+        metrics: ['Ranked 6th — TechnoFest 2026 AI Hackathon'],
         demo: 'http://de-home-spa-v2-uwxp.vercel.app/',
         repo: 'https://github.com/itsflaid/de-home-spa-v2'
     }
@@ -172,12 +240,26 @@ const projects: Project[] = [
 							<h3 class="card__title">{project.title}</h3>
 						</div>
 						<p class="card__tag">{project.tag}</p>
+						{#if project.metrics?.length}
+							<ul class="card__metrics">
+								{#each project.metrics as metric}
+									<li>{metric}</li>
+								{/each}
+							</ul>
+						{/if}
 						<p class="card__desc">{project.desc}</p>
 						<div class="card__tech">
 							<span class="tech__label">STACK</span>
 							<ul class="tech__list">
 								{#each project.tech as tech}
-									<li>{tech}</li>
+									<li style={tech.icon ? `--tech-color: ${tech.icon.hex}` : ''}>
+										{#if tech.icon}
+											<svg class="tech-icon" viewBox="0 0 24 24" aria-hidden="true"
+												><path d={tech.icon.path} fill-rule="evenodd" /></svg
+											>
+										{/if}
+										<span>{tech.name}</span>
+									</li>
 								{/each}
 							</ul>
 						</div>
@@ -215,6 +297,9 @@ const projects: Project[] = [
 		color: var(--black);
 		z-index: 3;
 		overflow: hidden;
+		min-height: 100dvh;
+		display: flex;
+		flex-direction: column;
 		padding: clamp(2rem, 6vh, 4rem) 0 clamp(2rem, 6vh, 3.5rem);
 	}
 	.work__mark {
@@ -278,7 +363,9 @@ const projects: Project[] = [
 		position: relative;
 		z-index: 1;
 		overflow: hidden;
-		margin-top: clamp(1.25rem, 3vh, 2rem);
+		flex: 1;
+		display: flex;
+		align-items: center;
 		padding: 0;
 	}
 	.work__track {
@@ -293,13 +380,18 @@ const projects: Project[] = [
 	}
 	.work__card {
 		flex: 0 0 auto;
-		width: clamp(300px, 38vw, 540px);
+		width: clamp(85vw, 88vw, 1200px);
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: clamp(2rem, 4vw, 4rem);
 	}
 	.card__media {
 		position: relative;
-		width: 100%;
-		aspect-ratio: 16 / 10;
-		max-height: clamp(200px, 32vh, 330px);
+		flex: 0 0 52%;
+		min-width: 0;
+		aspect-ratio: 4 / 3;
+		max-height: clamp(320px, 60vh, 720px);
 		overflow: hidden;
 		background: var(--accent-ph);
 		box-shadow: 0 24px 48px rgba(10, 10, 10, 0.1);
@@ -339,8 +431,9 @@ const projects: Project[] = [
 	.card__info {
 		display: flex;
 		flex-direction: column;
-		gap: clamp(0.4rem, 1vh, 0.7rem);
-		padding-top: clamp(1rem, 2.5vh, 1.5rem);
+		gap: clamp(0.5rem, 1.2vh, 0.85rem);
+		flex: 1 1 auto;
+		min-width: 0;
 	}
 	.card__row {
 		display: flex;
@@ -356,22 +449,40 @@ const projects: Project[] = [
 		font-family: var(--ff-display);
 		font-weight: 400;
 		letter-spacing: 0.005em;
-		font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+		font-size: clamp(1.35rem, 2vw, 1.9rem);
 		line-height: 1;
 	}
 	.card__tag {
 		font-family: var(--ff-body);
-		font-size: clamp(0.85rem, 1.1vw, 1rem);
+		font-size: clamp(0.78rem, 0.95vw, 0.9rem);
 		color: var(--ink-soft);
 		opacity: 0.75;
-		max-width: 46ch;
+		max-width: 42ch;
+	}
+	.card__metrics {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+	.card__metrics li {
+		font-family: var(--ff-mono);
+		font-size: 0.65rem;
+		letter-spacing: 0.04em;
+		color: var(--white);
+		background: var(--black);
+		border-radius: 999px;
+		padding: 0.3rem 0.7rem;
+		white-space: nowrap;
 	}
 	.card__desc {
 		font-family: var(--ff-body);
-		font-size: clamp(0.9rem, 1.15vw, 1.05rem);
+		font-size: clamp(0.82rem, 1vw, 0.95rem);
 		line-height: 1.55;
 		color: var(--gray);
-		max-width: 56ch;
+		max-width: 52ch;
 	}
 	.card__tech {
 		display: flex;
@@ -395,14 +506,32 @@ const projects: Project[] = [
 		gap: 0.5rem;
 	}
 	.tech__list li {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
 		font-family: var(--ff-mono);
-		font-size: 0.7rem;
+		font-size: 0.65rem;
 		letter-spacing: 0.03em;
 		color: var(--black);
 		border: 1px solid rgba(10, 10, 10, 0.25);
 		border-radius: 999px;
-		padding: 0.3rem 0.7rem;
+		padding: 0.25rem 0.6rem;
 		white-space: nowrap;
+		transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+	}
+	.tech__list li:hover {
+		background: var(--tech-color, var(--black));
+		border-color: transparent;
+		color: var(--white);
+	}
+	.tech-icon {
+		flex-shrink: 0;
+		width: 0.85em;
+		height: 0.85em;
+		color: inherit;
+	}
+	.tech-icon path {
+		fill: currentColor;
 	}
 	.card__actions {
 		display: flex;
@@ -471,6 +600,17 @@ const projects: Project[] = [
 	@media (max-width: 900px) {
 		.work {
 			padding-top: clamp(2.5rem, 6vh, 4rem);
+		}
+		.work__card {
+			flex-direction: column;
+			align-items: stretch;
+			width: 92vw;
+			gap: clamp(1.25rem, 3vh, 2rem);
+		}
+		.card__media {
+			flex: 0 0 auto;
+			width: 100%;
+			max-height: clamp(200px, 32vh, 330px);
 		}
 	}
 
