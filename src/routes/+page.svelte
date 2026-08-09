@@ -26,7 +26,7 @@
 <Experience />
 <Skills />
 
-<section class="dummy" aria-hidden="true"></section>
+<section class="dummy" id="contact"></section>
 
 <style>
 	.dummy {

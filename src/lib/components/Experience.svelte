@@ -88,7 +88,7 @@
 	});
 </script>
 
-<section class="xp" bind:this={sectionEl}>
+<section class="xp" id="experience" bind:this={sectionEl}>
 	<span class="xp__mark xp__mark--edu" aria-hidden="true">EDU</span>
 	<span class="xp__mark xp__mark--exp" aria-hidden="true">EXP</span>
 	<span class="xp__dots" aria-hidden="true">

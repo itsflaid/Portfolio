@@ -124,7 +124,7 @@
 	});
 </script>
 
-<section class="about" bind:this={aboutEl}>
+<section class="about" id="about" bind:this={aboutEl}>
 	<span class="about__mark" aria-hidden="true">ITSFLAID</span>
 	<span class="about__dots" aria-hidden="true">
 		{#each dots as _}<i></i>{/each}

@@ -110,6 +110,7 @@
 </script>
 
 <section class="work" id="work" bind:this={workEl}>
+	<img class="work__mark" src="/logo-mark.png" alt="" aria-hidden="true" draggable="false" />
 	<div class="work__head">
 		<span class="work__eyebrow">(WORK)</span>
 		<div class="work__head-right">
@@ -164,6 +165,17 @@
 		overflow: hidden;
 		padding: clamp(3rem, 8vh, 5.5rem) 0 clamp(3rem, 8vh, 5rem);
 	}
+	.work__mark {
+		position: absolute;
+		bottom: -6vw;
+		left: -2vw;
+		width: clamp(9rem, 24vw, 19rem);
+		height: auto;
+		opacity: 0.05;
+		z-index: 0;
+		user-select: none;
+		pointer-events: none;
+	}
 	.work__dots {
 		display: grid;
 		grid-template-columns: repeat(3, 8px);
@@ -189,6 +201,8 @@
 	.work__dots i:nth-child(8) { animation-delay: 2.1s; }
 	.work__dots i:nth-child(9) { animation-delay: 2.4s; }
 	.work__head {
+		position: relative;
+		z-index: 1;
 		display: flex;
 		align-items: baseline;
 		justify-content: space-between;
@@ -209,6 +223,8 @@
 		gap: clamp(1rem, 2vw, 1.5rem);
 	}
 	.work__viewport {
+		position: relative;
+		z-index: 1;
 		overflow: hidden;
 		margin-top: clamp(1.5rem, 4vh, 2.5rem);
 		padding: 0;

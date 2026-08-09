@@ -118,7 +118,7 @@
 	});
 </script>
 
-<section class="skills" bind:this={skillsEl}>
+<section class="skills" id="skills" bind:this={skillsEl}>
 	<div class="skills__dark" bind:this={darkEl}>
 		<span class="skills__dots" aria-hidden="true">
 			{#each dots as _}<i></i>{/each}
@@ -130,7 +130,7 @@
 				<span class="line-mask"><span class="line" bind:this={headingLine1El}>WHAT I</span></span>
 				<span class="line-mask"
 					><span class="line" bind:this={headingLine2El}
-						>USE&gt;<span class="cursor" bind:this={cursorEl}>_</span></span
+						>USE<span class="cursor" bind:this={cursorEl}>_</span></span
 					></span
 				>
 			</h2>

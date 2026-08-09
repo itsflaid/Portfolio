@@ -24,7 +24,7 @@
 	});
 </script>
 
-<section class="hero" bind:this={heroEl}>
+<section class="hero" id="top" bind:this={heroEl}>
 	<span class="hero__mark hero__mark--1" aria-hidden="true"><i>F</i><i>L</i><i>A</i><i>I</i><i>D</i></span>
 	<span class="hero__mark hero__mark--2" aria-hidden="true"><i>F</i><i>L</i><i>A</i><i>I</i><i>D</i></span>
 	<span class="hero__dots hero__dots--bl" aria-hidden="true">
