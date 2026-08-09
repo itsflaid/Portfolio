@@ -33,7 +33,7 @@
 	<span class="hero__spin" aria-hidden="true"></span>
 	<div class="hero__content">
 		<span class="hero__eyebrow">FULLSTACK DEVELOPER — SAMARINDA, ID</span>
-		<h1>MUHAMMAD FADIL</h1>
+		<h1><span class="hero__name">MUHAMMAD</span><span class="hero__name">FADIL</span></h1>
 		<span class="hero__sub">
 			Building tools that map, remember, and improve code — for other developers, and mostly for
 			myself.
@@ -87,7 +87,11 @@
 	.hero__content {
 		position: relative;
 		z-index: 2;
-		max-width: 50rem;
+		width: 100%;
+		max-width: 80rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 	}
 	.hero__eyebrow {
 		display: block;
@@ -104,9 +108,31 @@
 		font-weight: 400;
 		line-height: 0.95;
 		letter-spacing: 0.01em;
-		font-size: clamp(2.1rem, 8vw, 6.5rem);
+		font-size: clamp(3.1rem, 15vw, 11rem);
 		opacity: 0;
 		animation: rise 0.8s ease 0.3s forwards;
+	}
+	.hero__name {
+		display: inline;
+	}
+	.hero__name + .hero__name::before {
+		content: '\00a0';
+	}
+	@media (max-width: 768px) {
+		.hero h1 {
+			font-size: clamp(4.5rem, 18vw, 7rem);
+			line-height: 0.9;
+		}
+		.hero__name {
+			display: block;
+			white-space: nowrap;
+		}
+		.hero__name + .hero__name::before {
+			content: none;
+		}
+		.hero__sub {
+			max-width: 22rem;
+		}
 	}
 	.hero__sub {
 		display: block;
