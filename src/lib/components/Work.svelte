@@ -12,56 +12,56 @@
 		tech: string[];
 	};
 
-	const projects: Project[] = [
-		{
-			index: '01',
-			title: 'DEVMAP',
-			tag: 'Context layer that helps AI actually read a codebase',
-			thumb: '/devmap.webp',
-			desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-			tech: ['TypeScript', 'Node.js', 'AST', 'TS-Morph', 'Astro']
-		},
-		{
-			index: '02',
-			title: 'DEVNOTE',
-			tag: 'Markdown notes that sync everywhere',
-			thumb: '/devnote.webp',
-			desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-			tech: ['TypeScript', 'Next', 'Supabase', 'Tailwind']
-		},
-		{
-			index: '03',
-			title: 'CHATME',
-			tag: 'Self-chat & notes PWA — a place to remember things',
-			thumb: '/chatme.webp',
-			desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-			tech: ['TypeScript', 'Next', 'Upstash', 'Qtash', 'Neon']
-		},
-		{
-			index: '04',
-			title: 'DAILYFIT',
-			tag: 'Training tracker with rolling PDF reports',
-			thumb: '/dailyfit.webp',
-			desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-			tech: ['TypeScript', 'Next', 'Recharts', 'PDFKit', 'Neon']
-		},
-		{
-			index: '05',
-			title: 'MUFADZ PORTAL',
-			tag: 'Daily Islamic companion, works offline-first',
-			thumb: '/mufadz.webp',
-			desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-			tech: ['TypeScript', 'React', 'Express', 'MySql', 'Groq']
-		},
-		{
-			index: '06',
-			title: 'DE HOME SPA',
-			tag: 'Landing page for a home spa studio',
-			thumb: '/de-home-spa.webp',
-			desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-			tech: ['TypeScript', 'Next', 'Groq', 'Fonnte']
-		}
-	];
+const projects: Project[] = [
+    {
+        index: '01',
+        title: 'DEVMAP',
+        tag: 'Context layer that helps AI actually read a codebase',
+        thumb: '/devmap.webp',
+        desc: 'Maps your codebase through static analysis to give AI agents structured context and a clearer understanding of your project.',
+        tech: ['TypeScript', 'Node.js', 'ts-morph', 'Commander', 'Astro']
+    },
+    {
+        index: '02',
+        title: 'DEVNOTE',
+        tag: 'A platform for developers to manage and organize code, snippets, resources, and knowledge.',
+        thumb: '/devnote.webp',
+        desc: 'Keep your technical knowledge organized in one place, from reusable snippets and resources to notes and collections.',
+        tech: ['Next.js', 'TypeScript', 'PostgreSQL', 'Prisma', 'CodeMirror']
+    },
+    {
+        index: '03',
+        title: 'CHATME',
+        tag: 'Chat-UI-based personal notes and reminders web application',
+        thumb: '/chatme.webp',
+        desc: 'A simple way to capture thoughts, save notes, and manage reminders through a familiar chat-based interface.',
+        tech: ['Next.js', 'TypeScript', 'PostgreSQL', 'Prisma', 'Upstash']
+    },
+    {
+        index: '04',
+        title: 'DAILYFIT',
+        tag: 'Simple daily home workout web application',
+        thumb: '/dailyfit.webp',
+        desc: 'Follow daily workouts, track completed activities, and keep an eye on your progress through a simple fitness experience.',
+        tech: ['Next.js', 'TypeScript', 'PostgreSQL', 'Prisma', 'Recharts']
+    },
+    {
+        index: '05',
+        title: 'MUFADZ PORTAL',
+        tag: 'An all-in-one platform for Islamic services and features.',
+        thumb: '/mufadz.webp',
+        desc: 'Brings useful Islamic services and features together in one accessible platform designed for everyday use.',
+        tech: ['React', 'TypeScript', 'Express', 'MySQL', 'Groq']
+    },
+    {
+        index: '06',
+        title: 'DE HOME SPA',
+        tag: 'An AI-powered home spa platform for personalized treatment recommendations and guidance.',
+        thumb: '/de-home-spa.webp',
+        desc: 'Get personalized home spa recommendations based on your needs through guided selections or direct conversations with AI.',
+        tech: ['Next.js', 'TypeScript', 'Groq', 'Fonnte', 'Tailwind CSS']
+    }
+];
 
 	let workEl: HTMLElement;
 	let viewportEl: HTMLElement;
@@ -86,7 +86,7 @@
 		ScrollTrigger.addEventListener('refreshInit', setSpacing);
 
 		const getScroll = () => Math.max(0, trackEl.scrollWidth - viewportEl.clientWidth);
-		const imgs = gsap.utils.toArray<HTMLElement>(trackEl.querySelectorAll('.card__media img'));
+		const imgs = gsap.utils.toArray<HTMLElement>(trackEl.querySelectorAll('.media__pan'));
 
 		const tl = gsap.timeline({
 			scrollTrigger: {
@@ -142,13 +142,15 @@
 			{#each projects as project, i}
 				<li class="work__card">
 					<div class="card__media">
-						<img
-							src={project.thumb}
-							alt="{project.title} preview"
-							loading="lazy"
-							decoding="async"
-							draggable="false"
-						/>
+						<div class="media__pan">
+							<img
+								src={project.thumb}
+								alt="{project.title} preview"
+								loading="lazy"
+								decoding="async"
+								draggable="false"
+							/>
+						</div>
 					</div>
 					<div class="card__info">
 						<div class="card__row">
@@ -268,14 +270,33 @@
 		box-shadow: 0 24px 48px rgba(10, 10, 10, 0.1);
 		transition: transform 0.6s cubic-bezier(0.2, 0.6, 0.2, 1);
 	}
-	.card__media img {
+	.media__pan {
+		position: absolute;
+		top: 0;
+		left: -16%;
+		width: 132%;
+		height: 100%;
+		overflow: hidden;
+		will-change: transform;
+	}
+	.media__pan img {
 		display: block;
-		width: 115%;
-		max-width: none;
+		width: 100%;
 		height: 100%;
 		object-fit: cover;
 		object-position: center;
+		transform-origin: center;
+		animation: kenburns 9s ease-in-out infinite alternate;
 		will-change: transform;
+	}
+
+	@keyframes kenburns {
+		from {
+			transform: scale(1);
+		}
+		to {
+			transform: scale(1.08);
+		}
 	}
 	.work__card:hover .card__media {
 		transform: scale(1.02);
@@ -371,6 +392,9 @@
 		}
 		.card__media {
 			transition: none;
+		}
+		.media__pan img {
+			animation: none;
 		}
 	}
 </style>

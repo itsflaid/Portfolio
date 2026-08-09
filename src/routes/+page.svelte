@@ -7,6 +7,8 @@
 	import Marquee from '$lib/components/Marquee.svelte';
 	import Experience from '$lib/components/Experience.svelte';
 	import Skills from '$lib/components/Skills.svelte';
+	import Footer from '$lib/components/Footer.svelte';
+	import Contact from '$lib/components/Contact.svelte';
 </script>
 
 <svelte:head>
@@ -26,11 +28,5 @@
 <Experience />
 <Skills />
 
-<section class="dummy" id="contact"></section>
-
-<style>
-	.dummy {
-		height: 100vh;
-		background: var(--white);
-	}
-</style>
+<Contact />
+<Footer />

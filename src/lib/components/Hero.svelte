@@ -35,8 +35,7 @@
 		<span class="hero__eyebrow">FULLSTACK DEVELOPER — SAMARINDA, ID</span>
 		<h1><span class="hero__name">MUHAMMAD</span><span class="hero__name">FADIL</span></h1>
 		<span class="hero__sub">
-			Building tools that map, remember, and improve code — for other developers, and mostly for
-			myself.
+			Self-taught full-stack developer, learning and building through real-world projects since late 2024.
 		</span>
 	</div>
 	<div class="hero__scroll"><i></i>SCROLL</div>
