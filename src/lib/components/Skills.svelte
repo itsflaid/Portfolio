@@ -2,28 +2,100 @@
 	import { onMount } from 'svelte';
 	import { gsap } from 'gsap';
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
+	import {
+		siTailwindcss,
+		siTypescript,
+		siReact,
+		siNextdotjs,
+		siTanstack,
+		siVuedotjs,
+		siSvelte,
+		siNodedotjs,
+		siExpress,
+		siTrpc,
+		siPrisma,
+		siPhp,
+		siLaravel,
+		siMysql,
+		siPostgresql,
+		siNeon,
+		siSupabase,
+		siOpenrouter,
+		siOpencode,
+		siClaude,
+		siGithub,
+		siVite,
+		siUpstash
+	} from 'simple-icons';
+	import type { SimpleIcon } from 'simple-icons';
+	import { groqIcon, gptIcon, codexIcon } from './icons';
+	import type { SkillIcon } from './icons';
+
+	function si(icon: SimpleIcon): SkillIcon {
+		return { hex: `#${icon.hex}`, path: icon.path };
+	}
+
+	type SkillItem = {
+		name: string;
+		icon: SkillIcon;
+	};
 
 	type SkillGroup = {
 		label: string;
-		items: string[];
+		items: SkillItem[];
 	};
 
 	const groups: SkillGroup[] = [
 		{
 			label: 'FRONTEND',
-			items: ['TypeScript', 'React', 'SvelteKit', 'Tailwind']
+			items: [
+				{ name: 'Tailwind', icon: si(siTailwindcss) },
+				{ name: 'TypeScript', icon: si(siTypescript) },
+				{ name: 'React', icon: si(siReact) },
+				{ name: 'Next.js', icon: si(siNextdotjs) },
+				{ name: 'TanStack Query', icon: { ...si(siTanstack), hex: '#FF4154' } },
+				{ name: 'Vue', icon: si(siVuedotjs) },
+				{ name: 'SvelteKit', icon: si(siSvelte) }
+			]
 		},
 		{
 			label: 'BACKEND',
-			items: ['Node.js', 'Python', 'FastAPI', 'SQLite']
+			items: [
+				{ name: 'Node.js', icon: si(siNodedotjs) },
+				{ name: 'Express', icon: si(siExpress) },
+				{ name: 'tRPC', icon: si(siTrpc) },
+				{ name: 'Prisma', icon: si(siPrisma) },
+				{ name: 'PHP', icon: si(siPhp) },
+				{ name: 'Laravel', icon: si(siLaravel) }
+			]
+		},
+		{
+			label: 'DATABASE',
+			items: [
+				{ name: 'MySQL', icon: si(siMysql) },
+				{ name: 'PostgreSQL', icon: si(siPostgresql) },
+				{ name: 'Neon', icon: si(siNeon) },
+				{ name: 'Supabase', icon: si(siSupabase) }
+			]
 		},
 		{
 			label: 'AI TOOLING',
-			items: ['Prompt Engineering', 'LLM APIs', 'AST', 'RAG']
+			items: [
+				{ name: 'Groq', icon: groqIcon },
+				{ name: 'OpenRouter', icon: si(siOpenrouter) },
+				{ name: 'OpenCode', icon: si(siOpencode) },
+				{ name: 'Claude', icon: si(siClaude) },
+				{ name: 'GPT', icon: gptIcon },
+				{ name: 'Codex', icon: codexIcon }
+			]
 		},
 		{
-			label: 'DEV TOOLS',
-			items: ['Docker', 'Git', 'Vite', 'PWA']
+			label: 'TOOLS & INFRA',
+			items: [
+				{ name: 'GitHub', icon: si(siGithub) },
+				{ name: 'Vite', icon: si(siVite) },
+				{ name: 'Upstash', icon: si(siUpstash) }
+			]
 		}
 	];
 
@@ -148,7 +220,12 @@
 					<span class="skills__label">{group.label}</span>
 					<ul class="skills__chips">
 						{#each group.items as item}
-							<li>{item}</li>
+							<li style="--skill-color: {item.icon.hex}">
+								<svg class="skill-icon" viewBox="0 0 24 24" aria-hidden="true"
+									><path d={item.icon.path} fill-rule="evenodd" /></svg
+								>
+								<span>{item.name}</span>
+							</li>
 						{/each}
 					</ul>
 				</li>
@@ -266,7 +343,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: clamp(2rem, 6vw, 4rem);
+		padding: clamp(1.25rem, 4vh, 2.5rem) clamp(2rem, 6vw, 4rem);
 		overflow: hidden;
 	}
 	.skills__mark {
@@ -304,7 +381,7 @@
 	}
 	.skills__group {
 		border-top: 1px solid rgba(10, 10, 10, 0.14);
-		padding: clamp(0.9rem, 2vh, 1.2rem) 0;
+		padding: clamp(0.55rem, 1.3vh, 0.85rem) 0;
 		opacity: 0;
 	}
 	.skills__label {
@@ -315,21 +392,41 @@
 	}
 	.skills__chips {
 		list-style: none;
-		margin: 0.6rem 0 0;
+		margin: 0.4rem 0 0;
 		padding: 0;
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.5rem;
+		gap: 0.4rem;
 	}
 	.skills__chips li {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
 		font-family: var(--ff-mono);
 		font-size: 0.7rem;
 		letter-spacing: 0.03em;
 		color: var(--black);
 		border: 1px solid rgba(10, 10, 10, 0.25);
 		border-radius: 999px;
-		padding: 0.3rem 0.7rem;
+		padding: 0.25rem 0.6rem;
 		white-space: nowrap;
+		cursor: pointer;
+		background: transparent;
+		transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+	}
+	.skills__chips li:hover {
+		background: var(--skill-color);
+		border-color: transparent;
+		color: var(--white);
+	}
+	.skill-icon {
+		flex-shrink: 0;
+		width: 0.85em;
+		height: 0.85em;
+		color: inherit;
+	}
+	.skill-icon path {
+		fill: currentColor;
 	}
 
 	@keyframes skills-blink {

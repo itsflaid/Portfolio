@@ -23,27 +23,43 @@
 		},
 		{
 			index: '02',
-			title: 'CHATME',
-			tag: 'Self-chat & notes PWA — a place to remember things',
-			thumb: '/chatme.webp',
-			desc: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-			tech: ['TypeScript', 'Next', 'Upstash', 'Qtash', 'Neon']
+			title: 'DEVNOTE',
+			tag: 'Markdown notes that sync everywhere',
+			thumb: '/devnote.webp',
+			desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+			tech: ['TypeScript', 'Next', 'Supabase', 'Tailwind']
 		},
 		{
 			index: '03',
-			title: 'DAILYFIT',
-			tag: 'Training tracker with rolling PDF reports',
-			thumb: '/dailyfit.webp',
-			desc: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
-			tech: ['TypeScript', 'Next', 'Recharts', 'PDFKit', 'Neon']
+			title: 'CHATME',
+			tag: 'Self-chat & notes PWA — a place to remember things',
+			thumb: '/chatme.webp',
+			desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+			tech: ['TypeScript', 'Next', 'Upstash', 'Qtash', 'Neon']
 		},
 		{
 			index: '04',
+			title: 'DAILYFIT',
+			tag: 'Training tracker with rolling PDF reports',
+			thumb: '/dailyfit.webp',
+			desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+			tech: ['TypeScript', 'Next', 'Recharts', 'PDFKit', 'Neon']
+		},
+		{
+			index: '05',
 			title: 'MUFADZ PORTAL',
 			tag: 'Daily Islamic companion, works offline-first',
 			thumb: '/mufadz.webp',
-			desc: 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+			desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 			tech: ['TypeScript', 'React', 'Express', 'MySql', 'Groq']
+		},
+		{
+			index: '06',
+			title: 'DE HOME SPA',
+			tag: 'Landing page for a home spa studio',
+			thumb: '/de-home-spa.webp',
+			desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+			tech: ['TypeScript', 'Next', 'Groq', 'Fonnte']
 		}
 	];
 
