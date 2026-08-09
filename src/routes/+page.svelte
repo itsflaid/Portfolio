@@ -6,6 +6,7 @@
 	import Work from '$lib/components/Work.svelte';
 	import Marquee from '$lib/components/Marquee.svelte';
 	import Experience from '$lib/components/Experience.svelte';
+	import Skills from '$lib/components/Skills.svelte';
 </script>
 
 <svelte:head>
@@ -23,6 +24,7 @@
 <Work />
 <Marquee />
 <Experience />
+<Skills />
 
 <section class="dummy" aria-hidden="true"></section>
 

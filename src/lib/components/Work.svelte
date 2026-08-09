@@ -19,7 +19,7 @@
 			tag: 'Context layer that helps AI actually read a codebase',
 			thumb: '/devmap.webp',
 			desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-			tech: ['TypeScript', 'Node.js', 'AST', 'React', 'Docker']
+			tech: ['TypeScript', 'Node.js', 'AST', 'TS-Morph', 'Astro']
 		},
 		{
 			index: '02',
@@ -27,7 +27,7 @@
 			tag: 'Self-chat & notes PWA — a place to remember things',
 			thumb: '/chatme.webp',
 			desc: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-			tech: ['SvelteKit', 'IndexedDB', 'Vite', 'WebPush', 'SQLite']
+			tech: ['TypeScript', 'Next', 'Upstash', 'Qtash', 'Neon']
 		},
 		{
 			index: '03',
@@ -35,7 +35,7 @@
 			tag: 'Training tracker with rolling PDF reports',
 			thumb: '/dailyfit.webp',
 			desc: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
-			tech: ['Python', 'FastAPI', 'React Native', 'PDFKit', 'Redis']
+			tech: ['TypeScript', 'Next', 'Recharts', 'PDFKit', 'Neon']
 		},
 		{
 			index: '04',
@@ -43,7 +43,7 @@
 			tag: 'Daily Islamic companion, works offline-first',
 			thumb: '/mufadz.webp',
 			desc: 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-			tech: ['Next.js', 'Tailwind', 'Firebase', 'PWA', 'Vercel']
+			tech: ['TypeScript', 'React', 'Express', 'MySql', 'Groq']
 		}
 	];
 
