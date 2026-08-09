@@ -12,7 +12,6 @@
 		siSvelte,
 		siNodedotjs,
 		siExpress,
-		siTrpc,
 		siPrisma,
 		siPhp,
 		siLaravel,
@@ -25,10 +24,13 @@
 		siClaude,
 		siGithub,
 		siVite,
-		siUpstash
+		siUpstash,
+		siGit,
+		siNpm,
+		siVercel
 	} from 'simple-icons';
 	import type { SimpleIcon } from 'simple-icons';
-	import { groqIcon, gptIcon, codexIcon } from './icons';
+	import { groqIcon, gptIcon, codexIcon, restApiIcon } from './icons';
 	import type { SkillIcon } from './icons';
 
 	function si(icon: SimpleIcon): SkillIcon {
@@ -63,7 +65,7 @@
 			items: [
 				{ name: 'Node.js', icon: si(siNodedotjs) },
 				{ name: 'Express', icon: si(siExpress) },
-				{ name: 'tRPC', icon: si(siTrpc) },
+				{ name: 'REST API', icon: restApiIcon },
 				{ name: 'Prisma', icon: si(siPrisma) },
 				{ name: 'PHP', icon: si(siPhp) },
 				{ name: 'Laravel', icon: si(siLaravel) }
@@ -93,6 +95,9 @@
 			label: 'TOOLS & INFRA',
 			items: [
 				{ name: 'GitHub', icon: si(siGithub) },
+				{ name: 'Git', icon: si(siGit) },
+				{ name: 'npm', icon: si(siNpm) },
+				{ name: 'Vercel', icon: si(siVercel) },
 				{ name: 'Vite', icon: si(siVite) },
 				{ name: 'Upstash', icon: si(siUpstash) }
 			]
