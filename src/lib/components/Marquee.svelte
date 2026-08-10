@@ -75,7 +75,6 @@
 		flex: 0 0 auto;
 		user-select: none;
 		pointer-events: none;
-		animation: spin 10s linear infinite;
 	}
 
 	@keyframes scroll-left {
@@ -86,21 +85,10 @@
 			transform: translateX(-50%);
 		}
 	}
-	@keyframes spin {
-		from {
-			transform: rotate(0);
-		}
-		to {
-			transform: rotate(360deg);
-		}
-	}
 
 	@media (prefers-reduced-motion: reduce) {
 		.marquee__track {
 			animation-play-state: paused;
-		}
-		.marquee__sep {
-			animation: none;
 		}
 	}
 </style>

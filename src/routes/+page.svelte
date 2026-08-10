@@ -23,9 +23,9 @@
 <Nav />
 <Hero />
 <About />
-<Work />
-<Marquee />
 <Experience />
+<Marquee />
+<Work />
 <Skills />
 
 <Contact />

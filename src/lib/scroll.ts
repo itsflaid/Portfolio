@@ -24,3 +24,14 @@ export function scrollToTarget(target: string) {
 		document.querySelector(to)?.scrollIntoView();
 	}
 }
+
+// Jumps the scroll position to the top instantly, no smooth animation — used
+// when a curtain/overlay is already covering the screen and the jump itself
+// should be invisible to the user.
+export function jumpToTop() {
+	if (lenis) {
+		lenis.scrollTo(0, { immediate: true });
+	} else {
+		window.scrollTo({ top: 0 });
+	}
+}

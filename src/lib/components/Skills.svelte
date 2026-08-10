@@ -116,15 +116,18 @@
 	onMount(() => {
 		gsap.registerPlugin(ScrollTrigger);
 		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		const isMobile = window.matchMedia('(max-width: 860px)').matches;
 
 		const darkContent = gsap.utils.toArray<HTMLElement>(darkEl.querySelectorAll('[data-reveal]'));
 		const listGroups = gsap.utils.toArray<HTMLElement>(lightEl.querySelectorAll('.skills__group'));
+		const groupRules = gsap.utils.toArray<HTMLElement>(lightEl.querySelectorAll('.skills__rule'));
 
 		if (reduceMotion) {
 			gsap.set(darkEl, { xPercent: 0 });
 			gsap.set([headingLine1El, headingLine2El], { y: '0%', x: '0rem' });
 			gsap.set(cursorEl, { opacity: 1 });
 			gsap.set([...darkContent, ...listGroups], { opacity: 1, y: 0, x: 0 });
+			gsap.set(groupRules, { scaleX: 1 });
 			return;
 		}
 
@@ -164,19 +167,30 @@
 		);
 		tl.to(cursorEl, { opacity: 1, duration: 0.2 }, 0.95);
 
-		// Tech list pops in quick and early — all rows are up before the section
-		// reaches mid-screen, so the remaining scroll is just the dark slide-out.
-		tl.fromTo(
-			listGroups,
-			{ opacity: 0, y: 18 },
-			{ opacity: 1, y: 0, duration: 0.3, stagger: 0.05, ease: 'power2.out' },
-			0.55
-		);
+		// Desktop: tech list pops in quick and early inside the same scrub
+		// timeline as the dark slide — the section is only 100vh tall so one
+		// synced pass reads fine. Mobile stacks the white half far below the
+		// dark half and the whole section runs much taller, so this same
+		// container-wide scrub either reveals every group before the white
+		// half is even in view, or fades them out again mid-read on exit —
+		// each group gets its own scroll trigger lower down instead.
+		if (!isMobile) {
+			tl.fromTo(
+				listGroups,
+				{ opacity: 0, y: 18 },
+				{ opacity: 1, y: 0, duration: 0.3, stagger: 0.05, ease: 'power2.out' },
+				0.55
+			);
+		}
 
 		// Exit: as the section rides up and out of view, the text fades away and
 		// the dark half widens to the right until it fills the screen — reaching
-		// full width just as the section leaves the top of the viewport.
-		const exitTargets = [...darkContent, headingEl, ...listGroups];
+		// full width just as the section leaves the top of the viewport. On
+		// mobile the white half has its own reveal below and stays out of this
+		// exit fade — it's still mid-read long after the dark half is gone.
+		const exitTargets = isMobile
+			? [...darkContent, headingEl]
+			: [...darkContent, headingEl, ...listGroups];
 		const exitTl = gsap.timeline({
 			scrollTrigger: {
 				trigger: skillsEl,
@@ -188,9 +202,47 @@
 		exitTl.to(exitTargets, { opacity: 0, y: -24, duration: 0.5, stagger: 0.04, ease: 'power1.in' }, 0);
 		exitTl.to(darkEl, { width: '100%', duration: 0.9, ease: 'power1.inOut' }, 0.25);
 
+		// Mobile: each skill group plays its own small entrance as it scrolls
+		// into view — hairline draws in left-to-right (same move as the About
+		// section's facts rows), label + chips rise and settle, then chips
+		// cascade in just after. Plays once per group rather than scrubbing
+		// to the whole section, since the white half is long and groups
+		// shouldn't fade back out again on the way past.
+		const groupTriggers: ScrollTrigger[] = [];
+		if (isMobile) {
+			listGroups.forEach((group) => {
+				const rule = group.querySelector<HTMLElement>('.skills__rule');
+				const chips = gsap.utils.toArray<HTMLElement>(group.querySelectorAll('.skills__chips li'));
+				const groupTl = gsap.timeline({
+					scrollTrigger: {
+						trigger: group,
+						start: 'top 85%',
+						toggleActions: 'play none none none'
+					}
+				});
+				groupTl.fromTo(
+					group,
+					{ opacity: 0, y: 20 },
+					{ opacity: 1, y: 0, duration: 0.55, ease: 'power2.out' },
+					0
+				);
+				if (rule) {
+					groupTl.fromTo(rule, { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: 'power2.out' }, 0);
+				}
+				groupTl.fromTo(
+					chips,
+					{ opacity: 0, y: 8 },
+					{ opacity: 1, y: 0, duration: 0.35, stagger: 0.025, ease: 'power1.out' },
+					0.15
+				);
+				if (groupTl.scrollTrigger) groupTriggers.push(groupTl.scrollTrigger);
+			});
+		}
+
 		return () => {
 			tl.scrollTrigger?.kill();
 			exitTl.scrollTrigger?.kill();
+			groupTriggers.forEach((st) => st.kill());
 		};
 	});
 </script>
@@ -222,6 +274,7 @@
 		<ul class="skills__list">
 			{#each groups as group}
 				<li class="skills__group">
+					<span class="skills__rule" aria-hidden="true"></span>
 					<span class="skills__label">{group.label}</span>
 					<ul class="skills__chips">
 						{#each group.items as item}
@@ -389,6 +442,9 @@
 		padding: clamp(0.55rem, 1.3vh, 0.85rem) 0;
 		opacity: 0;
 	}
+	.skills__rule {
+		display: none;
+	}
 	.skills__label {
 		font-family: var(--ff-mono);
 		font-size: 0.72rem;
@@ -475,6 +531,21 @@
 			grid-column: 1;
 			margin-top: 60vh;
 			min-height: 70vh;
+		}
+		.skills__group {
+			position: relative;
+			border-top: none;
+		}
+		.skills__rule {
+			display: block;
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 1px;
+			background: rgba(10, 10, 10, 0.14);
+			transform: scaleX(0);
+			transform-origin: left;
 		}
 	}
 	@media (prefers-reduced-motion: reduce) {

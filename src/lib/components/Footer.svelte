@@ -2,14 +2,13 @@
 	import { onMount } from 'svelte';
 	import { gsap } from 'gsap';
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
-	import { scrollToTarget } from '$lib/scroll';
+	import { scrollToTarget, jumpToTop } from '$lib/scroll';
 
 	type FooterLink = { label: string; href: string };
 
 	const quickLinks: FooterLink[] = [
 		{ label: 'ABOUT', href: '#about' },
 		{ label: 'WORK', href: '#work' },
-		{ label: 'EXPERIENCE', href: '#experience' },
 		{ label: 'SKILLS', href: '#skills' },
 		{ label: 'CONTACT', href: '#contact' }
 	];
@@ -34,7 +33,45 @@
 	let endingCursorEl: HTMLElement;
 	let endingCreditsEl: HTMLElement;
 	let endingBackEl: HTMLElement;
+	let mobileEndingEl: HTMLElement;
+	let mobileEndingEyebrowEl: HTMLElement;
+	let mobileEndingLine1El: HTMLElement;
+	let mobileEndingLine2El: HTMLElement;
+	let mobileEndingCursorEl: HTMLElement;
+	let mobileEndingCreditsEl: HTMLElement;
+	let mobileEndingBackEl: HTMLElement;
+	let curtainEl: HTMLElement;
+	let curtainTransitioning = false;
 	let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+
+	// BACK TO TOP: the ending screen is already a full black frame, so instead
+	// of a visible fast-scroll back through every section, a fixed curtain
+	// (same black, so the swap-in is invisible) holds the screen, the scroll
+	// position jumps to the top underneath it unseen, then the curtain rises
+	// off the top edge like a theatre curtain — revealing the Hero from the
+	// top down, right where "back to top" actually lands.
+	function handleBackToTop() {
+		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		if (reduceMotion || !curtainEl || curtainTransitioning) {
+			scrollToTarget('#top');
+			return;
+		}
+		curtainTransitioning = true;
+		gsap.set(curtainEl, { display: 'block', opacity: 1, yPercent: 0 });
+		requestAnimationFrame(() => {
+			jumpToTop();
+			gsap.to(curtainEl, {
+				yPercent: -100,
+				duration: 0.9,
+				delay: 0.18,
+				ease: 'power3.inOut',
+				onComplete: () => {
+					gsap.set(curtainEl, { display: 'none' });
+					curtainTransitioning = false;
+				}
+			});
+		});
+	}
 
 	onMount(() => {
 		gsap.registerPlugin(ScrollTrigger);
@@ -51,12 +88,20 @@
 			gsap.set([headingLine1El, headingLine2El], { y: '0%', x: '0rem' });
 			gsap.set(cursorEl, { opacity: 1 });
 			gsap.set(lightContent, { opacity: 1, y: 0 });
-			// Mobile: bg dark tetap ada, tapi tanpa fase ending.
+			// Mobile: bg dark tetap ada; ending desktop (curtain-pin) di-skip, tapi
+			// ending mobile-nya sendiri (band statis di bawah) tetap ditampilkan.
 			gsap.set(darkContent, { opacity: isMobile ? 1 : 0 });
 			if (!isMobile) {
 				gsap.set(endingCursorEl, { opacity: 1 });
 				gsap.set([endingLine1El, endingLine2El], { y: '0%', x: '0rem' });
 				gsap.set([endingEyebrowEl, endingCreditsEl, endingBackEl], { opacity: 1, y: 0 });
+			} else {
+				gsap.set(mobileEndingCursorEl, { opacity: 1 });
+				gsap.set([mobileEndingLine1El, mobileEndingLine2El], { y: '0%', x: '0rem' });
+				gsap.set([mobileEndingEyebrowEl, mobileEndingCreditsEl, mobileEndingBackEl], {
+					opacity: 1,
+					y: 0
+				});
 			}
 			return;
 		}
@@ -157,16 +202,67 @@
 			);
 		}
 
+		// Mobile: no pin, no curtain-growth — the ending band just sits as a
+		// static dark block below the menu/connect info and plays a single,
+		// un-scrubbed reveal once it scrolls into view (same "play once, stay"
+		// approach as the Skills groups on mobile). Same beats as the desktop
+		// ending — eyebrow, headline mask-wipe, credits, button — just fired
+		// as one quick sequence instead of tied to a long pinned scroll.
+		const mobileEndingTriggers: ScrollTrigger[] = [];
+		if (isMobile) {
+			const mobileEndingTl = gsap.timeline({
+				scrollTrigger: {
+					trigger: mobileEndingEl,
+					start: 'top 78%',
+					toggleActions: 'play none none none'
+				}
+			});
+			mobileEndingTl.fromTo(
+				mobileEndingEyebrowEl,
+				{ opacity: 0, y: 10 },
+				{ opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' },
+				0
+			);
+			mobileEndingTl.fromTo(
+				mobileEndingLine1El,
+				{ y: '105%', x: '-1rem' },
+				{ y: '0%', x: '0rem', duration: 0.6, ease: 'power3.out' },
+				0.12
+			);
+			mobileEndingTl.fromTo(
+				mobileEndingLine2El,
+				{ y: '105%', x: '1rem' },
+				{ y: '0%', x: '0rem', duration: 0.6, ease: 'power3.out' },
+				0.24
+			);
+			mobileEndingTl.to(mobileEndingCursorEl, { opacity: 1, duration: 0.2 }, 0.65);
+			mobileEndingTl.fromTo(
+				mobileEndingCreditsEl,
+				{ opacity: 0, y: 12 },
+				{ opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' },
+				0.55
+			);
+			mobileEndingTl.fromTo(
+				mobileEndingBackEl,
+				{ opacity: 0, y: 12 },
+				{ opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' },
+				0.68
+			);
+			if (mobileEndingTl.scrollTrigger) mobileEndingTriggers.push(mobileEndingTl.scrollTrigger);
+		}
+
 		return () => {
 			tl.scrollTrigger?.kill();
 			tl.kill();
 			curtain.scrollTrigger?.kill();
 			curtain.kill();
+			mobileEndingTriggers.forEach((st) => st.kill());
 		};
 	});
 </script>
 
 <footer class="footer" id="site-footer" bind:this={footerEl}>
+	<div class="footer__curtain" bind:this={curtainEl} aria-hidden="true"></div>
 	<div class="footer__stage">
 		<div class="footer__light">
 		<span class="footer__mark footer__mark--light" aria-hidden="true">FLAID</span>
@@ -199,7 +295,7 @@
 		<span class="footer__mark footer__mark--dark" aria-hidden="true">FLAID</span>
 
 		<div class="footer__dark-content">
-			<span class="footer__eyebrow footer__eyebrow--dark" data-reveal>// LET'S TALK</span>
+			<span class="footer__eyebrow footer__eyebrow--dark" data-reveal>// LET'S CONNECT TO</span>
 			<h2 class="footer__heading">
 				<span class="line-mask"><span class="line" bind:this={headingLine1El}>BUILD</span></span>
 				<span class="line-mask"
@@ -224,10 +320,28 @@
 			<span class="footer__ending-credits" bind:this={endingCreditsEl}
 				>DESIGNED &amp; BUILT BY MUHAMMAD FADIL — FLAID</span
 			>
-			<button class="footer__ending-back" bind:this={endingBackEl} onclick={() => scrollToTarget('#top')}>
+			<button class="footer__ending-back" bind:this={endingBackEl} onclick={handleBackToTop}>
 				BACK TO TOP ↑
 			</button>
 		</div>
+		</div>
+
+		<div class="footer__ending-mobile" bind:this={mobileEndingEl}>
+			<span class="footer__ending-mobile-eyebrow" bind:this={mobileEndingEyebrowEl}>// THE END</span>
+			<h2 class="footer__ending-mobile-heading">
+				<span class="line-mask"><span class="line" bind:this={mobileEndingLine1El}>THANKS FOR</span></span>
+				<span class="line-mask"
+					><span class="line" bind:this={mobileEndingLine2El}
+						>SCROLLING<span class="cursor" bind:this={mobileEndingCursorEl}>_</span></span
+					></span
+				>
+			</h2>
+			<span class="footer__ending-mobile-credits" bind:this={mobileEndingCreditsEl}
+				>DESIGNED &amp; BUILT BY MUHAMMAD FADIL — FLAID</span
+			>
+			<button class="footer__ending-mobile-back" bind:this={mobileEndingBackEl} onclick={handleBackToTop}>
+				BACK TO TOP ↑
+			</button>
 		</div>
 	</div>
 </footer>
@@ -238,6 +352,18 @@
 		height: 200vh;
 		background: var(--white);
 		z-index: 3;
+	}
+	/* Fixed, independent of scroll — covers the whole viewport while the jump
+	   to top happens underneath it, then rises away to reveal Hero. Same
+	   black as the ending screen so engaging it is an invisible swap. */
+	.footer__curtain {
+		display: none;
+		position: fixed;
+		inset: 0;
+		z-index: 999;
+		background: var(--black);
+		pointer-events: none;
+		will-change: transform;
 	}
 	/* Stage sticky — pola yang sama dengan About: section 200vh, stage menempel
 	   di viewport selama 100vh kedua, dan scrubbing menggerakkan panel dark. */
@@ -433,6 +559,54 @@
 		transform: translateY(-2px);
 	}
 
+	/* ===== ENDING MOBILE (band statis, ditampilkan lewat @media di bawah) ===== */
+	.footer__ending-mobile {
+		display: none;
+	}
+	.footer__ending-mobile-eyebrow {
+		font-family: var(--ff-mono);
+		font-size: 0.78rem;
+		letter-spacing: 0.1em;
+		color: var(--gray);
+		opacity: 0;
+	}
+	.footer__ending-mobile-heading {
+		margin: 0;
+		font-family: var(--ff-display);
+		font-weight: 400;
+		line-height: 0.95;
+		letter-spacing: 0.01em;
+		font-size: clamp(2.2rem, 11vw, 3.2rem);
+	}
+	.footer__ending-mobile-credits {
+		font-family: var(--ff-mono);
+		font-size: 0.7rem;
+		letter-spacing: 0.06em;
+		color: var(--gray);
+		opacity: 0;
+	}
+	.footer__ending-mobile-back {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-top: clamp(0.3rem, 1.5vh, 0.6rem);
+		padding: 0.55rem 1.1rem;
+		border: 1px solid rgba(241, 241, 239, 0.3);
+		background: transparent;
+		color: var(--fg-dark);
+		font-family: var(--ff-mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.08em;
+		cursor: pointer;
+		opacity: 0;
+		transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+	}
+	.footer__ending-mobile-back:active {
+		background: var(--fg-dark);
+		color: var(--black);
+		border-color: var(--fg-dark);
+	}
+
 	/* ===== dekorasi (dot grid + ghost mark), reuse motif Skills/Work ===== */
 	.footer__dots {
 		position: absolute;
@@ -544,9 +718,20 @@
 			grid-column: 1 / -1;
 			text-align: left;
 		}
-		/* Mobile: tanpa fase ending (THANKS FOR SCROLLING). */
+		/* Mobile: bukan curtain-pin kayak desktop — cukup band statis, reveal
+		   sekali pas discroll ke situ (lihat .footer__ending-mobile di bawah). */
 		.footer__ending {
 			display: none;
+		}
+		.footer__ending-mobile {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			text-align: center;
+			gap: clamp(0.9rem, 3vh, 1.4rem);
+			background: var(--black);
+			color: var(--fg-dark);
+			padding: clamp(3rem, 12vh, 4.5rem) clamp(1.5rem, 6vw, 3rem);
 		}
 	}
 

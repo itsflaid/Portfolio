@@ -59,7 +59,7 @@ const projects: Project[] = [
             { name: 'Commander' },
             { name: 'Astro', icon: si(siAstro) }
         ],
-        metrics: ['175/175 tests passing', '3 audit bugs fixed'],
+        metrics: ['282/282 tests passing', '11 framework supported'],
         demo: 'https://devmap-web.vercel.app',
         repo: 'https://github.com/itsflaid/devmap'
     },
@@ -75,7 +75,7 @@ const projects: Project[] = [
             { name: 'PostgreSQL', icon: si(siPostgresql) },
             { name: 'Prisma', icon: si(siPrisma) },
         ],
-        metrics: ['40 languages supported', '17 GitHub stars'],
+        metrics: ['39 endpoint', '3 role levels'],
         demo: 'https://devnote-five.vercel.app',
         repo: 'https://github.com/itsflaid/devnote'
     },
@@ -91,7 +91,7 @@ const projects: Project[] = [
             { name: 'PostgreSQL', icon: si(siPostgresql) },
             { name: 'Prisma', icon: si(siPrisma) },
         ],
-        metrics: ['0 missed reminders since fix', '4 months of daily use'],
+        metrics: ['offline-ready', '3+ months of daily use'],
         demo: 'https://chatme-jet.vercel.app',
         repo: 'https://github.com/itsflaid/chatme'
     },
@@ -107,7 +107,7 @@ const projects: Project[] = [
             { name: 'PostgreSQL', icon: si(siPostgresql) },
             { name: 'Prisma', icon: si(siPrisma) },
         ],
-        metrics: ['4 months of daily use', '12 GitHub stars'],
+        metrics: ['PDF reports', '487 movement logged'],
         demo: 'https://dailyfit-alpha.vercel.app',
         repo: 'https://github.com/itsflaid/dailyfit'
     },
@@ -123,7 +123,7 @@ const projects: Project[] = [
             { name: 'Express', icon: si(siExpress) },
             { name: 'MySQL', icon: si(siMysql) },
         ],
-        metrics: ['8 months of daily use', '7 Islamic service modules'],
+        metrics: ['25 Stars', '3 APIs integrated'],
         demo: 'https://mufadz-app.vercel.app',
         repo: 'https://github.com/itsflaid/mufadz-portal'
     },
@@ -139,7 +139,7 @@ const projects: Project[] = [
             { name: 'Groq', icon: groqIcon },
             { name: 'Fonnte' },
         ],
-        metrics: ['Ranked 6th — TechnoFest 2026 AI FE Hackathon'],
+        metrics: ['Ranked 6th — TechnoFest 2026 FE AI Hackathon'],
         demo: 'http://de-home-spa-v2-uwxp.vercel.app/',
         repo: 'https://github.com/itsflaid/de-home-spa-v2'
     }

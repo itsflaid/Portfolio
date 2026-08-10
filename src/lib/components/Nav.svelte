@@ -11,7 +11,6 @@
 	const menuLinks: MenuLink[] = [
 		{ label: 'ABOUT', href: '#about' },
 		{ label: 'WORK', href: '#work' },
-		{ label: 'EXPERIENCE', href: '#experience' },
 		{ label: 'SKILLS', href: '#skills' },
 		{ label: 'CONTACT', href: '#contact' }
 	];
@@ -114,7 +113,6 @@
 	<div class="nav__links">
 		<a href="#about" onclick={(e) => go(e, '#about')}>About</a>
 		<a href="#work" onclick={(e) => go(e, '#work')}>Work</a>
-		<a href="#experience" onclick={(e) => go(e, '#experience')}>Experience</a>
 		<a href="#skills" onclick={(e) => go(e, '#skills')}>Skills</a>
 		<a href="#contact" onclick={(e) => go(e, '#contact')}>Contact</a>
 	</div>
