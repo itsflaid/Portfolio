@@ -139,7 +139,7 @@ const projects: Project[] = [
             { name: 'Groq', icon: groqIcon },
             { name: 'Fonnte' },
         ],
-        metrics: ['Ranked 6th — TechnoFest 2026 AI Hackathon'],
+        metrics: ['Ranked 6th — TechnoFest 2026 AI FE Hackathon'],
         demo: 'http://de-home-spa-v2-uwxp.vercel.app/',
         repo: 'https://github.com/itsflaid/de-home-spa-v2'
     }
@@ -601,6 +601,20 @@ const projects: Project[] = [
 		.work {
 			padding-top: clamp(2.5rem, 6vh, 4rem);
 		}
+
+		.work__head{
+			margin: 0 1.25rem;
+			padding-bottom: 0.85rem;
+		}
+
+		.work__dots{
+			display: none;
+		}
+
+		.work__head-right{
+			gap: 0.5rem;
+		}
+
 		.work__card {
 			flex-direction: column;
 			align-items: stretch;
@@ -610,7 +624,7 @@ const projects: Project[] = [
 		.card__media {
 			flex: 0 0 auto;
 			width: 100%;
-			max-height: clamp(200px, 32vh, 330px);
+			max-height: clamp(180px, 32vh, 300px);
 		}
 	}
 
