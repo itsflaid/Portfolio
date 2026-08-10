@@ -73,7 +73,7 @@ const projects: Project[] = [
             { name: 'Next.js', icon: si(siNextdotjs) },
             { name: 'TypeScript', icon: si(siTypescript) },
             { name: 'PostgreSQL', icon: si(siPostgresql) },
-            { name: 'Prisma', icon: si(siPrisma) },
+            { name: 'Codemirror', icon: si(siCodemirror) },
         ],
         metrics: ['39 endpoint', '3 role levels'],
         demo: 'https://devnote-five.vercel.app',
@@ -89,7 +89,7 @@ const projects: Project[] = [
             { name: 'Next.js', icon: si(siNextdotjs) },
             { name: 'TypeScript', icon: si(siTypescript) },
             { name: 'PostgreSQL', icon: si(siPostgresql) },
-            { name: 'Prisma', icon: si(siPrisma) },
+            { name: 'Upstash', icon: si(siUpstash) },
         ],
         metrics: ['offline-ready', '3+ months of daily use'],
         demo: 'https://chatme-jet.vercel.app',
@@ -219,7 +219,7 @@ const projects: Project[] = [
 		</div>
 	</div>
 
-	<div class="work__viewport" bind:this={viewportEl}>
+	<div class="work__viewport" bind:this={viewportEl} data-cursor-text="DRAG">
 		<ul class="work__track" bind:this={trackEl}>
 			{#each projects as project, i}
 				<li class="work__card">

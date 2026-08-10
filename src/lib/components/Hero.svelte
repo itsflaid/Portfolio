@@ -2,9 +2,16 @@
 	import { onMount } from 'svelte';
 	import { gsap } from 'gsap';
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
+	import { scrollToTarget } from '$lib/scroll';
+	import { openResumeModal } from '$lib/resume';
 
 	let heroEl: HTMLElement;
 	let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+
+	function goWork(e: MouseEvent) {
+		e.preventDefault();
+		scrollToTarget('#work');
+	}
 
 	onMount(() => {
 		gsap.registerPlugin(ScrollTrigger);
@@ -35,8 +42,30 @@
 		<span class="hero__eyebrow">FULLSTACK DEVELOPER — KUTAI KARTANEGARA, ID</span>
 		<h1><span class="hero__name">MUHAMMAD</span><span class="hero__name">FADIL</span></h1>
 		<span class="hero__sub">
-			Self-taught full-stack developer, learning and building through real-world projects since late 2024.
+			I build full-stack web applications from idea to deployment, combining design, engineering, and AI-assisted development.
 		</span>
+		<nav class="hero__cta" aria-label="Quick actions">
+			<button
+				type="button"
+				class="hero__cta-item"
+				onclick={openResumeModal}
+				data-cursor-text="OPEN"
+			>
+				<span class="hero__cta-index">01</span>
+				<span class="hero__cta-label">RESUME</span>
+				<svg class="hero__cta-icon" viewBox="0 0 24 24" aria-hidden="true"
+					><path d="M7 17 17 7M8 7h9v9" /></svg
+				>
+			</button>
+			<span class="hero__cta-divider" aria-hidden="true"></span>
+			<a class="hero__cta-item" href="#work" onclick={goWork} data-cursor-text="SCROLL">
+				<span class="hero__cta-index">02</span>
+				<span class="hero__cta-label">THE WORK</span>
+				<svg class="hero__cta-icon" viewBox="0 0 24 24" aria-hidden="true"
+					><path d="M12 4v14m0 0-5-5m5 5 5-5" /></svg
+				>
+			</a>
+		</nav>
 	</div>
 	<div class="hero__scroll"><i></i>SCROLL</div>
 </section>
@@ -132,16 +161,83 @@
 		.hero__sub {
 			max-width: 22rem;
 		}
+		.hero__cta {
+			gap: 0.85rem;
+		}
+		.hero__cta-item {
+			font-size: 0.7rem;
+		}
 	}
 	.hero__sub {
 		display: block;
 		font-size: clamp(1rem, 2vw, 1.25rem);
 		color: var(--ink-soft);
-		max-width: 32rem;
+		max-width: 35rem;
 		margin: 2rem auto 0;
 		line-height: 1.55;
 		opacity: 0;
 		animation: rise 0.8s ease 0.55s forwards;
+	}
+	.hero__cta {
+		position: relative;
+		z-index: 2;
+		display: flex;
+		align-items: center;
+		gap: clamp(1rem, 2.5vw, 1.75rem);
+		margin-top: clamp(2rem, 5vh, 3rem);
+		opacity: 0;
+		animation: rise 0.8s ease 0.75s forwards;
+	}
+	.hero__cta-item {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		background: none;
+		border: 0;
+		padding: 0;
+		margin: 0;
+		font-family: var(--ff-mono);
+		font-size: 0.78rem;
+		letter-spacing: 0.08em;
+		color: var(--black);
+		text-decoration: none;
+		cursor: pointer;
+	}
+	.hero__cta-index {
+		color: var(--gray);
+	}
+	.hero__cta-label {
+		position: relative;
+	}
+	.hero__cta-label::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: -3px;
+		height: 1px;
+		background: currentColor;
+		transform: scaleX(0);
+		transform-origin: right;
+		transition: transform 0.3s ease;
+	}
+	.hero__cta-item:hover .hero__cta-label::after {
+		transform: scaleX(1);
+		transform-origin: left;
+	}
+	.hero__cta-icon {
+		width: 12px;
+		height: 12px;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+	.hero__cta-divider {
+		width: 1px;
+		height: 1rem;
+		background: rgba(10, 10, 10, 0.2);
 	}
 	.hero__scroll {
 		position: absolute;
@@ -267,7 +363,8 @@
 	@media (prefers-reduced-motion: reduce) {
 		.hero__eyebrow,
 		.hero h1,
-		.hero__sub {
+		.hero__sub,
+		.hero__cta {
 			animation: none;
 			opacity: 1;
 		}

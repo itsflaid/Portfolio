@@ -81,7 +81,7 @@
 			]
 		},
 		{
-			label: 'AI TOOLING',
+			label: 'AI & LLM',
 			items: [
 				{ name: 'Groq', icon: groqIcon },
 				{ name: 'OpenRouter', icon: si(siOpenrouter) },

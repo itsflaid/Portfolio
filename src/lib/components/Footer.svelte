@@ -13,9 +13,9 @@
 		{ label: 'CONTACT', href: '#contact' }
 	];
 
-	// TODO: ganti href dengan link asli
+	// TODO: LinkedIn & Instagram belum diisi — ganti '#' dengan link asli
 	const socials: FooterLink[] = [
-		{ label: 'GITHUB', href: '#' },
+		{ label: 'GITHUB', href: 'https://github.com/itsflaid' },
 		{ label: 'LINKEDIN', href: '#' },
 		{ label: 'INSTAGRAM', href: '#' }
 	];
@@ -304,7 +304,9 @@
 					></span
 				>
 			</h2>
-			<a class="footer__cta" href="mailto:hello@example.com" data-reveal>mfadil.coder@gmail.com →</a>
+			<a class="footer__cta" href="mailto:mfadil.coder@gmail.com" data-reveal
+				>mfadil.coder@gmail.com →</a
+			>
 		</div>
 
 		<div class="footer__ending">

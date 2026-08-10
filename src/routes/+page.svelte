@@ -9,6 +9,7 @@
 	import Skills from '$lib/components/Skills.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import Contact from '$lib/components/Contact.svelte';
+	import ResumeModal from '$lib/components/ResumeModal.svelte';
 </script>
 
 <svelte:head>
@@ -30,3 +31,4 @@
 
 <Contact />
 <Footer />
+<ResumeModal />

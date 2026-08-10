@@ -101,7 +101,10 @@
 	onMount(() => {
 		reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		window.addEventListener('keydown', onKey);
-		return () => window.removeEventListener('keydown', onKey);
+
+		return () => {
+			window.removeEventListener('keydown', onKey);
+		};
 	});
 </script>
 
@@ -138,7 +141,11 @@
 
 		<nav class="nav__menu-links">
 			{#each menuLinks as link, i}
-				<a class="nav__menu-link" href={link.href} onclick={(e) => go(e, link.href)}>
+				<a
+					class="nav__menu-link"
+					href={link.href}
+					onclick={(e) => go(e, link.href)}
+				>
 					<span class="nav__menu-index">0{i + 1}</span>
 					<span class="nav__menu-mask"><span class="nav__menu-label">{link.label}</span></span>
 				</a>
