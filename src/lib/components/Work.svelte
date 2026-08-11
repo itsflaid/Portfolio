@@ -63,7 +63,7 @@ const projects: Project[] = [
             { name: 'Commander' },
             { name: 'Astro', icon: si(siAstro) }
         ],
-        metrics: ['282/282 tests passing', '11 framework supported', 'cli tool'],
+        metrics: ['282/282 tests passing', '11 framework supported'],
         demo: 'https://devmap-web.vercel.app',
         repo: 'https://github.com/itsflaid/devmap'
     },
@@ -157,6 +157,14 @@ const projects: Project[] = [
 	let workEl: HTMLElement;
 	let viewportEl: HTMLElement;
 	let trackEl: HTMLElement;
+	let introLine1El: HTMLElement;
+	let introLine2El: HTMLElement;
+	let introCursorEl: HTMLElement;
+	let introContentEl: HTMLElement;
+	let outroLine1El: HTMLElement;
+	let outroLine2El: HTMLElement;
+	let outroListEl: HTMLElement;
+	let outroLinkEl: HTMLElement;
 	let activeIndex = 0;
 	let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -164,10 +172,23 @@ const projects: Project[] = [
 		gsap.registerPlugin(ScrollTrigger);
 		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-		if (reduceMotion) return;
+		// Reduced motion: skip the pin/scrub entirely (the CSS reduced-motion
+		// block below switches .work__track to a normal stacked column so
+		// every slide stays reachable by ordinary page scroll). Just settle
+		// the intro heading into its revealed state so it isn't stuck
+		// invisible with no timeline ever running to reveal it.
+		if (reduceMotion) {
+			gsap.set([introLine1El, introLine2El], { y: '0%' });
+			gsap.set(introCursorEl, { opacity: 1 });
+			gsap.set([outroLine1El, outroLine2El], { y: '0%' });
+			gsap.set([outroListEl, outroLinkEl], { opacity: 1 });
+			return;
+		}
 
 		const setSpacing = () => {
-			const card = trackEl.querySelector('.work__card') as HTMLElement | null;
+			const card = trackEl.querySelector(
+				'.work__card:not(.work__card--intro):not(.work__card--outro)'
+			) as HTMLElement | null;
 			if (!card) return;
 			const gap = Math.max(0, (viewportEl.clientWidth - card.offsetWidth) / 2);
 			trackEl.style.paddingLeft = `${gap}px`;
@@ -192,7 +213,42 @@ const projects: Project[] = [
 			}
 		});
 
-		tl.to(trackEl, { x: () => -getScroll(), ease: 'none' }, 0);
+		// Explicit duration:1 makes every position below a literal 0–1
+		// fraction of the section's total scroll range. Left implicit, GSAP's
+		// default (0.5) was the real reason the old reveal timings looked
+		// "small" on paper but weren't: getScroll() spans several
+		// viewport-widths, so even a small time-slice of an implicit 0.5
+		// covers a huge amount of actual pixel travel.
+		tl.to(trackEl, { x: () => -getScroll(), duration: 1, ease: 'none' }, 0);
+
+		tl.fromTo(introLine1El, { y: '105%' }, { y: '0%', duration: 0.1, ease: 'power2.out' }, 0);
+		tl.fromTo(introLine2El, { y: '105%' }, { y: '0%', duration: 0.1, ease: 'power2.out' }, 0.03);
+		tl.to(introCursorEl, { opacity: 1, duration: 0.03 }, 0.13);
+
+		// The actual fix: hold the intro content visually centered by
+		// counter-scrolling it against trackEl's own shift for the first
+		// INTRO_DWELL of the range, then release it to slide out with the
+		// rest of the strip. getScroll() * INTRO_DWELL is exactly the
+		// distance trackEl covers in that same window, so the two cancel out
+		// and the heading actually sits still (and readable) while it
+		// reveals, instead of being dragged off-screen mid-reveal.
+		const INTRO_DWELL = 0.22;
+		tl.fromTo(
+			introContentEl,
+			{ x: 0 },
+			{ x: () => getScroll() * INTRO_DWELL, duration: INTRO_DWELL, ease: 'none' },
+			0
+		);
+
+		// Outro is a normal-width slide at the very end of the strip, so
+		// unlike intro it's only actually on screen for roughly the last
+		// ~15% of the range no matter what — reveal is timed to that tail
+		// instead of an arbitrary fraction, finishing with a small buffer
+		// before the pin releases at 1.
+		tl.fromTo(outroLine1El, { y: '105%' }, { y: '0%', duration: 0.05, ease: 'power2.out' }, 0.85);
+		tl.fromTo(outroLine2El, { y: '105%' }, { y: '0%', duration: 0.05, ease: 'power2.out' }, 0.89);
+		tl.fromTo(outroListEl, { opacity: 0 }, { opacity: 1, duration: 0.03, ease: 'power1.out' }, 0.93);
+		tl.fromTo(outroLinkEl, { opacity: 0 }, { opacity: 1, duration: 0.03, ease: 'power1.out' }, 0.96);
 
 		const onLoad = () => ScrollTrigger.refresh();
 		window.addEventListener('load', onLoad);
@@ -327,15 +383,33 @@ const projects: Project[] = [
 	<div class="work__head">
 		<span class="work__eyebrow">// WORK</span>
 		<div class="work__head-right">
-			<span class="work__dots" aria-hidden="true">
-				{#each dots as _}<i></i>{/each}
-			</span>
 			<span class="work__count">0{activeIndex + 1} / 0{projects.length}</span>
 		</div>
 	</div>
 
 	<div class="work__viewport" bind:this={viewportEl} data-cursor-text="DRAG">
 		<ul class="work__track" bind:this={trackEl}>
+			<li class="work__card work__card--intro">
+				<span class="work__dots" aria-hidden="true">
+					{#each dots as _}<i></i>{/each}
+				</span>
+				<div class="intro__content" bind:this={introContentEl}>
+					<h2 class="intro__heading">
+						<span class="line-mask"
+							><span class="line" bind:this={introLine1El}>FEATURED</span></span
+						>
+						<span class="line-mask"
+							><span class="line" bind:this={introLine2El}
+								>WORK<span class="cursor" bind:this={introCursorEl}>_</span></span
+							></span
+						>
+					</h2>
+					<span class="intro__scroll">
+						SCROLL TO EXPLORE
+						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16m0 0-6-6m6 6 6-6" /></svg>
+					</span>
+				</div>
+			</li>
 			{#each projects as project, i}
 				<li class="work__card">
 					<div class="card__media">
@@ -414,6 +488,36 @@ const projects: Project[] = [
 					</div>
 				</li>
 			{/each}
+
+			<li class="work__card work__card--outro">
+				<div class="outro__content">
+					<h2 class="outro__heading">
+						<span class="line-mask"
+							><span class="line" bind:this={outroLine1El}>THAT'S THE</span></span
+						>
+						<span class="line-mask"
+							><span class="line" bind:this={outroLine2El}>HIGHLIGHT REEL</span></span
+						>
+					</h2>
+					<p class="">Other projects:</p>
+					<ul class="outro__list" bind:this={outroListEl}>
+						<li>MyNime <span>· Vue</span></li>
+						<li>TechGear Store <span>· PHP</span></li>
+						<li>Topup Games <span>· Laravel</span></li>
+						<li>This Portfolio <span>· Sveltekit</span></li>
+					</ul>
+					<a
+						class="outro__link"
+						href="https://github.com/Mufacoderz"
+						target="_blank"
+						rel="noopener noreferrer"
+						bind:this={outroLinkEl}
+					>
+						MORE ON GITHUB
+						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M17 7H9m8 0v8" /></svg>
+					</a>
+				</div>
+			</li>
 		</ul>
 	</div>
 </section>
@@ -442,10 +546,14 @@ const projects: Project[] = [
 		pointer-events: none;
 	}
 	.work__dots {
+		position: absolute;
+		top: clamp(1.5rem, 4vw, 3rem);
+		left: clamp(1.5rem, 4vw, 3rem);
 		display: grid;
 		grid-template-columns: repeat(3, 8px);
 		grid-template-rows: repeat(3, 8px);
 		gap: 9px;
+		z-index: 1;
 		pointer-events: none;
 	}
 	.work__dots i {
@@ -454,7 +562,7 @@ const projects: Project[] = [
 		height: 8px;
 		background: var(--black);
 		font-style: normal;
-		opacity: 0.06;
+		opacity: 0.1;
 		animation: work-dot-blink 3s ease-in-out infinite;
 	}
 	.work__dots i:nth-child(2) { animation-delay: 0.3s; }
@@ -465,6 +573,124 @@ const projects: Project[] = [
 	.work__dots i:nth-child(7) { animation-delay: 1.8s; }
 	.work__dots i:nth-child(8) { animation-delay: 2.1s; }
 	.work__dots i:nth-child(9) { animation-delay: 2.4s; }
+
+	.work__card.work__card--intro,
+	.work__card.work__card--outro {
+		position: relative;
+		flex: 0 0 auto;
+		width: 100vw;
+		max-width: 100vw;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: transparent;
+		color: var(--black);
+	}
+	.intro__content,
+	.outro__content {
+		position: relative;
+		z-index: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: clamp(1.25rem, 3vh, 2rem);
+		text-align: center;
+		padding: 0 1.5rem;
+	}
+	.intro__heading,
+	.outro__heading {
+		margin: 0;
+		font-family: var(--ff-display);
+		font-weight: 400;
+		line-height: 0.95;
+		letter-spacing: 0.01em;
+		font-size: clamp(2.6rem, 7vw, 5.5rem);
+	}
+	.outro__list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		font-family: var(--ff-body);
+		font-weight: 400;
+		font-size: 0.9rem;
+		letter-spacing: 0.01em;
+		color: var(--gray);
+	}
+	.outro__list li {
+		display: flex;
+		align-items: center;
+	}
+	.outro__list li span {
+		color: var(--accent-ph);
+		margin-left: 0.3rem;
+	}
+	.outro__list li:not(:last-child)::after {
+		content: '|';
+		margin: 0 0.9rem;
+		color: var(--accent-ph);
+	}
+	.outro__link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-family: var(--ff-mono);
+		font-weight: 400;
+		font-size: 0.8rem;
+		letter-spacing: 0.08em;
+		color: var(--black);
+		text-decoration: none;
+		border-bottom: 1px solid var(--black);
+		padding-bottom: 0.15rem;
+		transition: opacity 0.2s ease;
+	}
+	.outro__link:hover {
+		opacity: 0.6;
+	}
+	.outro__link svg {
+		width: 13px;
+		height: 13px;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2;
+	}
+	.line-mask {
+		display: block;
+		overflow: hidden;
+	}
+	.line {
+		display: block;
+		transform: translateY(105%);
+	}
+	.cursor {
+		display: inline-block;
+		font-family: var(--ff-mono);
+		margin-left: 0.05em;
+		opacity: 0;
+	}
+	.intro__scroll {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-family: var(--ff-mono);
+		font-size: 0.75rem;
+		letter-spacing: 0.08em;
+		color: var(--gray);
+	}
+	.intro__scroll svg {
+		width: 14px;
+		height: 14px;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2;
+		animation: intro-scroll-bounce 1.6s ease-in-out infinite;
+	}
+	@keyframes intro-scroll-bounce {
+		0%, 100% { transform: translateY(0); opacity: 0.6; }
+		50% { transform: translateY(5px); opacity: 1; }
+	}
 	.work__head {
 		position: relative;
 		z-index: 1;
@@ -775,6 +1001,46 @@ const projects: Project[] = [
 		}
 		.media__pan video {
 			display: none;
+		}
+		.intro__scroll svg {
+			animation: none;
+		}
+
+		/* No pin/scrub runs at all in this mode (see reduceMotion branch in
+		   the script), so the track must lay out as a normal stacked column
+		   that flows with ordinary page scroll — otherwise work__viewport's
+		   overflow:hidden would leave every card past the first one
+		   permanently unreachable. */
+		.work__viewport {
+			overflow: visible;
+			align-items: flex-start;
+		}
+		.work__track {
+			flex-direction: column;
+			width: auto;
+			padding: 0;
+			gap: clamp(1.5rem, 4vh, 3rem);
+		}
+		.work__card,
+		.work__card.work__card--intro,
+		.work__card.work__card--outro {
+			width: 92vw;
+			max-width: 92vw;
+			margin: 0 auto;
+		}
+		.work__card:not(.work__card--intro):not(.work__card--outro) {
+			flex-direction: column;
+			align-items: stretch;
+			gap: clamp(1.25rem, 3vh, 2rem);
+		}
+		.work__card--intro,
+		.work__card--outro {
+			padding: clamp(3rem, 8vh, 5rem) 1.5rem;
+		}
+		.card__media {
+			flex: 0 0 auto;
+			width: 100%;
+			max-height: clamp(180px, 32vh, 300px);
 		}
 	}
 </style>
