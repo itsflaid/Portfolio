@@ -38,6 +38,11 @@ type CacheEntry = { data: unknown; expiresAt: number };
 let cache: CacheEntry | null = null;
 const TTL_MS = 60 * 60 * 1000; // 1 jam — cukup buat data yang cuma berubah kalau ngoding lagi
 
+// Jangan di-prerender jadi file statis: endpoint ini butuh baca GH_TOKEN dari
+// runtime env (serverless function) di Vercel, bukan dari build time. Kalau
+// di-prerender, data kebeku saat build dan env gak kebaca.
+export const prerender = false;
+
 export const GET: RequestHandler = async () => {
 	if (cache && cache.expiresAt > Date.now()) {
 		return json(cache.data);
