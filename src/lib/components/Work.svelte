@@ -36,6 +36,7 @@
 		title: string;
 		tag: string;
 		thumb: string;
+		video: string;
 		desc: string;
 		tech: TechItem[];
 		// Optional proof-of-work badges. Only fill these in with numbers you can
@@ -51,6 +52,7 @@ const projects: Project[] = [
         title: 'DEVMAP',
         tag: 'Analyze once, reuse context everywhere',
         thumb: '/devmap.webp',
+        video: '/devmap.mp4',
         desc: 'Maps your codebase through static analysis to give AI agents structured context and a clearer understanding of your project.',
         tech: [
             { name: 'TypeScript', icon: si(siTypescript) },
@@ -68,6 +70,7 @@ const projects: Project[] = [
         title: 'DEVNOTE',
         tag: 'A platform for developers to manage and organize code, snippets, resources, and knowledge.',
         thumb: '/devnote.webp',
+        video: '/devnote.mp4',
         desc: 'Keep your technical knowledge organized in one place, from reusable snippets and resources to notes and collections.',
         tech: [
             { name: 'Next.js', icon: si(siNextdotjs) },
@@ -84,6 +87,7 @@ const projects: Project[] = [
         title: 'CHATME',
         tag: 'Chat-UI-based personal notes and reminders web application',
         thumb: '/chatme.webp',
+        video: '/chatme.mp4',
         desc: 'A simple way to capture thoughts, save notes, and manage reminders through a familiar chat-based interface.',
         tech: [
             { name: 'Next.js', icon: si(siNextdotjs) },
@@ -100,6 +104,7 @@ const projects: Project[] = [
         title: 'DAILYFIT',
         tag: 'Simple daily home workout web application',
         thumb: '/dailyfit.webp',
+        video: '/dailyfit.mp4',
         desc: 'Follow daily workouts, track completed activities, and keep an eye on your progress through a simple fitness experience.',
         tech: [
             { name: 'Next.js', icon: si(siNextdotjs) },
@@ -116,6 +121,7 @@ const projects: Project[] = [
         title: 'MUFADZ PORTAL',
         tag: 'An all-in-one platform for Islamic services, from Quran to prayer schedule.',
         thumb: '/mufadz.webp',
+        video: '/mufadz.mp4',
         desc: 'Brings Islamic services together in one platform — Quran reader and prayer schedule anchor daily use, alongside dzikir, zakat calculator, and an AI chatbot.',
         tech: [
             { name: 'React', icon: si(siReact) },
@@ -132,6 +138,7 @@ const projects: Project[] = [
         title: 'DE HOME SPA',
         tag: 'An AI-powered home spa platform for personalized treatment recommendations and guidance.',
         thumb: '/de-home-spa.webp',
+        video: '/dehomespa.mp4',
         desc: 'Get personalized home spa recommendations based on your needs through guided selections or direct conversations with AI.',
         tech: [
             { name: 'Next.js', icon: si(siNextdotjs) },
@@ -168,7 +175,6 @@ const projects: Project[] = [
 		ScrollTrigger.addEventListener('refreshInit', setSpacing);
 
 		const getScroll = () => Math.max(0, trackEl.scrollWidth - viewportEl.clientWidth);
-		const imgs = gsap.utils.toArray<HTMLElement>(trackEl.querySelectorAll('.media__pan'));
 
 		const tl = gsap.timeline({
 			scrollTrigger: {
@@ -186,21 +192,128 @@ const projects: Project[] = [
 
 		tl.to(trackEl, { x: () => -getScroll(), ease: 'none' }, 0);
 
-		imgs.forEach((img, i) => {
-			tl.fromTo(
-				img,
-				{ xPercent: i % 2 === 0 ? 6 : -6 },
-				{ xPercent: i % 2 === 0 ? -6 : 6, ease: 'none' },
-				0
-			);
-		});
-
 		const onLoad = () => ScrollTrigger.refresh();
 		window.addEventListener('load', onLoad);
+
+		const pans = gsap.utils.toArray<HTMLElement>(trackEl.querySelectorAll('.media__pan'));
+		const swapTimers = new Map<HTMLElement, number>();
+		const swapped = new Set<HTMLElement>();
+		const primed = new Set<HTMLElement>();
+
+		// Short hold before the still frame hands off to video — long enough
+		// to survive a fast scroll flick past the card, short enough that the
+		// swap feels immediate once it actually settles into view.
+		const VIDEO_SWAP_DELAY = 250;
+
+		const clearSwapTimer = (pan: HTMLElement) => {
+			const id = swapTimers.get(pan);
+			if (id !== undefined) {
+				window.clearTimeout(id);
+				swapTimers.delete(pan);
+			}
+		};
+
+		// Switches the element to `preload="auto"` and kicks off a real fetch
+		// of the video bytes (not just metadata). This is what actually fixes
+		// the sluggish start — without it the browser only begins downloading
+		// once play() is called, so the swap sits waiting on the network,
+		// which is worse on mobile connections.
+		const primeVideo = (pan: HTMLElement, video: HTMLVideoElement) => {
+			if (primed.has(pan)) return;
+			primed.add(pan);
+			video.preload = 'auto';
+			video.load();
+		};
+
+		// Starts priming videos while the card is still off to the side of the
+		// viewport, using an expanded margin so buffering gets a head start
+		// before the card is actually on screen.
+		const preloadObserver = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (!entry.isIntersecting) return;
+					const pan = entry.target as HTMLElement;
+					const video = pan.querySelector('video');
+					if (!video) return;
+					primeVideo(pan, video);
+				});
+			},
+			{ threshold: 0, rootMargin: '0px 40%' }
+		);
+
+		// Decides the actual still → video swap, based on true on-screen
+		// visibility (no expanded margin here, so the swap point matches what
+		// the user actually sees in the viewport).
+		const observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					const pan = entry.target as HTMLElement;
+					const video = pan.querySelector('video');
+					if (!video) return;
+					if (entry.isIntersecting) {
+						if (!swapped.has(pan)) {
+							swapped.add(pan);
+							primeVideo(pan, video);
+							const id = window.setTimeout(() => {
+								swapTimers.delete(pan);
+								pan.classList.add('is-video');
+								video.play().catch(() => {});
+							}, VIDEO_SWAP_DELAY);
+							swapTimers.set(pan, id);
+						} else {
+							video.play().catch(() => {});
+						}
+					} else {
+						video.pause();
+						// Left the viewport before the swap ever fired —
+						// cancel it so the card starts fresh (image first)
+						// the next time it scrolls into view, instead of
+						// jumping straight to video from a stale timer.
+						if (swapTimers.has(pan)) {
+							clearSwapTimer(pan);
+							swapped.delete(pan);
+						}
+					}
+				});
+			},
+			{ threshold: 0.35 }
+		);
+
+		pans.forEach((pan) => {
+			preloadObserver.observe(pan);
+			observer.observe(pan);
+		});
+
+		const resetAll = () => {
+			pans.forEach((pan) => {
+				const video = pan.querySelector('video');
+				if (!video) return;
+				clearSwapTimer(pan);
+				pan.classList.remove('is-video');
+				swapped.delete(pan);
+				primed.delete(pan);
+				video.pause();
+				video.currentTime = 0;
+			});
+		};
+
+		const sectionObserver = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (!entry.isIntersecting) resetAll();
+				});
+			},
+			{ threshold: 0 }
+		);
+		sectionObserver.observe(workEl);
 
 		return () => {
 			window.removeEventListener('load', onLoad);
 			ScrollTrigger.removeEventListener('refreshInit', setSpacing);
+			swapTimers.forEach((id) => window.clearTimeout(id));
+			preloadObserver.disconnect();
+			observer.disconnect();
+			sectionObserver.disconnect();
 			tl.scrollTrigger?.kill();
 			tl.kill();
 		};
@@ -226,12 +339,23 @@ const projects: Project[] = [
 					<div class="card__media">
 						<div class="media__pan">
 							<img
+								class="media__img"
 								src={project.thumb}
 								alt="{project.title} preview"
 								loading="lazy"
 								decoding="async"
 								draggable="false"
 							/>
+							<video
+								class="media__video"
+								src={project.video}
+								muted
+								loop
+								playsinline
+								preload="metadata"
+								aria-hidden="true"
+								tabindex="-1"
+							></video>
 						</div>
 					</div>
 					<div class="card__info">
@@ -400,31 +524,41 @@ const projects: Project[] = [
 	.media__pan {
 		position: absolute;
 		top: 0;
-		left: -16%;
-		width: 132%;
+		left: 0;
+		width: 100%;
 		height: 100%;
 		overflow: hidden;
-		will-change: transform;
 	}
-	.media__pan img {
+	.media__pan img,
+	.media__pan video {
 		display: block;
+		position: absolute;
+		top: 0;
+		left: 0;
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
 		object-position: center;
-		transform-origin: center;
-		animation: kenburns 9s ease-in-out infinite alternate;
-		will-change: transform;
+	}
+	.media__pan img {
+		transition: opacity 0.6s ease;
+	}
+	.media__pan video {
+		/* Source clips are 4:3, matching .card__media 1:1 now that the pan
+		   box is no longer oversized for the old parallax slide, so `cover`
+		   fills the frame with no extra crop. */
+		object-fit: cover;
+		background: #000;
+		opacity: 0;
+		transition: opacity 0.6s ease;
+	}
+	:global(.media__pan.is-video) .media__img {
+		opacity: 0;
+	}
+	:global(.media__pan.is-video) .media__video {
+		opacity: 1;
 	}
 
-	@keyframes kenburns {
-		from {
-			transform: scale(1);
-		}
-		to {
-			transform: scale(1.08);
-		}
-	}
 	.work__card:hover .card__media {
 		transform: scale(1.02);
 	}
@@ -635,8 +769,8 @@ const projects: Project[] = [
 		.card__media {
 			transition: none;
 		}
-		.media__pan img {
-			animation: none;
+		.media__pan video {
+			display: none;
 		}
 	}
 </style>
