@@ -1,20 +1,29 @@
-export const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*_+-<>/\\';
+// Shared "scramble reveal" text effect — characters randomize until scroll
+// progress locks them in left-to-right. Originally lived only inside
+// Contact.svelte; extracted here once GithubActivity started needing the
+// same effect for its closing insight line, so both share one source.
 
-export function randomScrambleChar() {
+const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*_+-<>/\\';
+
+export function randomScrambleChar(): string {
 	return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
 }
 
-// Renders a target string where the first `progress * target.length` characters
-// are locked in and the rest keep jittering as random characters. Spaces,
-// apostrophes and separators always stay put so words don't fall apart mid-scramble.
-const KEEP = new Set([' ', "'", '·', '—', '.', ',', '&']);
-
-export function scrambleText(target: string, progress: number) {
+/**
+ * Returns `target` with the first `progress * target.length` characters
+ * locked in place and the rest replaced by random scramble characters.
+ * Characters in `skipChars` (spaces, punctuation) are never scrambled.
+ */
+export function renderScramble(
+	target: string,
+	progress: number,
+	skipChars: string[] = [' ', "'", '·', '_']
+): string {
 	const revealCount = Math.floor(progress * target.length);
 	let out = '';
 	for (let i = 0; i < target.length; i++) {
 		const ch = target[i];
-		if (KEEP.has(ch)) {
+		if (skipChars.includes(ch)) {
 			out += ch;
 			continue;
 		}
@@ -23,7 +32,8 @@ export function scrambleText(target: string, progress: number) {
 	return out;
 }
 
-// Random-looking initial state (nothing locked) for the pre-reveal frame.
-export function scrambledPlaceholder(target: string) {
-	return target.replace(/[^ '·—.,&]/g, () => randomScrambleChar());
+/** Same-length string of pure scramble noise, used for the initial paint
+ * before any scroll progress exists (so the line isn't blank on first frame). */
+export function fullScramble(target: string, skipChars: string[] = [' ', "'", '·', '_']): string {
+	return target.replace(/./g, (ch) => (skipChars.includes(ch) ? ch : randomScrambleChar()));
 }

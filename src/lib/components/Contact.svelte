@@ -2,9 +2,9 @@
 	import { onMount } from 'svelte';
 	import { gsap } from 'gsap';
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
+	import { renderScramble, fullScramble } from '$lib/scramble';
 
 	const TARGET = "LET'S TALK";
-	const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*_+-<>/\\';
 
 	let contactEl: HTMLElement;
 	let eyebrowEl: HTMLElement;
@@ -12,24 +12,6 @@
 	let headingTextEl: HTMLElement;
 	let cursorEl: HTMLElement;
 	let ctaEl: HTMLElement;
-
-	function randomChar() {
-		return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
-	}
-
-	function renderScramble(progress: number) {
-		const revealCount = Math.floor(progress * TARGET.length);
-		let out = '';
-		for (let i = 0; i < TARGET.length; i++) {
-			const ch = TARGET[i];
-			if (ch === ' ' || ch === "'") {
-				out += ch;
-				continue;
-			}
-			out += i < revealCount ? ch : randomChar();
-		}
-		headingTextEl.textContent = out;
-	}
 
 	onMount(() => {
 		gsap.registerPlugin(ScrollTrigger);
@@ -42,7 +24,7 @@
 			return;
 		}
 
-		headingTextEl.textContent = TARGET.replace(/[^ ']/g, () => randomChar());
+		headingTextEl.textContent = fullScramble(TARGET);
 
 		let progress = 0;
 
@@ -68,7 +50,7 @@
 		let frame = 0;
 		const ticker = () => {
 			frame++;
-			if (frame % 2 === 0) renderScramble(progress);
+			if (frame % 2 === 0) headingTextEl.textContent = renderScramble(TARGET, progress);
 		};
 		gsap.ticker.add(ticker);
 

@@ -1,193 +1,151 @@
 import { json } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
+import type { RequestHandler } from './$types';
 
-export const prerender = false;
+// Server-only: GH_TOKEN never reaches the client bundle. Uses `viewer` in the
+// GraphQL query, so the token's own account is the one being read — no
+// username needs to be passed or hardcoded here.
+const QUERY = `
+	query {
+		viewer {
+			followers {
+				totalCount
+			}
+			repositories(first: 100, ownerAffiliations: OWNER, isFork: false) {
+				nodes {
+					stargazerCount
+				}
+			}
+			contributionsCollection {
+				contributionCalendar {
+					totalContributions
+					weeks {
+						contributionDays {
+							contributionCount
+							date
+							weekday
+						}
+					}
+				}
+			}
+		}
+	}
+`;
 
-const GITHUB_GRAPHQL = 'https://api.github.com/graphql';
-const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
-const USERNAME = env.GH_USERNAME || 'itsflaid';
+type ContributionDay = { contributionCount: number; date: string; weekday: number };
 
-type Day = { date: string; count: number; level: number };
-type Week = { days: Day[] };
-type Payload = {
-	ok: boolean;
-	error?: string;
-	username?: string;
-	year?: number;
-	weeks?: Week[];
-	totalContributions?: number;
-	currentStreak?: number;
-	longestStreak?: number;
-	activeDays?: number;
-	activeWeeks?: number;
+type CacheEntry = { data: unknown; expiresAt: number };
+let cache: CacheEntry | null = null;
+const TTL_MS = 60 * 60 * 1000; // 1 jam — cukup buat data yang cuma berubah kalau ngoding lagi
+
+export const GET: RequestHandler = async () => {
+	if (cache && cache.expiresAt > Date.now()) {
+		return json(cache.data);
+	}
+
+	const token = env.GH_TOKEN;
+	if (!token) {
+		return json(
+			{ error: 'GH_TOKEN belum di-set. Tambahin di .env (lokal) atau Vercel env vars (deploy).' },
+			{ status: 500 }
+		);
+	}
+
+	try {
+		const res = await fetch('https://api.github.com/graphql', {
+			method: 'POST',
+			headers: {
+				Authorization: `bearer ${token}`,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ query: QUERY })
+		});
+
+		if (!res.ok) {
+			return json({ error: `GitHub API respond ${res.status}` }, { status: 502 });
+		}
+
+		const payload = await res.json();
+		const viewer = payload?.data?.viewer;
+		const calendar = viewer?.contributionsCollection?.contributionCalendar;
+
+		if (!calendar) {
+			return json({ error: 'Response GitHub GraphQL gak sesuai bentuk yang diharapkan.' }, { status: 502 });
+		}
+
+		const weeks: { contributionDays: ContributionDay[] }[] = calendar.weeks ?? [];
+		const days: ContributionDay[] = weeks.flatMap((w) => w.contributionDays);
+
+		const { current, longest } = computeStreaks(days);
+		const mostActiveDay = computeMostActiveDay(days);
+
+		const followers = viewer?.followers?.totalCount ?? 0;
+		// Repo publik non-fork lu > 100? Stars dari sisanya gak ke-hitung —
+		// GitHub gak punya field agregat langsung, jadi ini di-sum manual
+		// dari first 100. Cukup buat hampir semua profile portfolio.
+		const repoNodes: { stargazerCount: number }[] = viewer?.repositories?.nodes ?? [];
+		const stars = repoNodes.reduce((sum, r) => sum + (r.stargazerCount ?? 0), 0);
+
+		const responseData = {
+			// Client cuma butuh count + date per cell buat render heatmap & tooltip —
+			// weekday udah dipakai di sini buat itung stat, gak perlu ikut dikirim.
+			weeks: weeks.map((w) => w.contributionDays.map((d) => ({ count: d.contributionCount, date: d.date }))),
+			stats: {
+				total: calendar.totalContributions ?? 0,
+				currentStreak: current,
+				longestStreak: longest,
+				mostActiveDay,
+				stars,
+				followers
+			}
+		};
+
+		cache = { data: responseData, expiresAt: Date.now() + TTL_MS };
+		return json(responseData);
+	} catch (err) {
+		return json({ error: 'Gagal fetch data GitHub.' }, { status: 500 });
+	}
 };
 
-let cache: { at: number; payload: Payload } | null = null;
-
-const LEVEL_MAP: Record<string, number> = {
-	NONE: 0,
-	FIRST_QUARTER: 1,
-	HALF: 2,
-	THREE_QUARTERS: 3,
-	FULL: 4
-};
-
-function toIso(d: Date) {
-	return d.toISOString().slice(0, 10);
-}
-
-function computeStreaks(days: Day[]) {
-	let currentStreak = 0;
-	let longestStreak = 0;
-	let activeDays = 0;
+function computeStreaks(days: ContributionDay[]) {
+	let longest = 0;
 	let run = 0;
-
-	for (const day of days) {
-		if (day.count > 0) {
+	for (const d of days) {
+		if (d.contributionCount > 0) {
 			run++;
-			activeDays++;
-			if (run > longestStreak) longestStreak = run;
+			longest = Math.max(longest, run);
 		} else {
 			run = 0;
 		}
 	}
 
+	// Current streak dihitung mundur dari hari terakhir (hari ini). Kalau hari
+	// ini masih 0 kontribusi, itu wajar — belum tentu udah ngoding hari ini,
+	// bukan berarti streak putus. Lanjut hitung dari kemarin.
+	let current = 0;
 	for (let i = days.length - 1; i >= 0; i--) {
-		if (days[i].count > 0) {
-			let j = i;
-			while (j >= 0 && days[j].count > 0) j--;
-			currentStreak = i - j;
+		const isToday = i === days.length - 1;
+		if (days[i].contributionCount > 0) {
+			current++;
+		} else if (isToday) {
+			continue;
+		} else {
 			break;
 		}
 	}
 
-	return { currentStreak, longestStreak, activeDays };
+	return { current, longest };
 }
 
-async function queryCalendar(token: string) {
-	const to = new Date();
-	const from = new Date(to);
-	from.setDate(from.getDate() - 364);
-
-	const query = `
-		query($login: String!, $from: DateTime!, $to: DateTime!) {
-			user(login: $login) {
-				contributionsCollection(from: $from, to: $to) {
-					contributionCalendar {
-						totalContributions
-						weeks {
-							contributionDays {
-								contributionCount
-								contributionLevel
-								date
-							}
-						}
-					}
-				}
-			}
-		}`;
-
-	const controller = new AbortController();
-	const timeout = setTimeout(() => controller.abort(), 10000);
-
-	try {
-		const res = await fetch(GITHUB_GRAPHQL, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`
-			},
-			body: JSON.stringify({
-				query,
-				variables: { login: USERNAME, from: toIso(from), to: toIso(to) }
-			}),
-			signal: controller.signal
-		});
-		clearTimeout(timeout);
-
-		if (!res.ok) {
-			return { error: `GitHub responded ${res.status}` };
-		}
-
-		const body = await res.json();
-		if (body.errors?.length) {
-			return { error: body.errors[0].message };
-		}
-
-		const calendar = body.data?.user?.contributionsCollection?.contributionCalendar;
-		if (!calendar) return { error: 'No contribution calendar returned' };
-
-		const weeks: Week[] = (calendar.weeks as Array<{
-			contributionDays: Array<{
-				contributionCount: number;
-				contributionLevel: string;
-				date: string;
-			}>
-		}>).map((week) => ({
-			days: week.contributionDays.map((day) => ({
-				date: day.date,
-				count: day.contributionCount,
-				level: LEVEL_MAP[day.contributionLevel] ?? 0
-			}))
-		}));
-
-		const allDays = weeks.flatMap((w) => w.days);
-		const { currentStreak, longestStreak, activeDays } = computeStreaks(allDays);
-		const activeWeeks = weeks.filter((w) => w.days.some((d) => d.count > 0)).length;
-
-		return {
-			payload: {
-				ok: true,
-				username: USERNAME,
-				year: to.getFullYear(),
-				weeks,
-				totalContributions: calendar.totalContributions as number,
-				currentStreak,
-				longestStreak,
-				activeDays,
-				activeWeeks
-			}
-		};
-	} catch (err) {
-		clearTimeout(timeout);
-		return { error: err instanceof Error ? err.message : 'Unknown error' };
+function computeMostActiveDay(days: ContributionDay[]) {
+	// Pakai field `weekday` yang udah dikasih langsung sama GitHub (0=Sun..6=Sat)
+	// — bukan re-parse string tanggal secara manual, biar gak kena bug offset
+	// timezone kayak yang pernah kejadian di UTC checklist DailyFit dulu.
+	const totals = [0, 0, 0, 0, 0, 0, 0];
+	for (const d of days) {
+		totals[d.weekday] += d.contributionCount;
 	}
-}
-
-export async function GET() {
-	const now = Date.now();
-	if (cache && now - cache.at < CACHE_TTL_MS) {
-		return json(cache.payload, {
-			headers: cache.payload.ok
-				? { 'Cache-Control': 'public, max-age=3600, s-maxage=3600' }
-				: {}
-		});
-	}
-
-	const token = env.GH_TOKEN;
-	if (!token) {
-		const payload: Payload = { ok: false, error: 'GH_TOKEN is not set', weeks: [] };
-		cache = { at: now, payload };
-		return json(payload);
-	}
-
-	const result = await queryCalendar(token);
-
-	let payload: Payload;
-	if ('error' in result) {
-		if (cache) {
-			payload = cache.payload;
-		} else {
-			payload = { ok: false, error: result.error, weeks: [] };
-		}
-	} else {
-		payload = result.payload;
-	}
-
-	cache = { at: now, payload };
-	return json(payload, {
-		headers: payload.ok
-			? { 'Cache-Control': 'public, max-age=3600, s-maxage=3600' }
-			: {}
-	});
+	const maxIdx = totals.indexOf(Math.max(...totals));
+	const names = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+	return names[maxIdx];
 }

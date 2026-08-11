@@ -63,7 +63,7 @@ const projects: Project[] = [
             { name: 'Commander' },
             { name: 'Astro', icon: si(siAstro) }
         ],
-        metrics: ['282/282 tests passing', '11 framework supported'],
+        metrics: ['282/282 tests passing', '11 framework supported', 'cli tool'],
         demo: 'https://devmap-web.vercel.app',
         repo: 'https://github.com/itsflaid/devmap'
     },

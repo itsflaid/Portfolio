@@ -2,59 +2,122 @@
 	import { onMount, tick } from 'svelte';
 	import { gsap } from 'gsap';
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
-	import { scrambleText, scrambledPlaceholder } from '$lib/scramble';
+	import { renderScramble } from '$lib/scramble';
 
-	const statDefs = [
-		{ key: 'totalContributions', label: 'KONTRIBUSI · 1 TAHUN' },
-		{ key: 'currentStreak', label: 'STREAK HARI INI' },
-		{ key: 'longestStreak', label: 'STREAK TERBAIK' },
-		{ key: 'activeDays', label: 'HARI AKTIF' }
-	];
+	type Day = { count: number; date: string };
+	type Stats = {
+		total: number;
+		currentStreak: number;
+		longestStreak: number;
+		mostActiveDay: string;
+		stars: number;
+		followers: number;
+	};
+	type MonthBucket = { label: string; sortKey: string; count: number; pct: number };
 
-	const LEVEL_OPACITY = [0.05, 0.2, 0.36, 0.58, 0.88];
+	const GITHUB_URL = 'https://github.com/itsflaid';
 	const year = new Date().getFullYear();
 
-	type GithubPayload = {
-		ok: boolean;
-		username?: string;
-		year?: number;
-		weeks?: { days: { date: string; count: number; level: number }[] }[];
-		totalContributions?: number;
-		currentStreak?: number;
-		longestStreak?: number;
-		activeDays?: number;
-		activeWeeks?: number;
+	const DAY_ID: Record<string, string> = {
+		Sunday: 'MINGGU',
+		Monday: 'SENIN',
+		Tuesday: 'SELASA',
+		Wednesday: 'RABU',
+		Thursday: 'KAMIS',
+		Friday: 'JUMAT',
+		Saturday: 'SABTU'
 	};
+	const MONTH_ID = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGU', 'SEP', 'OKT', 'NOV', 'DES'];
 
-	let activityEl: HTMLElement;
+	let weeks: Day[][] = [];
+	let stats: Stats = {
+		total: 0,
+		currentStreak: 0,
+		longestStreak: 0,
+		mostActiveDay: 'Monday',
+		stars: 0,
+		followers: 0
+	};
+	let monthly: MonthBucket[] = [];
+	let loading = true;
+	let loadError = false;
+
+	let sectionEl: HTMLElement;
+	let markEl: HTMLElement;
 	let eyebrowEl: HTMLElement;
 	let line1El: HTMLElement;
 	let line2El: HTMLElement;
 	let cursorEl: HTMLElement;
-	let gridEl: HTMLElement;
 	let statsEl: HTMLElement;
+	let metaEl: HTMLElement;
+	let heatmapEl: HTMLElement;
+	let legendEl: HTMLElement;
+	let monthlyEl: HTMLElement;
 	let insightEl: HTMLElement;
-	let insightTextEl: HTMLElement;
-	let markEl: HTMLElement;
-	let dotsEl: HTMLElement;
+	let totalNumEl: HTMLElement;
+	let streakNumEl: HTMLElement;
+	let longestNumEl: HTMLElement;
+	let mostActiveEl: HTMLElement;
+	let starsNumEl: HTMLElement;
+	let followersNumEl: HTMLElement;
 
-	let cleanup: (() => void) | null = null;
-
-	let payload: GithubPayload | null = null;
 	let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
-	function ramp(level: number) {
-		return LEVEL_OPACITY[level] ?? LEVEL_OPACITY[0];
+	function levelFor(count: number) {
+		if (count === 0) return 0;
+		if (count <= 2) return 1;
+		if (count <= 5) return 2;
+		if (count <= 9) return 3;
+		return 4;
 	}
 
-	function fmt(n: number) {
-		return Math.round(n).toLocaleString('en-US');
+	function opacityFor(level: number) {
+		return [0.06, 0.3, 0.55, 0.8, 1][level];
 	}
 
-	function buildInsight(p: GithubPayload) {
-		const total = p.totalContributions ?? 0;
-		const weeks = p.activeWeeks ?? 0;
-		return `${fmt(total)} KONTRIBUSI · ${fmt(weeks)} MINGGU AKTIF`;
+	function formatDate(dateStr: string) {
+		// Parsed as local midnight, not naive `new Date(dateStr)` — the latter
+		// reads as UTC and can silently shift a day depending on the visitor's
+		// timezone offset (same family of bug as the DailyFit checklist fix).
+		const d = new Date(`${dateStr}T00:00:00`);
+		return new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).format(d);
+	}
+
+	function dayNameId(name: string) {
+		return DAY_ID[name] ?? name;
+	}
+
+	function insightText() {
+		return `${stats.total} KONTRIBUSI · ${stats.longestStreak} HARI TERPANJANG`;
+	}
+
+	// "1,2rb" instead of "1234" — stars/followers bisa gede angkanya, jadi
+	// diringkes pake locale yang sama dengan formatDate.
+	function formatCompact(n: number) {
+		return new Intl.NumberFormat('id-ID', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
+	}
+
+	/** Aggregates the same daily data already fetched for the heatmap into a
+	 * trailing 12-month breakdown — real data, not a filler visual, so it
+	 * earns the extra space on the right side instead of just padding it. */
+	function computeMonthly(weeksData: Day[][]): MonthBucket[] {
+		const buckets = new Map<string, MonthBucket>();
+		for (const day of weeksData.flat()) {
+			const d = new Date(`${day.date}T00:00:00`);
+			const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+			const existing = buckets.get(key);
+			if (existing) {
+				existing.count += day.count;
+			} else {
+				buckets.set(key, { label: MONTH_ID[d.getMonth()], sortKey: key, count: day.count, pct: 0 });
+			}
+		}
+		const sorted = [...buckets.values()].sort((a, b) => a.sortKey.localeCompare(b.sortKey)).slice(-12);
+		const max = Math.max(1, ...sorted.map((m) => m.count));
+		// Floor at 4% so a zero-contribution month still shows a faint nub
+		// instead of vanishing — consistent with the heatmap's "always show
+		// something faint" treatment for empty days.
+		return sorted.map((m) => ({ ...m, pct: Math.max(4, Math.round((m.count / max) * 100)) }));
 	}
 
 	onMount(() => {
@@ -62,276 +125,465 @@
 		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		const isMobile = window.matchMedia('(max-width: 860px)').matches;
 
-		async function load() {
+		let cleanup: (() => void) | null = null;
+
+		(async () => {
 			try {
 				const res = await fetch('/api/github');
-				payload = (await res.json()) as GithubPayload;
+				const data = await res.json();
+				if (!res.ok || data.error) throw new Error(data.error ?? 'unknown');
+				weeks = data.weeks;
+				stats = data.stats;
+				monthly = computeMonthly(weeks);
 			} catch {
-				payload = { ok: false, weeks: [] };
-			}
-
-			if (!payload.weeks?.length) {
-				payload = { ...payload, ok: false, weeks: [] };
+				loadError = true;
+			} finally {
+				loading = false;
 			}
 
 			await tick();
-			init();
-		}
 
-		function init() {
-			const weeks = payload?.weeks ?? [];
-			if (!weeks.length) return;
+			if (loadError) return;
 
-			const cells = gsap.utils.toArray<HTMLElement>(gridEl.querySelectorAll('.activity__cell'));
-			const values = gsap.utils.toArray<HTMLElement>(statsEl.querySelectorAll('.activity__stat-value'));
+			const cells = gsap.utils.toArray<HTMLElement>(heatmapEl.querySelectorAll('.heatmap__cell'));
+			const rows = gsap.utils.toArray<HTMLElement>(statsEl.querySelectorAll('.stats__row'));
+			const bars = gsap.utils.toArray<HTMLElement>(monthlyEl.querySelectorAll('.monthly__bar'));
 
-			insightTextEl.textContent = scrambledPlaceholder(buildInsight(payload!));
+			// Monthly strip should line up under the heatmap ONLY on desktop.
+			// On mobile the heatmap scrolls sideways on its own (see
+			// .heatmap-wrap below), but locking the strip to that same
+			// un-clamped content width (~700px+ for a full year) was forcing
+			// it — and the whole right column with it — wider than the
+			// viewport instead of scrolling neatly inside its own box. Let it
+			// just fill the visible width on mobile instead.
+			if (isMobile) {
+				monthlyEl.style.width = '100%';
+				monthlyEl.style.maxWidth = '100%';
+			} else {
+				monthlyEl.style.width = `${heatmapEl.offsetWidth}px`;
+				monthlyEl.style.maxWidth = '100%';
+			}
+
+			mostActiveEl.textContent = dayNameId(stats.mostActiveDay);
 
 			if (reduceMotion) {
 				gsap.set(eyebrowEl, { opacity: 1 });
 				gsap.set([line1El, line2El], { y: '0%', x: '0rem' });
 				gsap.set(cursorEl, { opacity: 1 });
-				gsap.set(cells, { opacity: (i) => ramp(Number(cells[i].dataset.level)) });
-				values.forEach((el, i) => {
-					el.textContent = fmt(payload![statDefs[i].key as keyof GithubPayload] as number ?? 0);
-				});
-				gsap.set(values, { opacity: 1 });
-				insightTextEl.textContent = buildInsight(payload!);
-				gsap.set(insightEl, { opacity: 1, y: 0 });
-				gsap.set(dotsEl, { opacity: 1 });
+				gsap.set(cells, { opacity: (i, t) => parseFloat((t as HTMLElement).dataset.opacity ?? '0.06') });
+				gsap.set(rows, { opacity: 1, y: 0 });
+				gsap.set(metaEl, { opacity: 1, y: 0 });
+				gsap.set(bars, { scaleY: 1 });
+				gsap.set(legendEl, { opacity: 1, y: 0 });
+				totalNumEl.textContent = String(stats.total);
+				streakNumEl.textContent = String(stats.currentStreak);
+				longestNumEl.textContent = String(stats.longestStreak);
+				starsNumEl.textContent = formatCompact(stats.stars);
+				followersNumEl.textContent = formatCompact(stats.followers);
+				insightEl.textContent = insightText();
 				return;
 			}
 
+			if (isMobile) {
+				// No sticky-scrub theatre on mobile — a single play-once reveal
+				// covering every element in the section (heading, stats, meta,
+				// heatmap, monthly strip, legend), same "family" treatment
+				// Skills/Footer already use below 860px. Numbers count up via a
+				// tween instead of snapping straight to their final value, so
+				// this row visibly animates in step with the row fade-in, same
+				// spirit as desktop.
+				gsap.set(cells, { opacity: 0 });
+				gsap.set(rows, { opacity: 0, y: 16 });
+				gsap.set(metaEl, { opacity: 0, y: 10 });
+				gsap.set(bars, { scaleY: 0 });
+				gsap.set(legendEl, { opacity: 0, y: 10 });
+				totalNumEl.textContent = '0';
+				streakNumEl.textContent = '0';
+				longestNumEl.textContent = '0';
+				starsNumEl.textContent = '0';
+				followersNumEl.textContent = '0';
+				insightEl.textContent = '';
+
+				const mTl = gsap.timeline({
+					scrollTrigger: { trigger: sectionEl, start: 'top 78%', toggleActions: 'play none none none' }
+				});
+				mTl.fromTo(line1El, { y: '105%', x: '-1rem' }, { y: '0%', x: '0rem', duration: 0.6, ease: 'power3.out' }, 0);
+				mTl.fromTo(line2El, { y: '105%', x: '1rem' }, { y: '0%', x: '0rem', duration: 0.6, ease: 'power3.out' }, 0.12);
+				mTl.to(cursorEl, { opacity: 1, duration: 0.2 }, 0.5);
+				mTl.to(rows, { opacity: 1, y: 0, stagger: 0.08, ease: 'power2.out' }, 0.2);
+				mTl.to(metaEl, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0.15);
+
+				const mCounters = { total: 0, streak: 0, longest: 0, stars: 0, followers: 0 };
+				mTl.to(
+					mCounters,
+					{
+						total: stats.total,
+						streak: stats.currentStreak,
+						longest: stats.longestStreak,
+						stars: stats.stars,
+						followers: stats.followers,
+						duration: 0.5,
+						ease: 'power1.out',
+						onUpdate: () => {
+							totalNumEl.textContent = String(Math.floor(mCounters.total));
+							streakNumEl.textContent = String(Math.floor(mCounters.streak));
+							longestNumEl.textContent = String(Math.floor(mCounters.longest));
+							starsNumEl.textContent = formatCompact(Math.floor(mCounters.stars));
+							followersNumEl.textContent = formatCompact(Math.floor(mCounters.followers));
+						}
+					},
+					0.2
+				);
+
+				mTl.to(
+					cells,
+					{
+						opacity: (i, t) => parseFloat((t as HTMLElement).dataset.opacity ?? '0.06'),
+						stagger: { amount: 0.5, from: 'start' },
+						ease: 'none'
+					},
+					0.3
+				);
+				mTl.to(bars, { scaleY: 1, stagger: 0.03, duration: 0.35, ease: 'power2.out' }, 0.75);
+				mTl.to(legendEl, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0.95);
+				mTl.call(
+					() => {
+						insightEl.textContent = insightText();
+					},
+					undefined,
+					0.95
+				);
+
+				cleanup = () => {
+					mTl.scrollTrigger?.kill();
+					mTl.kill();
+				};
+				return;
+			}
+
+			// Desktop: sticky "stage" (same technique as About.svelte) + one scrub
+			// timeline over a tall section — scroll position directly drives how
+			// far through the year the heatmap has filled in, not an autoplay.
+			gsap.set(cells, { opacity: 0 });
+			gsap.set(rows, { opacity: 0, y: 16 });
+			gsap.set(metaEl, { opacity: 0, y: 10 });
+			gsap.set(bars, { scaleY: 0 });
+			gsap.set(legendEl, { opacity: 0, y: 10 });
+			gsap.set([line1El, line2El], { y: '105%' });
+
 			let progress = 0;
+			const counters = { total: 0, streak: 0, longest: 0, stars: 0, followers: 0 };
 
-			const scrollTrigger = isMobile
-				? {
-						trigger: activityEl,
-						start: 'top 78%',
-						toggleActions: 'play none none none',
-						onUpdate: (self: { progress: number }) => {
-							progress = self.progress;
-						}
+			const tl = gsap.timeline({
+				scrollTrigger: {
+					trigger: sectionEl,
+					start: 'top top',
+					end: 'bottom bottom',
+					scrub: 1.2,
+					invalidateOnRefresh: true,
+					onUpdate: (self) => {
+						progress = self.progress;
 					}
-				: {
-						trigger: activityEl,
-						start: 'top top',
-						end: 'bottom bottom',
-						scrub: 1,
-						onUpdate: (self: { progress: number }) => {
-							progress = self.progress;
-						},
-						onEnter: () => {
-							gridEl.style.willChange = 'opacity';
-						},
-						onLeave: () => {
-							gridEl.style.willChange = '';
-						}
-					};
+				}
+			});
 
-			const tl = gsap.timeline({ scrollTrigger });
+			tl.fromTo(line1El, { y: '105%', x: '-1.4rem' }, { y: '0%', x: '0rem', duration: 0.35, ease: 'power3.out' }, 0);
+			tl.fromTo(line2El, { y: '105%', x: '1.4rem' }, { y: '0%', x: '0rem', duration: 0.35, ease: 'power3.out' }, 0.05);
+			tl.to(cursorEl, { opacity: 1, duration: 0.05 }, 0.12);
 
-			// 0–~0.1: eyebrow + heading mask-wipe.
-			tl.fromTo(eyebrowEl, { opacity: 0 }, { opacity: 1, duration: 0.08, ease: 'none' }, 0);
-			tl.fromTo(
-				line1El,
-				{ y: '105%', x: '-1.4rem' },
-				{ y: '0%', x: '0rem', duration: 0.5, ease: 'power3.out' },
-				0.02
-			);
-			tl.fromTo(
-				line2El,
-				{ y: '105%', x: '1.4rem' },
-				{ y: '0%', x: '0rem', duration: 0.5, ease: 'power3.out' },
-				0.06
-			);
-			tl.to(cursorEl, { opacity: 1, duration: 0.15 }, 0.55);
+			tl.to(rows, { opacity: 1, y: 0, stagger: 0.05, ease: 'power2.out' }, 0.15);
+			tl.to(metaEl, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' }, 0.1);
 
-			// ~0.12–0.76: heatmap columns light up left → right, scrubbed.
-			// One tween + stagger (column-major DOM = column-by-column sweep),
-			// opacity-only so it stays on the compositor.
 			tl.to(
 				cells,
 				{
-					opacity: (i) => ramp(Number(cells[i].dataset.level)),
-					duration: 0.02,
-					stagger: 0.0017,
+					opacity: (i, target) => parseFloat((target as HTMLElement).dataset.opacity ?? '0.06'),
+					stagger: { amount: 0.5, from: 'start' },
 					ease: 'none'
 				},
-				0.12
+				0.15
 			);
 
-			// Stats count-up, driven by the same scrub (not autoplay).
-			values.forEach((el, i) => {
-				const end = payload![statDefs[i].key as keyof GithubPayload] as number ?? 0;
-				const pos = 0.2 + i * 0.06;
-				const holder = { v: 0 };
-				tl.fromTo(
-					holder,
-					{ v: 0 },
-					{
-						v: end,
-						duration: 0.34,
-						ease: 'none',
-						onUpdate: () => {
-							el.textContent = fmt(holder.v);
-						}
-					},
-					pos
-				);
-				tl.fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.12, ease: 'none' }, pos);
-			});
-
-			// Watermark parallax across the whole pin.
-			tl.fromTo(markEl, { yPercent: 10 }, { yPercent: -10, duration: 1, ease: 'none' }, 0);
-
-			tl.fromTo(dotsEl, { opacity: 0 }, { opacity: 1, duration: 0.1, ease: 'none' }, 0.7);
-
-			// ~0.78–1: insight line reveals, scramble resolved by scroll.
-			tl.fromTo(
-				insightEl,
-				{ opacity: 0, y: 12 },
-				{ opacity: 1, y: 0, duration: 0.1, ease: 'none' },
-				0.78
+			tl.to(
+				counters,
+				{
+					total: stats.total,
+					streak: stats.currentStreak,
+					longest: stats.longestStreak,
+					stars: stats.stars,
+					followers: stats.followers,
+					duration: 0.55,
+					ease: 'power1.out',
+					onUpdate: () => {
+						totalNumEl.textContent = String(Math.floor(counters.total));
+						streakNumEl.textContent = String(Math.floor(counters.streak));
+						longestNumEl.textContent = String(Math.floor(counters.longest));
+						starsNumEl.textContent = formatCompact(Math.floor(counters.stars));
+						followersNumEl.textContent = formatCompact(Math.floor(counters.followers));
+					}
+				},
+				0.15
 			);
 
+			// Monthly strip catches up partway through the daily heatmap reveal,
+			// then the legend settles right after — closing out the sequence
+			// just before the insight line starts scrambling in.
+			tl.to(bars, { scaleY: 1, stagger: 0.03, duration: 0.35, ease: 'power2.out' }, 0.5);
+			tl.to(legendEl, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' }, 0.9);
+
+			tl.fromTo(markEl, { yPercent: -6 }, { yPercent: 6, ease: 'none' }, 0);
+
+			const targetInsight = insightText();
 			let frame = 0;
 			const ticker = () => {
 				frame++;
 				if (frame % 2 !== 0) return;
-				const local = gsap.utils.clamp(0, 1, (progress - 0.78) / 0.22);
-				insightTextEl.textContent = scrambleText(buildInsight(payload!), local);
+				if (progress < 0.82) {
+					insightEl.textContent = '';
+					return;
+				}
+				const local = Math.min((progress - 0.82) / 0.18, 1);
+				insightEl.textContent = renderScramble(targetInsight, local);
 			};
 			gsap.ticker.add(ticker);
-
-			// Free the compositor once the section has fully played.
-			if (!isMobile) {
-				tl.eventCallback('onComplete', () => {
-					gridEl.style.willChange = '';
-				});
-			}
 
 			cleanup = () => {
 				gsap.ticker.remove(ticker);
 				tl.scrollTrigger?.kill();
 				tl.kill();
 			};
-		}
+		})();
 
-		const onLoad = () => ScrollTrigger.refresh();
-		window.addEventListener('load', onLoad);
-
-		load();
-
-		return () => {
-			window.removeEventListener('load', onLoad);
-			cleanup?.();
-		};
+		return () => cleanup?.();
 	});
 </script>
 
-<section class="activity" id="activity" bind:this={activityEl}>
-	<span class="activity__mark" bind:this={markEl} aria-hidden="true">{year}</span>
-	<span class="activity__dots" bind:this={dotsEl} aria-hidden="true">
-		{#each dots as _}<i></i>{/each}
-	</span>
+<section class="ghactivity" id="activity" bind:this={sectionEl}>
+	<div class="ghactivity__stage">
+		<span class="ghactivity__mark" aria-hidden="true" bind:this={markEl}>
+			<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+				<path
+					d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
+				/>
+			</svg>
+		</span>
+		<span class="ghactivity__dots" aria-hidden="true">
+			{#each dots as _}<i></i>{/each}
+		</span>
 
-	<div class="activity__stage">
-		<div class="activity__inner">
-			<div class="activity__head">
-				<span class="activity__eyebrow" bind:this={eyebrowEl}>// ACTIVITY</span>
-				<h2 class="activity__heading">
+		<div class="ghactivity__inner">
+			<div class="ghactivity__left">
+				<span class="eyebrow" bind:this={eyebrowEl}>// GITHUB ACTIVITY</span>
+				<h2 class="heading">
 					<span class="line-mask"><span class="line" bind:this={line1El}>STILL</span></span>
 					<span class="line-mask"
 						><span class="line" bind:this={line2El}
-							>GOING<span class="cursor" bind:this={cursorEl}>_</span></span
+							>BUILDING<span class="cursor" bind:this={cursorEl}>_</span></span
 						></span
 					>
 				</h2>
+
+				{#if loadError}
+					<p class="ghactivity__fallback">
+						Data aktivitas GitHub lagi gak bisa dimuat. Cek langsung di
+						<a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">github.com/itsflaid ↗</a>
+					</p>
+				{:else}
+					<dl class="stats" bind:this={statsEl}>
+						<div class="stats__row">
+							<span class="stats__rule" aria-hidden="true"></span>
+							<dt>TOTAL</dt>
+							<dd><span bind:this={totalNumEl}>0</span> kontribusi / 12 bulan</dd>
+						</div>
+						<div class="stats__row">
+							<span class="stats__rule" aria-hidden="true"></span>
+							<dt>STREAK</dt>
+							<dd><span bind:this={streakNumEl}>0</span> hari berturut-turut</dd>
+						</div>
+						<div class="stats__row">
+							<span class="stats__rule" aria-hidden="true"></span>
+							<dt>TERPANJANG</dt>
+							<dd><span bind:this={longestNumEl}>0</span> hari</dd>
+						</div>
+						<div class="stats__row">
+							<span class="stats__rule" aria-hidden="true"></span>
+							<dt>PALING AKTIF</dt>
+							<dd bind:this={mostActiveEl}>—</dd>
+						</div>
+					</dl>
+
+					<p class="ghactivity__insight" bind:this={insightEl} aria-hidden="true"></p>
+
+					<a 
+						class="ghactivity__link"
+						href={GITHUB_URL}
+						target="_blank"
+						rel="noopener noreferrer"
+						data-cursor-text="OPEN"
+					>
+						FULL PROFILE ↗
+					</a>
+				{/if}
 			</div>
 
-			<div class="activity__grid-scroll">
-				<div class="activity__grid" bind:this={gridEl}>
-					{#if payload?.weeks}
-						{#each payload.weeks as week}
-							{#each week.days as day}
-								<i
-									class="activity__cell"
-									style="--lvl: {day.level}"
-									data-level={day.level}
-									title="{day.date} · {day.count} kontribusi"
-								></i>
-							{/each}
-						{/each}
-					{/if}
-				</div>
-			</div>
-
-			<div class="activity__stats" bind:this={statsEl}>
-				{#each statDefs as stat}
-					<div class="activity__stat">
-						<span class="activity__stat-value">0</span>
-						<span class="activity__stat-label">{stat.label}</span>
+			{#if !loadError}
+				<div class="ghactivity__right">
+					<div class="ghactivity__meta" bind:this={metaEl}>
+						<span class="ghactivity__meta-item" data-cursor-text="{stats.stars} bintang">
+						<span class="ghactivity__meta-icon" aria-hidden="true">★</span>
+						<span bind:this={starsNumEl}>0</span>
+						</span>
+						<span class="ghactivity__meta-item" data-cursor-text="{stats.followers} followers">
+						<span class="ghactivity__meta-person" aria-hidden="true"></span>
+						<span bind:this={followersNumEl}>0</span>
+						</span>
 					</div>
-				{/each}
-			</div>
 
-			<span class="activity__insight" bind:this={insightEl}>
-				<span bind:this={insightTextEl}>—</span>
-			</span>
+					<div class="monthly" bind:this={monthlyEl}>
+						{#each monthly as m}
+							<div class="monthly__col">
+								<div class="monthly__track">
+									<span
+										class="monthly__bar"
+										style="height: {m.pct}%"
+										data-cursor-text="{m.count} kontribusi"
+										title="{m.label} · {m.count} kontribusi"
+									></span>
+								</div>
+								<span class="monthly__label">{m.label}</span>
+							</div>
+						{/each}
+					</div>
+
+					<div class="heatmap-wrap">
+						{#if loading}
+							<p class="ghactivity__loading">LOADING_</p>
+						{/if}
+						<div class="heatmap-scroll">
+						<div class="heatmap" bind:this={heatmapEl}>
+							{#each weeks as week}
+								<div class="heatmap__col">
+									{#each week as day}
+										<span
+											class="heatmap__cell"
+											style="--opacity: {opacityFor(levelFor(day.count))}"
+											data-opacity={opacityFor(levelFor(day.count))}
+											data-cursor-text="{day.count} kontribusi"
+											title="{day.count} kontribusi · {formatDate(day.date)}"
+										></span>
+									{/each}
+								</div>
+							{/each}
+						</div>
+						<div class="heatmap__legend" bind:this={legendEl} aria-hidden="true">
+							<span>Less</span>
+							<i class="heatmap__cell" style="--opacity:.06"></i>
+							<i class="heatmap__cell" style="--opacity:.3"></i>
+							<i class="heatmap__cell" style="--opacity:.55"></i>
+							<i class="heatmap__cell" style="--opacity:.8"></i>
+							<i class="heatmap__cell" style="--opacity:1"></i>
+							<span>More</span>
+						</div>
+						</div>
+					</div>
+				</div>
+			{/if}
 		</div>
 	</div>
 </section>
 
 <style>
-	.activity {
+	.ghactivity {
 		position: relative;
-		height: 180vh;
-		background: var(--black);
-		color: var(--fg-dark);
+		min-height: 220vh;
+		background: var(--white);
+		color: var(--black);
 		z-index: 3;
 	}
-	.activity__stage {
+	.ghactivity__stage {
 		position: sticky;
 		top: 0;
 		height: 100vh;
 		overflow: hidden;
 		display: flex;
 		align-items: center;
-		justify-content: center;
-		padding: clamp(2rem, 6vh, 4rem) clamp(1.25rem, 4vw, 4rem);
+		padding-block: clamp(1.75rem, 6vw, 4.5rem);
 	}
-	.activity__inner {
+	.ghactivity__mark {
+		position: absolute;
+		bottom: -1vw;
+		right: 3vw;
+		width: clamp(14rem, 30vw, 26rem);
+		height: auto;
+		color: var(--black);
+		opacity: 0.07;
+		z-index: 0;
+		user-select: none;
+		pointer-events: none;
+	}
+	.ghactivity__mark svg {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+	.ghactivity__dots {
+		position: absolute;
+		top: clamp(1.5rem, 4vw, 3rem);
+		right: clamp(1.5rem, 4vw, 3rem);
+		display: grid;
+		grid-template-columns: repeat(3, 8px);
+		grid-template-rows: repeat(3, 8px);
+		gap: 9px;
+		z-index: 1;
+		pointer-events: none;
+	}
+	.ghactivity__dots i {
+		display: block;
+		width: 8px;
+		height: 8px;
+		background: var(--black);
+		font-style: normal;
+		opacity: 0.08;
+		animation: gh-dot-blink 3s ease-in-out infinite;
+	}
+	.ghactivity__dots i:nth-child(2) { animation-delay: 0.3s; }
+	.ghactivity__dots i:nth-child(3) { animation-delay: 0.6s; }
+	.ghactivity__dots i:nth-child(4) { animation-delay: 0.9s; }
+	.ghactivity__dots i:nth-child(5) { animation-delay: 1.2s; }
+	.ghactivity__dots i:nth-child(6) { animation-delay: 1.5s; }
+	.ghactivity__dots i:nth-child(7) { animation-delay: 1.8s; }
+	.ghactivity__dots i:nth-child(8) { animation-delay: 2.1s; }
+	.ghactivity__dots i:nth-child(9) { animation-delay: 2.4s; }
+
+	.ghactivity__inner {
 		position: relative;
 		z-index: 1;
-		width: min(100%, 1160px);
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: clamp(1.25rem, 3.5vh, 2.4rem);
+		width: 100%;
+		display: grid;
+		grid-template-columns: minmax(240px, 35%) 1fr;
+		gap: clamp(2rem, 5vw, 4rem);
+		padding-inline: clamp(2rem, 7vw, 5.5rem);
 	}
 
-	.activity__head {
+	.ghactivity__left {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		text-align: center;
-		gap: clamp(0.4rem, 1.2vh, 0.7rem);
+		gap: clamp(0.6rem, 1.6vh, 1rem);
 	}
-	.activity__eyebrow {
+
+	.eyebrow {
 		font-family: var(--ff-mono);
 		font-size: 0.8rem;
-		letter-spacing: 0.08em;
+		letter-spacing: 0.1em;
 		color: var(--gray);
-		opacity: 0;
 	}
-	.activity__heading {
+	.heading {
 		margin: 0;
 		font-family: var(--ff-display);
 		font-weight: 400;
-		line-height: 0.92;
+		line-height: 0.95;
 		letter-spacing: 0.01em;
-		font-size: clamp(2.6rem, 7vw, 5.5rem);
+		font-size: clamp(2.6rem, 6vw, 4.5rem);
 	}
 	.line-mask {
 		display: block;
@@ -343,166 +595,306 @@
 	}
 	.cursor {
 		display: inline-block;
-		font-family: var(--ff-mono);
 		margin-left: 0.05em;
 		opacity: 0;
-		animation: activity-blink 1s step-end infinite;
+		animation: gh-blink 1s step-end infinite;
 	}
 
-	.activity__grid-scroll {
-		width: 100%;
-		overflow-x: auto;
-		overscroll-behavior-x: contain;
-		scrollbar-width: thin;
-		scrollbar-color: #1c1c1a var(--black);
-	}
-	.activity__grid {
-		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: var(--cell);
-		grid-template-rows: repeat(7, var(--cell));
-		gap: var(--cell-gap);
-		width: max-content;
-		margin: 0 auto;
-		padding: clamp(0.75rem, 1.8vh, 1.25rem);
-		border: 1px solid rgba(241, 241, 239, 0.12);
-		border-radius: 10px;
-		--cell: clamp(8px, 1.35vw, 15px);
-		--cell-gap: clamp(2px, 0.4vw, 5px);
-	}
-	.activity__cell {
-		display: block;
-		width: var(--cell);
-		height: var(--cell);
-		border-radius: 3px;
-		background: var(--fg-dark);
-		opacity: 0;
-	}
-	.activity__cell:hover {
-		background: var(--gray);
-	}
-
-	.activity__stats {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		gap: clamp(1.25rem, 4vw, 3.5rem);
-	}
-	.activity__stat {
+	.stats {
+		margin: clamp(0.5rem, 1.6vh, 1rem) 0 0;
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		gap: 0.2rem;
 	}
-	.activity__stat-value {
-		font-family: var(--ff-mono);
-		font-size: clamp(1.6rem, 4vw, 2.8rem);
-		line-height: 1;
-		color: var(--fg-dark);
-		opacity: 0;
-		font-variant-numeric: tabular-nums;
+	.stats__row {
+		position: relative;
+		display: flex;
+		align-items: baseline;
+		gap: 1.25rem;
+		padding: 0.55rem 0;
 	}
-	.activity__stat-label {
+	.stats__rule {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 1px;
+		background: rgba(10, 10, 10, 0.14);
+	}
+	.stats__row dt {
+		flex: 0 0 auto;
+		width: 6.5rem;
+		margin: 0;
 		font-family: var(--ff-mono);
 		font-size: 0.68rem;
 		letter-spacing: 0.08em;
 		color: var(--gray);
 	}
-
-	.activity__insight {
+	.stats__row dd {
+		margin: 0;
+		font-family: var(--ff-body);
+		font-size: 0.9rem;
+		color: var(--black);
+	}
+	.stats__row dd span {
 		font-family: var(--ff-mono);
-		font-size: clamp(0.85rem, 1.4vw, 1.05rem);
-		letter-spacing: 0.04em;
-		color: var(--fg-dark);
-		opacity: 0;
-		white-space: nowrap;
+		font-weight: 600;
 	}
 
-	/* Ghost watermark + dot decor — reuse motif dari Nav/Footer/Skills. */
-	.activity__mark {
-		position: absolute;
-		left: -0.5vw;
-		bottom: -3vw;
-		font-family: var(--ff-display);
-		font-weight: 400;
-		letter-spacing: 0.01em;
-		font-size: clamp(6rem, 18vw, 15rem);
+	.ghactivity__insight {
+		margin: 0.4rem 0 0;
+		font-family: var(--ff-mono);
+		font-size: 0.76rem;
+		letter-spacing: 0.06em;
+		color: var(--gray);
+		min-height: 1em;
+		white-space: pre;
+	}
+
+	.ghactivity__link {
+		align-self: flex-start;
+		margin-top: clamp(0.6rem, 1.6vh, 1rem);
+		font-family: var(--ff-mono);
+		font-size: 0.8rem;
+		letter-spacing: 0.05em;
+		color: var(--black);
+		border-bottom: 1px solid rgba(10, 10, 10, 0.3);
+		padding-bottom: 0.2rem;
+		transition: border-color 0.2s ease;
+	}
+	.ghactivity__link:hover {
+		border-color: var(--black);
+	}
+
+	.ghactivity__fallback {
+		font-family: var(--ff-body);
+		font-size: 0.92rem;
+		color: var(--ink-soft);
+		max-width: 26rem;
+	}
+	.ghactivity__fallback a {
+		border-bottom: 1px solid rgba(10, 10, 10, 0.3);
+	}
+
+	.ghactivity__right {
+		display: flex;
+		flex-direction: column;
+		gap: clamp(1.5rem, 4vh, 2.5rem);
+		/* Grid items default to a min-width that hugs their content's
+		   min-content size, which can silently force the whole track (and
+		   the page with it) wider than the viewport once any descendant has
+		   an intrinsically wide box. This keeps it shrinkable so the
+		   heatmap's own overflow-x:auto is what scrolls — not the page. */
+		min-width: 0;
+	}
+
+	/* Stars + followers — sits above the monthly strip, pinned to the right
+	   edge of the right column via align-self so it doesn't need its own
+	   grid track or disturb the stack below it. */
+	.ghactivity__meta {
+		display: flex;
+		align-self: flex-end;
+		gap: 1.1rem;
+	}
+	.ghactivity__meta-item {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+		font-family: var(--ff-mono);
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--black);
+	}
+	.ghactivity__meta-icon {
+		font-size: 1.1rem;
 		line-height: 1;
-		color: var(--fg-dark);
-		opacity: 0.04;
-		z-index: 0;
-		user-select: none;
-		pointer-events: none;
+		opacity: 0.65;
+		flex-shrink: 0;
 	}
-	.activity__dots {
+	.ghactivity__meta-person {
+		position: relative;
+		display: inline-block;
+		width: 0.95rem;
+		height: 0.95rem;
+		flex-shrink: 0;
+		opacity: 0.65;
+	}
+	.ghactivity__meta-person::before {
+		content: '';
 		position: absolute;
-		top: clamp(1.5rem, 4vw, 3rem);
-		right: clamp(1.5rem, 4vw, 3rem);
-		display: grid;
-		grid-template-columns: repeat(3, 8px);
-		grid-template-rows: repeat(3, 8px);
-		gap: 9px;
-		z-index: 1;
-		pointer-events: none;
-		opacity: 0;
+		top: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 0.4rem;
+		height: 0.4rem;
+		border-radius: 50%;
+		background: currentColor;
 	}
-	.activity__dots i {
-		display: block;
-		width: 8px;
-		height: 8px;
-		background: var(--fg-dark);
-		font-style: normal;
-		opacity: 0.08;
-		animation: activity-dot-blink 3s ease-in-out infinite;
+	.ghactivity__meta-person::after {
+		content: '';
+		position: absolute;
+		left: 50%;
+		bottom: 0;
+		transform: translateX(-50%);
+		width: 0.82rem;
+		height: 0.48rem;
+		border-radius: 50% 50% 0.15rem 0.15rem;
+		background: currentColor;
 	}
-	.activity__dots i:nth-child(2) { animation-delay: 0.3s; }
-	.activity__dots i:nth-child(3) { animation-delay: 0.6s; }
-	.activity__dots i:nth-child(4) { animation-delay: 0.9s; }
-	.activity__dots i:nth-child(5) { animation-delay: 1.2s; }
-	.activity__dots i:nth-child(6) { animation-delay: 1.5s; }
-	.activity__dots i:nth-child(7) { animation-delay: 1.8s; }
-	.activity__dots i:nth-child(8) { animation-delay: 2.1s; }
-	.activity__dots i:nth-child(9) { animation-delay: 2.4s; }
 
-	@keyframes activity-blink {
+	.ghactivity__loading {
+		font-family: var(--ff-mono);
+		font-size: 0.75rem;
+		letter-spacing: 0.08em;
+		color: var(--gray);
+		animation: gh-blink 1.2s step-end infinite;
+	}
+
+	.heatmap-wrap {
+		position: relative;
+		width: 100%;
+		max-width: 100%;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		touch-action: pan-x;
+		scrollbar-width: none;
+		padding-bottom: 0.5rem;
+	}
+	.heatmap-wrap::-webkit-scrollbar {
+		display: none;
+	}
+
+	.heatmap-scroll {
+		width: max-content;
+		margin-left: auto;
+	}
+
+	.heatmap {
+		display: flex;
+		gap: 3px;
+		width: max-content;
+	}
+	.heatmap__col {
+		display: flex;
+		flex-direction: column;
+		gap: 3px;
+	}
+	.heatmap__cell {
+		display: block;
+		width: 11px;
+		height: 11px;
+		background: var(--black);
+		opacity: var(--opacity, 0.06);
+		will-change: opacity;
+	}
+
+	.heatmap__legend {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		margin-top: 1rem;
+		font-family: var(--ff-mono);
+		font-size: 0.7rem;
+		letter-spacing: 0.05em;
+		color: var(--gray);
+	}
+	.heatmap__legend .heatmap__cell {
+		width: 9px;
+		height: 9px;
+	}
+
+	/* Monthly strip — trailing 12-month totals aggregated from the same
+	   fetch as the heatmap, so this is a second read of real data rather
+	   than decoration filling space. Bars grow via scaleY (compositor-only,
+	   no layout thrash) off a track whose final height is set once by CSS.
+	   Width is locked to the heatmap's measured width in JS on desktop only
+	   — see onMount — so on mobile it just fills 100% here. */
+	.monthly {
+		display: flex;
+		align-items: flex-end;
+		gap: clamp(0.2rem, 0.6vw, 0.4rem);
+		margin-top: auto;
+		margin-left: auto;
+	}
+	.monthly__col {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	.monthly__track {
+		width: 100%;
+		max-width: 26px;
+		height: 96px;
+		display: flex;
+		align-items: flex-end;
+	}
+	.monthly__bar {
+		display: block;
+		width: 100%;
+		background: var(--black);
+		opacity: 0.8;
+		transform-origin: bottom;
+	}
+	.monthly__label {
+		font-family: var(--ff-mono);
+		font-size: 0.6rem;
+		letter-spacing: 0.03em;
+		color: var(--gray);
+	}
+
+	@keyframes gh-blink {
 		0%, 100% { opacity: 1; }
 		50% { opacity: 0; }
 	}
-	@keyframes activity-dot-blink {
+	@keyframes gh-dot-blink {
 		0%, 100% { opacity: 0.08; }
 		50% { opacity: 0.34; }
 	}
 
 	@media (max-width: 860px) {
-		.activity {
-			height: auto;
+		.ghactivity {
+			min-height: auto;
 		}
-		.activity__stage {
+		.ghactivity__stage {
 			position: relative;
 			top: auto;
 			height: auto;
-			padding: clamp(4rem, 10vh, 5rem) 1.25rem;
+			padding-block: clamp(3rem, 10vh, 4.5rem);
 		}
-		.activity__inner {
+		.ghactivity__inner {
+			grid-template-columns: 1fr;
 			gap: clamp(1.5rem, 4vh, 2.5rem);
+			padding-inline: clamp(1.5rem, 6vw, 3rem);
 		}
-		.activity__grid {
-			margin: 0 auto;
-			--cell: 9px;
-			--cell-gap: 3px;
+		.heading {
+			font-size: clamp(2.2rem, 11vw, 3rem);
 		}
-		.activity__stats {
-			gap: clamp(1.25rem, 6vw, 2.5rem);
+		.monthly {
+			width: 100%;
+			gap: 0.2rem;
+		}
+		.monthly__track {
+			height: 72px;
+			max-width: 22px;
+		}
+		.monthly__label {
+			font-size: 0.55rem;
 		}
 	}
+
 	@media (prefers-reduced-motion: reduce) {
 		.cursor {
 			animation: none;
 			opacity: 1;
 		}
-		.activity__dots i {
+		.ghactivity__dots i {
 			animation: none;
 			opacity: 0.2;
+		}
+		.ghactivity__loading {
+			animation: none;
 		}
 	}
 </style>
