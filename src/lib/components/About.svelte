@@ -152,7 +152,7 @@
 
 			<div class="body" bind:this={bodyEl}>
 				<p class="bio" bind:this={bioEl}>
-					I'm a otodidakerss developer based in Kutai Kartanegara, Indonesia, building web applications from real-world problems and ideas I personally encounter. I enjoy turning those ideas into useful, practical products that I can actually use myself
+					I'm an otodidakers developer, building web applications from real-world problems and ideas I personally encounter. I enjoy turning those ideas into useful, practical products that I can actually use myself.
 				</p>
 
 				<dl class="facts" bind:this={factsEl}>
@@ -169,12 +169,12 @@
 					<div class="facts__row">
 						<span class="facts__rule" aria-hidden="true"></span>
 						<dt>STATUS</dt>
-						<dd>Self-Taught · Info Systems Student</dd>
+						<dd>Inform Systems Student · 5th Semester</dd>
 					</div>
 					<div class="facts__row">
 						<span class="facts__rule" aria-hidden="true"></span>
-						<dt>GITHUB</dt>
-						<dd>Itsflaid</dd>
+						<dt>Experience</dt>
+						<dd>Self-Taught since late 2024</dd>
 					</div>
 				</dl>
 			</div>

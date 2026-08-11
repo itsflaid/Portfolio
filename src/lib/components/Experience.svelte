@@ -18,21 +18,27 @@
 			date: 'JUL 2021 — MAR 2024',
 			type: 'EDUCATION',
 			title: 'COMPUTER ENGINEERING & NETWORKING (TKJ)',
-			org: 'SMK Muhammadiyah Loa Janan'
+			org: 'SMK Muhammadiyah Loa Janan',
+			desc: 'Started my journey in IT, building a foundation in computer systems, hardware & networking.'
+
 		},
 		{
 			side: 'right',
 			date: 'JUL — DEC 2022',
 			type: 'EXPERIENCE',
 			title: 'PRAKTIK KERJA INDUSTRI - LOGISTICS',
-			org: 'PT. Anugerah Bara Kaltim'
+			org: 'PT. Anugerah Bara Kaltim',
+			desc: 'Worked in a real-world logistics environment, handling inventory records, checking incoming goods, and scanning docs.'
+
 		},
 		{
 			side: 'left',
 			date: 'AUG 2024 — PRESENT',
 			type: 'EDUCATION',
 			title: 'INFORMATION SYSTEM (S1)',
-			org: 'UIN Sultan Aji Muhammad Idris Samarinda'
+			org: 'UIN Sultan Aji Muhammad Idris Samarinda',
+			desc: 'Studying information systems, with coursework in web dev, databases, software eng, & UI/UX'
+
 		},
 		{
 			side: 'right',
@@ -40,7 +46,7 @@
 			type: 'SELF-TAUGHT',
 			title: 'Full-Stack Development',
 			org: 'Independent',
-			desc: 'Learning by shipping — DevMap, ChatMe, and other tools, in public.'
+			desc: 'Learning by building through personal projects, courses, Youtube, & community events'
 		}
 	];
 
@@ -110,9 +116,9 @@
 						<span class="xp__date">{entry.date} · {entry.type}</span>
 						<span class="xp__title">{entry.title}</span>
 						<span class="xp__org">{entry.org}</span>
-						{#if entry.desc}
+						
 							<p class="xp__desc">{entry.desc}</p>
-						{/if}
+					
 					</div>
 				</li>
 			{/each}
