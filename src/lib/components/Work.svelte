@@ -36,6 +36,8 @@
 		title: string;
 		tag: string;
 		thumb: string;
+		// Base path WITHOUT extension — .webm/.mp4 are appended in the
+		// template so the browser can pick whichever it supports.
 		video: string;
 		desc: string;
 		tech: TechItem[];
@@ -52,7 +54,7 @@ const projects: Project[] = [
         title: 'DEVMAP',
         tag: 'Analyze once, reuse context everywhere',
         thumb: '/devmap.webp',
-        video: '/devmap.mp4',
+        video: '/devmap',
         desc: 'Maps your codebase through static analysis to give AI agents structured context and a clearer understanding of your project.',
         tech: [
             { name: 'TypeScript', icon: si(siTypescript) },
@@ -70,7 +72,7 @@ const projects: Project[] = [
         title: 'DEVNOTE',
         tag: 'A platform for developers to manage and organize code, snippets, resources, and knowledge.',
         thumb: '/devnote.webp',
-        video: '/devnote.mp4',
+        video: '/devnote',
         desc: 'Keep your technical knowledge organized in one place, from reusable snippets and resources to notes and collections.',
         tech: [
             { name: 'Next.js', icon: si(siNextdotjs) },
@@ -87,7 +89,7 @@ const projects: Project[] = [
         title: 'CHATME',
         tag: 'Chat-UI-based personal notes and reminders web application',
         thumb: '/chatme.webp',
-        video: '/chatme.mp4',
+        video: '/chatme',
         desc: 'A simple way to capture thoughts, save notes, and manage reminders through a familiar chat-based interface.',
         tech: [
             { name: 'Next.js', icon: si(siNextdotjs) },
@@ -104,7 +106,7 @@ const projects: Project[] = [
         title: 'DAILYFIT',
         tag: 'Simple daily home workout web application',
         thumb: '/dailyfit.webp',
-        video: '/dailyfit.mp4',
+        video: '/dailyfit',
         desc: 'Follow daily workouts, track completed activities, and keep an eye on your progress through a simple fitness experience.',
         tech: [
             { name: 'Next.js', icon: si(siNextdotjs) },
@@ -121,7 +123,7 @@ const projects: Project[] = [
         title: 'MUFADZ PORTAL',
         tag: 'An all-in-one platform for Islamic services, from Quran to prayer schedule.',
         thumb: '/mufadz.webp',
-        video: '/mufadz.mp4',
+        video: '/mufadz',
         desc: 'Brings Islamic services together in one platform — Quran reader and prayer schedule anchor daily use, alongside dzikir, zakat calculator, and an AI chatbot.',
         tech: [
             { name: 'React', icon: si(siReact) },
@@ -138,7 +140,7 @@ const projects: Project[] = [
         title: 'DE HOME SPA',
         tag: 'An AI-powered home spa platform for personalized treatment recommendations and guidance.',
         thumb: '/de-home-spa.webp',
-        video: '/dehomespa.mp4',
+        video: '/dehomespa',
         desc: 'Get personalized home spa recommendations based on your needs through guided selections or direct conversations with AI.',
         tech: [
             { name: 'Next.js', icon: si(siNextdotjs) },
@@ -348,14 +350,16 @@ const projects: Project[] = [
 							/>
 							<video
 								class="media__video"
-								src={project.video}
 								muted
 								loop
 								playsinline
 								preload="metadata"
 								aria-hidden="true"
 								tabindex="-1"
-							></video>
+							>
+								<source src="{project.video}.webm" type="video/webm" />
+								<source src="{project.video}.mp4" type="video/mp4" />
+							</video>
 						</div>
 					</div>
 					<div class="card__info">
