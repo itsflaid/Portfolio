@@ -9,7 +9,9 @@
 		total: number;
 		currentStreak: number;
 		longestStreak: number;
-		mostActiveDay: string;
+		activeDays: number;
+		commits: number;
+		repos: number;
 		stars: number;
 		followers: number;
 	};
@@ -18,15 +20,6 @@
 	const GITHUB_URL = 'https://github.com/itsflaid';
 	const year = new Date().getFullYear();
 
-	const DAY_ID: Record<string, string> = {
-		Sunday: 'MINGGU',
-		Monday: 'SENIN',
-		Tuesday: 'SELASA',
-		Wednesday: 'RABU',
-		Thursday: 'KAMIS',
-		Friday: 'JUMAT',
-		Saturday: 'SABTU'
-	};
 	const MONTH_ID = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGU', 'SEP', 'OKT', 'NOV', 'DES'];
 
 	let weeks: Day[][] = [];
@@ -34,7 +27,9 @@
 		total: 0,
 		currentStreak: 0,
 		longestStreak: 0,
-		mostActiveDay: 'Monday',
+		activeDays: 0,
+		commits: 0,
+		repos: 0,
 		stars: 0,
 		followers: 0
 	};
@@ -56,8 +51,8 @@
 	let insightEl: HTMLElement;
 	let totalNumEl: HTMLElement;
 	let streakNumEl: HTMLElement;
-	let longestNumEl: HTMLElement;
-	let mostActiveEl: HTMLElement;
+	let commitsNumEl: HTMLElement;
+	let reposNumEl: HTMLElement;
 	let starsNumEl: HTMLElement;
 	let followersNumEl: HTMLElement;
 
@@ -83,12 +78,8 @@
 		return new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).format(d);
 	}
 
-	function dayNameId(name: string) {
-		return DAY_ID[name] ?? name;
-	}
-
 	function insightText() {
-		return `${stats.total} KONTRIBUSI · ${stats.longestStreak} HARI TERPANJANG`;
+		return `${stats.activeDays} HARI AKTIF · ${stats.longestStreak} HARI TERPANJANG`;
 	}
 
 	// "1,2rb" instead of "1234" — stars/followers bisa gede angkanya, jadi
@@ -164,8 +155,6 @@
 				monthlyEl.style.maxWidth = '100%';
 			}
 
-			mostActiveEl.textContent = dayNameId(stats.mostActiveDay);
-
 			if (reduceMotion) {
 				gsap.set(eyebrowEl, { opacity: 1 });
 				gsap.set([line1El, line2El], { y: '0%', x: '0rem' });
@@ -177,7 +166,8 @@
 				gsap.set(legendEl, { opacity: 1, y: 0 });
 				totalNumEl.textContent = String(stats.total);
 				streakNumEl.textContent = String(stats.currentStreak);
-				longestNumEl.textContent = String(stats.longestStreak);
+				commitsNumEl.textContent = String(stats.commits);
+				reposNumEl.textContent = String(stats.repos);
 				starsNumEl.textContent = formatCompact(stats.stars);
 				followersNumEl.textContent = formatCompact(stats.followers);
 				insightEl.textContent = insightText();
@@ -199,7 +189,8 @@
 				gsap.set(legendEl, { opacity: 0, y: 10 });
 				totalNumEl.textContent = '0';
 				streakNumEl.textContent = '0';
-				longestNumEl.textContent = '0';
+				commitsNumEl.textContent = '0';
+				reposNumEl.textContent = '0';
 				starsNumEl.textContent = '0';
 				followersNumEl.textContent = '0';
 				insightEl.textContent = '';
@@ -213,13 +204,14 @@
 				mTl.to(rows, { opacity: 1, y: 0, stagger: 0.08, ease: 'power2.out' }, 0.2);
 				mTl.to(metaEl, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0.15);
 
-				const mCounters = { total: 0, streak: 0, longest: 0, stars: 0, followers: 0 };
+				const mCounters = { total: 0, streak: 0, commits: 0, repos: 0, stars: 0, followers: 0 };
 				mTl.to(
 					mCounters,
 					{
 						total: stats.total,
 						streak: stats.currentStreak,
-						longest: stats.longestStreak,
+						commits: stats.commits,
+						repos: stats.repos,
 						stars: stats.stars,
 						followers: stats.followers,
 						duration: 0.5,
@@ -227,7 +219,8 @@
 						onUpdate: () => {
 							totalNumEl.textContent = String(Math.floor(mCounters.total));
 							streakNumEl.textContent = String(Math.floor(mCounters.streak));
-							longestNumEl.textContent = String(Math.floor(mCounters.longest));
+							commitsNumEl.textContent = String(Math.floor(mCounters.commits));
+							reposNumEl.textContent = String(Math.floor(mCounters.repos));
 							starsNumEl.textContent = formatCompact(Math.floor(mCounters.stars));
 							followersNumEl.textContent = formatCompact(Math.floor(mCounters.followers));
 						}
@@ -272,7 +265,7 @@
 			gsap.set([line1El, line2El], { y: '105%' });
 
 			let progress = 0;
-			const counters = { total: 0, streak: 0, longest: 0, stars: 0, followers: 0 };
+			const counters = { total: 0, streak: 0, commits: 0, repos: 0, stars: 0, followers: 0 };
 
 			const tl = gsap.timeline({
 				scrollTrigger: {
@@ -309,7 +302,8 @@
 				{
 					total: stats.total,
 					streak: stats.currentStreak,
-					longest: stats.longestStreak,
+					commits: stats.commits,
+					repos: stats.repos,
 					stars: stats.stars,
 					followers: stats.followers,
 					duration: 0.55,
@@ -317,7 +311,8 @@
 					onUpdate: () => {
 						totalNumEl.textContent = String(Math.floor(counters.total));
 						streakNumEl.textContent = String(Math.floor(counters.streak));
-						longestNumEl.textContent = String(Math.floor(counters.longest));
+						commitsNumEl.textContent = String(Math.floor(counters.commits));
+						reposNumEl.textContent = String(Math.floor(counters.repos));
 						starsNumEl.textContent = formatCompact(Math.floor(counters.stars));
 						followersNumEl.textContent = formatCompact(Math.floor(counters.followers));
 					}
@@ -402,13 +397,13 @@
 						</div>
 						<div class="stats__row">
 							<span class="stats__rule" aria-hidden="true"></span>
-							<dt>TERPANJANG</dt>
-							<dd><span bind:this={longestNumEl}>0</span> hari</dd>
+							<dt>COMMIT</dt>
+							<dd><span bind:this={commitsNumEl}>0</span> commit / 12 bulan</dd>
 						</div>
 						<div class="stats__row">
 							<span class="stats__rule" aria-hidden="true"></span>
-							<dt>PALING AKTIF</dt>
-							<dd bind:this={mostActiveEl}>—</dd>
+							<dt>REPO</dt>
+							<dd><span bind:this={reposNumEl}>0</span> repo publik</dd>
 						</div>
 					</dl>
 

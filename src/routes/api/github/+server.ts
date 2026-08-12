@@ -12,11 +12,13 @@ const QUERY = `
 				totalCount
 			}
 			repositories(first: 100, ownerAffiliations: OWNER, isFork: false) {
+				totalCount
 				nodes {
 					stargazerCount
 				}
 			}
 			contributionsCollection {
+				totalCommitContributions
 				contributionCalendar {
 					totalContributions
 					weeks {
@@ -82,7 +84,7 @@ export const GET: RequestHandler = async () => {
 		const days: ContributionDay[] = weeks.flatMap((w) => w.contributionDays);
 
 		const { current, longest } = computeStreaks(days);
-		const mostActiveDay = computeMostActiveDay(days);
+		const activeDays = days.filter((d) => d.contributionCount > 0).length;
 
 		const followers = viewer?.followers?.totalCount ?? 0;
 		// Repo publik non-fork lu > 100? Stars dari sisanya gak ke-hitung —
@@ -90,6 +92,7 @@ export const GET: RequestHandler = async () => {
 		// dari first 100. Cukup buat hampir semua profile portfolio.
 		const repoNodes: { stargazerCount: number }[] = viewer?.repositories?.nodes ?? [];
 		const stars = repoNodes.reduce((sum, r) => sum + (r.stargazerCount ?? 0), 0);
+		const repos = viewer?.repositories?.totalCount ?? repoNodes.length;
 
 		const responseData = {
 			// Client cuma butuh count + date per cell buat render heatmap & tooltip —
@@ -99,7 +102,9 @@ export const GET: RequestHandler = async () => {
 				total: calendar.totalContributions ?? 0,
 				currentStreak: current,
 				longestStreak: longest,
-				mostActiveDay,
+				activeDays,
+				commits: calendar.totalCommitContributions ?? 0,
+				repos,
 				stars,
 				followers
 			}
@@ -140,17 +145,4 @@ function computeStreaks(days: ContributionDay[]) {
 	}
 
 	return { current, longest };
-}
-
-function computeMostActiveDay(days: ContributionDay[]) {
-	// Pakai field `weekday` yang udah dikasih langsung sama GitHub (0=Sun..6=Sat)
-	// — bukan re-parse string tanggal secara manual, biar gak kena bug offset
-	// timezone kayak yang pernah kejadian di UTC checklist DailyFit dulu.
-	const totals = [0, 0, 0, 0, 0, 0, 0];
-	for (const d of days) {
-		totals[d.weekday] += d.contributionCount;
-	}
-	const maxIdx = totals.indexOf(Math.max(...totals));
-	const names = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-	return names[maxIdx];
 }
