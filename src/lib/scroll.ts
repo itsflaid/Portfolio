@@ -6,6 +6,10 @@ export function setLenis(instance: Lenis | null) {
 	lenis = instance;
 }
 
+export function getLenis() {
+	return lenis;
+}
+
 export function stopLenis() {
 	lenis?.stop();
 }

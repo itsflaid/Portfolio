@@ -4,6 +4,9 @@
 	import Hero from '$lib/components/Hero.svelte';
 	import About from '$lib/components/About.svelte';
 	import Work from '$lib/components/Work.svelte';
+	import ScrollModeToggle from '$lib/components/ScrollModeToggle.svelte';
+	// TODO (Manifesto belum selesai — dinonaktifkan sementara, jangan dijalankan)
+	// import Manifesto from '$lib/components/Manifesto.svelte';
 	import Marquee from '$lib/components/Marquee.svelte';
 	import Experience from '$lib/components/Experience.svelte';
 	import Skills from '$lib/components/Skills.svelte';
@@ -23,11 +26,14 @@
 
 <Grain />
 <Nav />
+<ScrollModeToggle />
 <Hero />
 <About />
 <Experience />
 <Marquee />
-<Work />
+	<!-- Manifesto belum selesai — dinonaktifkan sementara -->
+	<!-- <Manifesto /> -->
+	<Work />
 <Skills />
 <GithubActivity />
 
