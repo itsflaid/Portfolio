@@ -2,10 +2,10 @@ import { json } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import type { RequestHandler } from './$types';
 
-// Server-only: GH_TOKEN never reaches the client bundle. Uses `viewer` in the
-// GraphQL query, so the token's own account is the one being read — no
-// username needs to be passed or hardcoded here.
-const QUERY = `
+// Statistik (TOTAL, COMMIT, HARI AKTIF, STREAK) dihitung all-time — di-loop
+// per tahun karena GitHub cuma ngasih satu jendela waktu (biasanya ~setahun)
+// per contributionsCollection. Profil (followers/repos/stars) cukup sekali.
+const PROFILE_QUERY = `
 	query {
 		viewer {
 			followers {
@@ -18,14 +18,22 @@ const QUERY = `
 				}
 			}
 			contributionsCollection {
-				totalCommitContributions
+				contributionYears
+			}
+		}
+	}
+`;
+
+// Heatmap + bar bulanan DEFAULT: 12 bulan terakhir (koleksi default GitHub).
+const TRAILING_QUERY = `
+	query {
+		viewer {
+			contributionsCollection {
 				contributionCalendar {
-					totalContributions
 					weeks {
 						contributionDays {
 							contributionCount
 							date
-							weekday
 						}
 					}
 				}
@@ -34,7 +42,30 @@ const QUERY = `
 	}
 `;
 
-type ContributionDay = { contributionCount: number; date: string; weekday: number };
+// Satu tahun penuh — dipakai buat filter tahun & agregat all-time.
+const YEAR_QUERY = `
+	query($from: DateTime!, $to: DateTime!) {
+		viewer {
+			contributionsCollection(from: $from, to: $to) {
+				totalCommitContributions
+				contributionCalendar {
+					totalContributions
+					weeks {
+						contributionDays {
+							contributionCount
+							date
+						}
+					}
+				}
+			}
+		}
+	}
+`;
+
+type ContributionDay = { contributionCount: number; date: string };
+
+// Bentuk yang dikirim ke client buat render heatmap — cuma butuh count + date.
+type DayCell = { count: number; date: string };
 
 type CacheEntry = { data: unknown; expiresAt: number };
 let cache: CacheEntry | null = null;
@@ -44,6 +75,32 @@ const TTL_MS = 60 * 60 * 1000; // 1 jam — cukup buat data yang cuma berubah ka
 // runtime env (serverless function) di Vercel, bukan dari build time. Kalau
 // di-prerender, data kebeku saat build dan env gak kebaca.
 export const prerender = false;
+
+async function ghGraphQL(token: string, query: string, variables: Record<string, unknown> = {}) {
+	const res = await fetch('https://api.github.com/graphql', {
+		method: 'POST',
+		headers: {
+			Authorization: `bearer ${token}`,
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({ query, variables })
+	});
+
+	if (!res.ok) {
+		throw new Error(`GitHub API respond ${res.status}`);
+	}
+
+	const payload = await res.json();
+	if (payload?.errors?.length) {
+		throw new Error(`GitHub GraphQL error: ${payload.errors[0].message}`);
+	}
+
+	return payload?.data?.viewer;
+}
+
+function mapWeeks(weeks: { contributionDays: ContributionDay[] }[]): DayCell[][] {
+	return weeks.map((w) => w.contributionDays.map((d) => ({ count: d.contributionCount, date: d.date })));
+}
 
 export const GET: RequestHandler = async () => {
 	if (cache && cache.expiresAt > Date.now()) {
@@ -59,54 +116,60 @@ export const GET: RequestHandler = async () => {
 	}
 
 	try {
-		const res = await fetch('https://api.github.com/graphql', {
-			method: 'POST',
-			headers: {
-				Authorization: `bearer ${token}`,
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ query: QUERY })
-		});
+		const [profile, trailingViewer] = await Promise.all([
+			ghGraphQL(token, PROFILE_QUERY),
+			ghGraphQL(token, TRAILING_QUERY)
+		]);
+		const years: number[] = profile?.contributionsCollection?.contributionYears ?? [];
 
-		if (!res.ok) {
-			return json({ error: `GitHub API respond ${res.status}` }, { status: 502 });
+		const byYear: Record<string, DayCell[][]> = {};
+		const days: ContributionDay[] = [];
+		let total = 0;
+		let commits = 0;
+
+		for (const year of years.slice().sort((a, b) => a - b)) {
+			const yearViewer = await ghGraphQL(token, YEAR_QUERY, {
+				from: `${year}-01-01T00:00:00.000Z`,
+				to: `${year}-12-31T23:59:59.999Z`
+			});
+
+			const calendar = yearViewer?.contributionsCollection?.contributionCalendar;
+			const yearWeeks: { contributionDays: ContributionDay[] }[] = calendar?.weeks ?? [];
+
+			byYear[String(year)] = mapWeeks(yearWeeks);
+			for (const w of yearWeeks) days.push(...w.contributionDays);
+
+			total += calendar?.totalContributions ?? 0;
+			// totalCommitContributions ada di contributionsCollection, BUKAN di
+			// contributionCalendar. Dulu dibaca dari objek yang salah, makanya
+			// selalu balik undefined -> 0.
+			commits += yearViewer?.contributionsCollection?.totalCommitContributions ?? 0;
 		}
-
-		const payload = await res.json();
-		const viewer = payload?.data?.viewer;
-		const calendar = viewer?.contributionsCollection?.contributionCalendar;
-
-		if (!calendar) {
-			return json({ error: 'Response GitHub GraphQL gak sesuai bentuk yang diharapkan.' }, { status: 502 });
-		}
-
-		const weeks: { contributionDays: ContributionDay[] }[] = calendar.weeks ?? [];
-		const days: ContributionDay[] = weeks.flatMap((w) => w.contributionDays);
 
 		const { current, longest } = computeStreaks(days);
 		const activeDays = days.filter((d) => d.contributionCount > 0).length;
 
-		const followers = viewer?.followers?.totalCount ?? 0;
 		// Repo publik non-fork lu > 100? Stars dari sisanya gak ke-hitung —
 		// GitHub gak punya field agregat langsung, jadi ini di-sum manual
 		// dari first 100. Cukup buat hampir semua profile portfolio.
-		const repoNodes: { stargazerCount: number }[] = viewer?.repositories?.nodes ?? [];
+		const repoNodes: { stargazerCount: number }[] = profile?.repositories?.nodes ?? [];
 		const stars = repoNodes.reduce((sum, r) => sum + (r.stargazerCount ?? 0), 0);
-		const repos = viewer?.repositories?.totalCount ?? repoNodes.length;
 
 		const responseData = {
-			// Client cuma butuh count + date per cell buat render heatmap & tooltip —
-			// weekday udah dipakai di sini buat itung stat, gak perlu ikut dikirim.
-			weeks: weeks.map((w) => w.contributionDays.map((d) => ({ count: d.contributionCount, date: d.date }))),
+			years,
+			// Heatmap & bar bulanan default: 12 bulan terakhir.
+			weeks: mapWeeks(trailingViewer?.contributionsCollection?.contributionCalendar?.weeks ?? []),
+			// Pilihan filter per tahun: { "2025": DayCell[][], ... }
+			byYear,
 			stats: {
-				total: calendar.totalContributions ?? 0,
+				total,
 				currentStreak: current,
 				longestStreak: longest,
 				activeDays,
-				commits: calendar.totalCommitContributions ?? 0,
-				repos,
+				commits,
+				repos: profile?.repositories?.totalCount ?? repoNodes.length,
 				stars,
-				followers
+				followers: profile?.followers?.totalCount ?? 0
 			}
 		};
 
@@ -117,11 +180,31 @@ export const GET: RequestHandler = async () => {
 	}
 };
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+// "2026-08-12" (UTC). GitHub menghitung hari kontribusi per UTC, jadi anchor
+// streak juga pakai UTC biar konsisten sama data yang dikasih API.
+function utcDateStr(offsetDays: number): string {
+	return new Date(Date.now() + offsetDays * DAY_MS).toISOString().slice(0, 10);
+}
+
+function isNextDay(prev: string, next: string): boolean {
+	return Date.parse(`${next}T00:00:00Z`) - Date.parse(`${prev}T00:00:00Z`) === DAY_MS;
+}
+
 function computeStreaks(days: ContributionDay[]) {
+	const sorted = [...days].sort((a, b) => a.date.localeCompare(b.date));
+	const counts = new Map(sorted.map((d) => [d.date, d.contributionCount]));
+
+	// Longest streak = rentang hari beruntun terpanjang, dan wajib kontigu
+	// (selisih tanggal tepat 1 hari). Cek tanggal, bukan cuma count > 0 —
+	// kalau ada tahun tanpa kontribusi (gap di antara contributionYears),
+	// streak harus putus di situ.
 	let longest = 0;
 	let run = 0;
-	for (const d of days) {
-		if (d.contributionCount > 0) {
+	for (let i = 0; i < sorted.length; i++) {
+		const contiguous = i === 0 || isNextDay(sorted[i - 1].date, sorted[i].date);
+		if (sorted[i].contributionCount > 0 && contiguous) {
 			run++;
 			longest = Math.max(longest, run);
 		} else {
@@ -129,19 +212,17 @@ function computeStreaks(days: ContributionDay[]) {
 		}
 	}
 
-	// Current streak dihitung mundur dari hari terakhir (hari ini). Kalau hari
-	// ini masih 0 kontribusi, itu wajar — belum tentu udah ngoding hari ini,
-	// bukan berarti streak putus. Lanjut hitung dari kemarin.
+	// Current streak dihitung mundur dari hari ini (UTC). Kalau hari ini masih
+	// 0 kontribusi, itu wajar — belum tentu udah ngoding hari ini, bukan berarti
+	// streak putus. Lanjut hitung dari kemarin.
 	let current = 0;
-	for (let i = days.length - 1; i >= 0; i--) {
-		const isToday = i === days.length - 1;
-		if (days[i].contributionCount > 0) {
-			current++;
-		} else if (isToday) {
-			continue;
-		} else {
-			break;
-		}
+	let offset = 0;
+	if ((counts.get(utcDateStr(offset)) ?? 0) === 0) {
+		offset = -1;
+	}
+	while ((counts.get(utcDateStr(offset)) ?? 0) > 0) {
+		current++;
+		offset--;
 	}
 
 	return { current, longest };

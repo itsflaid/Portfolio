@@ -53,8 +53,8 @@
       index: "01",
       title: "DEVMAP",
       tag: "Analyze once, reuse context everywhere",
-      thumb: "/devmap.webp",
-      video: "/devmap",
+      thumb: "/preview/image/devmap.webp",
+      video: "/preview/video/devmap",
       desc: "Maps your codebase through static analysis to give AI agents structured context and a clearer understanding of your project.",
       tech: [
         { name: "TypeScript", icon: si(siTypescript) },
@@ -71,8 +71,8 @@
       index: "02",
       title: "DEVNOTE",
       tag: "A platform for developers to manage and organize code, snippets, resources, and knowledge.",
-      thumb: "/devnote.webp",
-      video: "/devnote",
+      thumb: "/preview/image/devnote.webp",
+      video: "/preview/video/devnote",
       desc: "Keep your technical knowledge organized in one place, from reusable snippets and resources to notes and collections.",
       tech: [
         { name: "Next.js", icon: si(siNextdotjs) },
@@ -88,8 +88,8 @@
       index: "03",
       title: "CHATME",
       tag: "Chat-UI-based personal notes and reminders web application",
-      thumb: "/chatme.webp",
-      video: "/chatme",
+      thumb: "/preview/image/chatme.webp",
+      video: "/preview/video/chatme",
       desc: "A simple way to capture thoughts, save notes, and manage reminders through a familiar chat-based interface.",
       tech: [
         { name: "Next.js", icon: si(siNextdotjs) },
@@ -105,8 +105,8 @@
       index: "04",
       title: "DAILYFIT",
       tag: "Simple daily home workout web application",
-      thumb: "/dailyfit.webp",
-      video: "/dailyfit",
+      thumb: "/preview/image/dailyfit.webp",
+      video: "/preview/video/dailyfit",
       desc: "Follow daily workouts, track completed activities, and keep an eye on your progress through a simple fitness experience.",
       tech: [
         { name: "Next.js", icon: si(siNextdotjs) },
@@ -122,8 +122,8 @@
       index: "05",
       title: "MUFADZ PORTAL",
       tag: "An all-in-one platform for Islamic services, from Quran to prayer schedule.",
-      thumb: "/mufadz.webp",
-      video: "/mufadz",
+      thumb: "/preview/image/mufadz.webp",
+      video: "/preview/video/mufadz",
       desc: "Brings Islamic services together in one platform — Quran reader and prayer schedule anchor daily use, alongside dzikir, zakat calculator, and an AI chatbot.",
       tech: [
         { name: "React", icon: si(siReact) },
@@ -139,8 +139,8 @@
       index: "06",
       title: "DE HOME SPA",
       tag: "An AI-powered home spa platform for personalized treatment recommendations and guidance.",
-      thumb: "/de-home-spa.webp",
-      video: "/dehomespa",
+      thumb: "/preview/image/de-home-spa.webp",
+      video: "/preview/video/dehomespa",
       desc: "Get personalized home spa recommendations based on your needs through guided selections or direct conversations with AI.",
       tech: [
         { name: "Next.js", icon: si(siNextdotjs) },
@@ -362,7 +362,7 @@
 <section class="work" id="work" bind:this={workEl}>
   <img
     class="work__mark"
-    src="/logo-mark.png"
+    src="/logo/logo-mark.png"
     alt=""
     aria-hidden="true"
     draggable="false"

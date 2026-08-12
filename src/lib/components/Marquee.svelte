@@ -31,7 +31,7 @@
 			<div class="marquee__group">
 				{#each words as word (word)}
 					<span class="marquee__word">{word}</span>
-					<img class="marquee__sep" src="/logo-trans.png" alt="" aria-hidden="true" draggable="false" />
+					<img class="marquee__sep" src="/logo/logo-trans.png" alt="" aria-hidden="true" draggable="false" />
 				{/each}
 			</div>
 		{/each}

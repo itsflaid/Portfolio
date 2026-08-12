@@ -110,7 +110,7 @@
 
 <nav class="nav">
 	<a class="nav__brand" href="#top" onclick={(e) => go(e, '#top')} aria-label="FLAID">
-		<img class="nav__logo" src="/logo-nav.png" alt="" draggable="false" />
+		<img class="nav__logo" src="/logo/logo-nav.png" alt="" draggable="false" />
 		<span class="nav__mark">FLAID</span>
 	</a>
 	<div class="nav__links">
@@ -135,7 +135,7 @@
 		<span class="nav__menu-dots" aria-hidden="true">
 			{#each dots as _}<i></i>{/each}
 		</span>
-		<img class="nav__menu-logo" src="/logo-nav.png" alt="" aria-hidden="true" draggable="false" />
+		<img class="nav__menu-logo" src="/logo/logo-nav.png" alt="" aria-hidden="true" draggable="false" />
 
 		<span class="nav__menu-eyebrow">// NAVIGATION</span>
 

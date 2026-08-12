@@ -37,6 +37,14 @@
 	let loading = true;
 	let loadError = false;
 
+	// Filter tahun heatmap & bar bulanan. Default 'trailing' = 12 bulan terakhir.
+	let trailingWeeks: Day[][] = [];
+	let byYear: Record<string, Day[][]> = {};
+	let years: number[] = [];
+	let yearFilter: 'trailing' | number = 'trailing';
+	// Value select dropdown (mobile) — string karena bind:value di <select>.
+	let selectValue = 'trailing';
+
 	let sectionEl: HTMLElement;
 	let markEl: HTMLElement;
 	let eyebrowEl: HTMLElement;
@@ -45,6 +53,7 @@
 	let cursorEl: HTMLElement;
 	let statsEl: HTMLElement;
 	let metaEl: HTMLElement;
+	let yearsEl: HTMLElement;
 	let heatmapEl: HTMLElement;
 	let legendEl: HTMLElement;
 	let monthlyEl: HTMLElement;
@@ -89,7 +98,7 @@
 	}
 
 	/** Aggregates the same daily data already fetched for the heatmap into a
-	 * trailing 12-month breakdown — real data, not a filler visual, so it
+	 * all-time monthly breakdown — real data, not a filler visual, so it
 	 * earns the extra space on the right side instead of just padding it. */
 	function computeMonthly(weeksData: Day[][]): MonthBucket[] {
 		const buckets = new Map<string, MonthBucket>();
@@ -103,12 +112,35 @@
 				buckets.set(key, { label: MONTH_ID[d.getMonth()], sortKey: key, count: day.count, pct: 0 });
 			}
 		}
-		const sorted = [...buckets.values()].sort((a, b) => a.sortKey.localeCompare(b.sortKey)).slice(-12);
+		const sorted = [...buckets.values()].sort((a, b) => a.sortKey.localeCompare(b.sortKey));
 		const max = Math.max(1, ...sorted.map((m) => m.count));
 		// Floor at 4% so a zero-contribution month still shows a faint nub
 		// instead of vanishing — consistent with the heatmap's "always show
 		// something faint" treatment for empty days.
 		return sorted.map((m) => ({ ...m, pct: Math.max(4, Math.round((m.count / max) * 100)) }));
+	}
+
+	// Geser filter: setel ulang heatmap & bar bulanan, lalu tampilkan semua
+	// cell pada opacity finalnya (skip animasi scrub biar simpel & konsisten).
+	// Counter (TOTAL/COMMIT/dst) tetap all-time, gak ikut kebawa filter.
+	async function applyYear(value: 'trailing' | number) {
+		yearFilter = value;
+		selectValue = value === 'trailing' ? 'trailing' : String(value);
+		weeks = value === 'trailing' ? trailingWeeks : (byYear[String(value)] ?? []);
+		monthly = computeMonthly(weeks);
+		await tick();
+		const cells = gsap.utils.toArray<HTMLElement>(heatmapEl.querySelectorAll('.heatmap__cell'));
+		gsap.set(cells, { opacity: (i, t) => parseFloat((t as HTMLElement).dataset.opacity ?? '0.06') });
+		lockMonthlyWidth();
+	}
+
+	// Bar bulanan mengikuti lebar heatmap (min: konten heatmap, kolom kanan)
+	// biar ujung kiri-kanannya selalu sejajar, di semua ukuran layar.
+	function lockMonthlyWidth() {
+		const container = monthlyEl.parentElement?.clientWidth ?? 0;
+		const target = Math.min(heatmapEl.offsetWidth, container);
+		monthlyEl.style.width = `${target}px`;
+		monthlyEl.style.maxWidth = '100%';
 	}
 
 	onMount(() => {
@@ -124,6 +156,9 @@
 				const data = await res.json();
 				if (!res.ok || data.error) throw new Error(data.error ?? 'unknown');
 				weeks = data.weeks;
+				trailingWeeks = data.weeks;
+				byYear = data.byYear ?? {};
+				years = data.years ?? [];
 				stats = data.stats;
 				monthly = computeMonthly(weeks);
 			} catch {
@@ -140,20 +175,12 @@
 			const rows = gsap.utils.toArray<HTMLElement>(statsEl.querySelectorAll('.stats__row'));
 			const bars = gsap.utils.toArray<HTMLElement>(monthlyEl.querySelectorAll('.monthly__bar'));
 
-			// Monthly strip should line up under the heatmap ONLY on desktop.
-			// On mobile the heatmap scrolls sideways on its own (see
-			// .heatmap-wrap below), but locking the strip to that same
-			// un-clamped content width (~700px+ for a full year) was forcing
-			// it — and the whole right column with it — wider than the
-			// viewport instead of scrolling neatly inside its own box. Let it
-			// just fill the visible width on mobile instead.
-			if (isMobile) {
-				monthlyEl.style.width = '100%';
-				monthlyEl.style.maxWidth = '100%';
-			} else {
-				monthlyEl.style.width = `${heatmapEl.offsetWidth}px`;
-				monthlyEl.style.maxWidth = '100%';
-			}
+			// Lock the monthly strip to the heatmap's width so keduanya share
+			// edge kiri-kanan yang sama. Width = min(lebar konten heatmap,
+			// lebar kolom kanan), diselaraskan ke sisi yang sama dengan heatmap
+			// (margin-left: auto) — jalan di desktop & mobile, mau heatmap
+			// overflow scroller-nya atau nggak.
+			lockMonthlyWidth();
 
 			if (reduceMotion) {
 				gsap.set(eyebrowEl, { opacity: 1 });
@@ -161,7 +188,7 @@
 				gsap.set(cursorEl, { opacity: 1 });
 				gsap.set(cells, { opacity: (i, t) => parseFloat((t as HTMLElement).dataset.opacity ?? '0.06') });
 				gsap.set(rows, { opacity: 1, y: 0 });
-				gsap.set(metaEl, { opacity: 1, y: 0 });
+				gsap.set([metaEl, yearsEl], { opacity: 1, y: 0 });
 				gsap.set(bars, { scaleY: 1 });
 				gsap.set(legendEl, { opacity: 1, y: 0 });
 				totalNumEl.textContent = String(stats.total);
@@ -184,7 +211,7 @@
 				// spirit as desktop.
 				gsap.set(cells, { opacity: 0 });
 				gsap.set(rows, { opacity: 0, y: 16 });
-				gsap.set(metaEl, { opacity: 0, y: 10 });
+				gsap.set([metaEl, yearsEl], { opacity: 0, y: 10 });
 				gsap.set(bars, { scaleY: 0 });
 				gsap.set(legendEl, { opacity: 0, y: 10 });
 				totalNumEl.textContent = '0';
@@ -203,6 +230,7 @@
 				mTl.to(cursorEl, { opacity: 1, duration: 0.2 }, 0.5);
 				mTl.to(rows, { opacity: 1, y: 0, stagger: 0.08, ease: 'power2.out' }, 0.2);
 				mTl.to(metaEl, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0.15);
+				mTl.to(yearsEl, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0.25);
 
 				const mCounters = { total: 0, streak: 0, commits: 0, repos: 0, stars: 0, followers: 0 };
 				mTl.to(
@@ -259,7 +287,7 @@
 			// far through the year the heatmap has filled in, not an autoplay.
 			gsap.set(cells, { opacity: 0 });
 			gsap.set(rows, { opacity: 0, y: 16 });
-			gsap.set(metaEl, { opacity: 0, y: 10 });
+			gsap.set([metaEl, yearsEl], { opacity: 0, y: 10 });
 			gsap.set(bars, { scaleY: 0 });
 			gsap.set(legendEl, { opacity: 0, y: 10 });
 			gsap.set([line1El, line2El], { y: '105%' });
@@ -285,7 +313,7 @@
 			tl.to(cursorEl, { opacity: 1, duration: 0.05 }, 0.12);
 
 			tl.to(rows, { opacity: 1, y: 0, stagger: 0.05, ease: 'power2.out' }, 0.15);
-			tl.to(metaEl, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' }, 0.1);
+			tl.to([metaEl, yearsEl], { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' }, 0.1);
 
 			tl.to(
 				cells,
@@ -388,7 +416,7 @@
 						<div class="stats__row">
 							<span class="stats__rule" aria-hidden="true"></span>
 							<dt>TOTAL</dt>
-							<dd><span bind:this={totalNumEl}>0</span> kontribusi / 12 bulan</dd>
+							<dd><span bind:this={totalNumEl}>0</span> kontribusi</dd>
 						</div>
 						<div class="stats__row">
 							<span class="stats__rule" aria-hidden="true"></span>
@@ -398,7 +426,7 @@
 						<div class="stats__row">
 							<span class="stats__rule" aria-hidden="true"></span>
 							<dt>COMMIT</dt>
-							<dd><span bind:this={commitsNumEl}>0</span> commit / 12 bulan</dd>
+							<dd><span bind:this={commitsNumEl}>0</span> commit</dd>
 						</div>
 						<div class="stats__row">
 							<span class="stats__rule" aria-hidden="true"></span>
@@ -432,6 +460,36 @@
 						<span class="ghactivity__meta-person" aria-hidden="true"></span>
 						<span bind:this={followersNumEl}>0</span>
 						</span>
+					</div>
+
+					<div class="ghactivity__years" bind:this={yearsEl} aria-label="Filter tahun">
+						<div class="ghactivity__years-btns">
+							<button
+								class="ghactivity__year"
+								class:is-active={yearFilter === 'trailing'}
+								type="button"
+								onclick={() => applyYear('trailing')}
+							>12 BULAN</button>
+							{#each years as y}
+								<button
+									class="ghactivity__year"
+									class:is-active={yearFilter === y}
+									type="button"
+									onclick={() => applyYear(y)}
+								>{y}</button>
+							{/each}
+						</div>
+						<div class="ghactivity__years-mobile">
+							<select
+								bind:value={selectValue}
+								onchange={() => applyYear(selectValue === 'trailing' ? 'trailing' : Number(selectValue))}
+							>
+								<option value="trailing">12 BULAN</option>
+								{#each years as y}
+									<option value={y}>{y}</option>
+								{/each}
+							</select>
+						</div>
 					</div>
 
 					<div class="monthly" bind:this={monthlyEl}>
@@ -690,6 +748,59 @@
 		align-self: flex-end;
 		gap: 1.1rem;
 	}
+	/* Filter tahun (12 BULAN default + tiap tahun) — nempel di bawah
+	   blok stars/followers, sejajar kanan. */
+	.ghactivity__years {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		align-self: flex-end;
+		margin-top: -1rem;
+	}
+	.ghactivity__years-btns {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 1rem;
+	}
+	/* Dropdown filter cuma untuk mobile — tombol disembunyikan di <860px. */
+	.ghactivity__years-mobile {
+		display: none;
+	}
+	.ghactivity__years-mobile select {
+		font-family: var(--ff-mono);
+		font-size: 0.68rem;
+		letter-spacing: 0.08em;
+		padding: 0.3rem 0.4rem;
+		border: 0;
+		border-bottom: 1px solid rgba(10, 10, 10, 0.3);
+		background: var(--white);
+		color: var(--gray);
+		cursor: pointer;
+	}
+	.ghactivity__year {
+		font-family: var(--ff-mono);
+		font-size: 0.68rem;
+		letter-spacing: 0.08em;
+		padding: 0.25rem 0;
+		border: 0;
+		border-bottom: 1px solid rgba(10, 10, 10, 0.3);
+		background: transparent;
+		color: var(--gray);
+		cursor: pointer;
+		transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+	}
+	.ghactivity__year:hover {
+		border-color: var(--black);
+		color: var(--black);
+	}
+	.ghactivity__year.is-active {
+		background: var(--black);
+		border-bottom: 0;
+		color: var(--white);
+		padding-inline: 0.65rem;
+	}
 	.ghactivity__meta-item {
 		display: flex;
 		align-items: center;
@@ -791,6 +902,13 @@
 		font-size: 0.7rem;
 		letter-spacing: 0.05em;
 		color: var(--gray);
+		/* Pin ke tepi kiri scroller: waktu heatmap di-scroll horizontal (mobile),
+		   legend Less→More gak ikut keseret ke samping. */
+		position: sticky;
+		left: 0;
+		width: max-content;
+		background: var(--white);
+		padding-right: 0.5rem;
 	}
 	.heatmap__legend .heatmap__cell {
 		width: 9px;
@@ -806,7 +924,8 @@
 	.monthly {
 		display: flex;
 		align-items: flex-end;
-		gap: clamp(0.2rem, 0.6vw, 0.4rem);
+		/* Sama kayak gap antar kolom heatmap (3px) biar rapat & proporsional. */
+		gap: 3px;
 		margin-top: auto;
 		margin-left: auto;
 	}
@@ -852,6 +971,12 @@
 		.ghactivity {
 			min-height: auto;
 		}
+		.ghactivity__years-btns {
+			display: none;
+		}
+		.ghactivity__years-mobile {
+			display: block;
+		}
 		.ghactivity__stage {
 			position: relative;
 			top: auto;
@@ -868,7 +993,7 @@
 		}
 		.monthly {
 			width: 100%;
-			gap: 0.2rem;
+			gap: 3px;
 		}
 		.monthly__track {
 			height: 72px;
