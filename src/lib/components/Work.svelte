@@ -72,7 +72,7 @@
       title: "DEVNOTE",
       tag: "A platform for developers to manage and organize code, snippets, resources, and knowledge.",
       thumb: "/preview/image/devnote.webp",
-      video: "/preview/video/devnote",
+      video: "/preview/video/devnote2",
       desc: "Keep your technical knowledge organized in one place, from reusable snippets and resources to notes and collections.",
       tech: [
         { name: "Next.js", icon: si(siNextdotjs) },
@@ -89,7 +89,7 @@
       title: "CHATME",
       tag: "Chat-UI-based personal notes and reminders web application",
       thumb: "/preview/image/chatme.webp",
-      video: "/preview/video/chatme",
+      video: "/preview/video/chatme2",
       desc: "A simple way to capture thoughts, save notes, and manage reminders through a familiar chat-based interface.",
       tech: [
         { name: "Next.js", icon: si(siNextdotjs) },
