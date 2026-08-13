@@ -6,6 +6,7 @@
   let sectionEl: HTMLElement;
   let viewportEl: HTMLElement;
   let trackEl: HTMLElement;
+  let endSpacerEl: HTMLElement;
 
   onMount(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -18,20 +19,34 @@
 
     const viewportWidth = viewportEl.clientWidth;
     const trackRect = trackEl.getBoundingClientRect();
-    const fullScroll = Math.max(0, trackEl.scrollWidth - viewportWidth);
 
-    // Scroll dibikin BERHENTI pas cluster--final pas di TENGAH viewport,
-    // bukan lanjut sampai padding-right kebuka semua (itu penyebab dia
-    // nyangkut ke kanan pas scroll abis).
-    const finalCluster = trackEl.querySelector<HTMLElement>(".cluster--final");
-    let maxScroll = fullScroll;
-    if (finalCluster) {
-      const clusterRect = finalCluster.getBoundingClientRect();
-      const clusterCenter =
-        clusterRect.left - trackRect.left + clusterRect.width / 2;
-      const desiredScroll = clusterCenter - viewportWidth / 2;
-      maxScroll = Math.min(Math.max(0, desiredScroll), fullScroll);
+    const lastCluster = trackEl.querySelector<HTMLElement>(".cluster--into");
+
+    const END_GAP = 30; // px jarak kosong di kanan card pas scroll berhenti
+
+    let maxScroll = 0;
+    function computeMaxScroll() {
+      // Spacer ini elemen DOM beneran, jadi lebarnya PASTI kehitung di
+      // scrollWidth track — beda sama padding-right yang kadang ke-skip
+      // tergantung timing/reflow.
+      endSpacerEl.style.width = `${END_GAP}px`;
+
+      const vw = viewportEl.clientWidth;
+      const tRect = trackEl.getBoundingClientRect();
+      const full = Math.max(0, trackEl.scrollWidth - vw);
+
+      if (!lastCluster) {
+        maxScroll = full;
+        return;
+      }
+
+      const clusterRect = lastCluster.getBoundingClientRect();
+      const clusterRight = clusterRect.right - tRect.left;
+      const desiredScroll = clusterRight - vw + END_GAP;
+      maxScroll = Math.min(Math.max(0, desiredScroll), full);
     }
+    computeMaxScroll();
+    ScrollTrigger.addEventListener("refreshInit", computeMaxScroll);
 
     const getScroll = () => maxScroll;
 
@@ -43,12 +58,12 @@
         pin: true,
         scrub: 1,
         invalidateOnRefresh: true,
+        anticipatePin: 1, // fix "kebekap"/freeze konten section sebelumnya pas pin start
       },
     });
 
     tl.to(trackEl, { x: () => -getScroll(), duration: 1, ease: "none" }, 0);
 
-    // ================= ENTRANCE WINDOW (viewport-relative) =================
     const ENTER_AT = 0.82;
     const FINISH_AT = 0.58;
     const CARD_FINISH_AT = 0.62;
@@ -98,7 +113,9 @@
     };
 
     function assignAnimTypes(lookback = 2) {
-      const words = Array.from(trackEl.querySelectorAll<HTMLElement>(".word"));
+      const words = Array.from(
+        trackEl.querySelectorAll<HTMLElement>(".word"),
+      );
       const recent: string[] = [];
 
       words.forEach((el) => {
@@ -132,7 +149,6 @@
       return Math.min(raw, Math.max(0, 1 - duration));
     }
 
-    // ================= WORD ENTRANCE =================
     trackEl.querySelectorAll<HTMLElement>(".word").forEach((el) => {
       const type = el.dataset.anim!;
       const position = entrancePosition(el, wordDuration);
@@ -179,15 +195,16 @@
       tl.to(el, { ...preset.to, duration: wordDuration }, position);
     });
 
-    // ================= CARD & DIAMOND ENTRANCE (generic, default) =================
     const CARD_STAGGER = 0.012;
 
     trackEl.querySelectorAll<HTMLElement>(".cluster").forEach((cluster) => {
-      if (cluster.classList.contains("cluster--final")) return;
-
       const cards = Array.from(
         cluster.querySelectorAll<HTMLElement>(".card"),
-      ).filter((card) => !card.classList.contains("card--system"));
+      ).filter(
+        (card) =>
+          !card.classList.contains("card--system") &&
+          !card.classList.contains("card--problems"),
+      );
 
       cards.forEach((card, i) => {
         const basePosition = entrancePosition(card, cardDuration);
@@ -217,280 +234,6 @@
       });
     });
 
-    trackEl.querySelectorAll<HTMLElement>(".diamond").forEach((diamond) => {
-      const position = entrancePosition(diamond, cardDuration);
-      const baseRotation = gsap.getProperty(diamond, "rotation") as number;
-      const kick = Math.random() > 0.5 ? 24 : -24;
-
-      gsap.set(diamond, {
-        opacity: 0,
-        scale: 0.3,
-        rotation: baseRotation + kick,
-      });
-      tl.to(
-        diamond,
-        {
-          opacity: 1,
-          scale: 1,
-          rotation: baseRotation,
-          duration: cardDuration,
-          ease: "back.out(1.6)",
-        },
-        position,
-      );
-    });
-
-    // ================= CLUSTER--FINAL =================
-    // ================= CLUSTER--FINAL =================
-    if (finalCluster) {
-      const built = finalCluster.querySelector<HTMLElement>(".card--built");
-
-      const andReady =
-        finalCluster.querySelector<HTMLElement>(".card--andready");
-
-      const forUse = finalCluster.querySelector<HTMLElement>(".card--foruse");
-
-      const logo = finalCluster.querySelector<HTMLElement>(".final-logo");
-
-      if (built && andReady && forUse && logo) {
-        const finalBasePosition = entrancePosition(built, cardDuration);
-
-        // ==================================================
-        // BUILT
-        // ==================================================
-
-        gsap.set(built, {
-          opacity: 0,
-          scale: 0.8,
-        });
-
-        tl.to(
-          built,
-          {
-            opacity: 1,
-            scale: 1,
-            duration: cardDuration,
-            ease: "back.out(1.5)",
-          },
-          finalBasePosition,
-        );
-
-        // ==================================================
-        // AND READY
-        // ==================================================
-
-        const andReadyRect = andReady.getBoundingClientRect();
-
-        const builtRect = built.getBoundingClientRect();
-
-        // Simpan ukuran asli sebelum width diubah
-        const andReadyFullWidth = andReadyRect.width;
-
-        const andReadySquare = andReadyRect.height;
-
-        // Posisi awal benar-benar di belakang BUILT
-        const andReadyHiddenX =
-          builtRect.left -
-          andReadyRect.left -
-          (andReadyRect.width - builtRect.width) * 0.5;
-
-        const andReadyStart = finalBasePosition + cardDuration * 0.42;
-
-        const andReadyDropDuration = cardDuration * 0.32;
-
-        // Square + hidden
-        gsap.set(andReady, {
-          opacity: 1,
-          width: andReadySquare,
-          x: andReadyHiddenX,
-          y: -andReadySquare * 0.9,
-          scale: 1,
-        });
-
-        const andReadyText = andReady.querySelector<HTMLElement>("span");
-
-        if (andReadyText) {
-          gsap.set(andReadyText, {
-            opacity: 0,
-            clipPath: "inset(0 100% 0 0)",
-          });
-        }
-
-        // ----------------------------------------------
-        // 1. TURUN DARI BALIK BUILT
-        // ----------------------------------------------
-
-        tl.to(
-          andReady,
-          {
-            y: 0,
-            duration: andReadyDropDuration,
-            ease: "power2.out",
-          },
-          andReadyStart,
-        );
-
-        // ----------------------------------------------
-        // 2. DIAM SEJENAK
-        // ----------------------------------------------
-
-        const andReadyMoveStart =
-          andReadyStart + andReadyDropDuration + cardDuration * 0.14;
-
-        // ----------------------------------------------
-        // 3. GESER KANAN + MELEBAR
-        // ----------------------------------------------
-
-        const andReadyMoveDuration = cardDuration * 0.58;
-
-        tl.to(
-          andReady,
-          {
-            x: 0,
-            width: andReadyFullWidth,
-            duration: andReadyMoveDuration,
-            ease: "power2.out",
-          },
-          andReadyMoveStart,
-        );
-
-        // Text muncul mengikuti proses pelebaran
-        if (andReadyText) {
-          tl.to(
-            andReadyText,
-            {
-              opacity: 1,
-              clipPath: "inset(0 0% 0 0)",
-              duration: andReadyMoveDuration * 0.8,
-              ease: "power2.out",
-            },
-            andReadyMoveStart + andReadyMoveDuration * 0.12,
-          );
-        }
-
-        // ==================================================
-        // FOR USE
-        // ==================================================
-
-        const forUseRect = forUse.getBoundingClientRect();
-
-        const forUseFullWidth = forUseRect.width;
-
-        const forUseSquare = forUseRect.height;
-
-        const forUseHiddenX =
-          builtRect.left -
-          forUseRect.left -
-          (forUseRect.width - builtRect.width) * 0.5;
-
-        const forUseStart =
-          andReadyMoveStart + andReadyMoveDuration + cardDuration * 0.1;
-
-        // ----------------------------------------------
-        // Awalnya SQUARE di belakang BUILT
-        // ----------------------------------------------
-
-        gsap.set(forUse, {
-          opacity: 1,
-          width: forUseSquare,
-          x: forUseHiddenX,
-          scale: 1,
-        });
-
-        const forUseText = forUse.querySelector<HTMLElement>("span");
-
-        if (forUseText) {
-          gsap.set(forUseText, {
-            opacity: 0,
-            clipPath: "inset(0 100% 0 0)",
-          });
-        }
-
-        // ----------------------------------------------
-        // 1. KELUAR SEDIKIT + MULAI MELEBAR
-        // ----------------------------------------------
-
-        const forUsePeekDuration = cardDuration * 0.34;
-
-        const forUsePeekX = forUseHiddenX + forUseFullWidth * 0.3;
-
-        tl.to(
-          forUse,
-          {
-            x: forUsePeekX,
-            width: forUseFullWidth * 0.72,
-            duration: forUsePeekDuration,
-            ease: "power2.out",
-          },
-          forUseStart,
-        );
-
-        // ----------------------------------------------
-        // 2. DIAM DALAM KONDISI SEBAGIAN NONGOL
-        // ----------------------------------------------
-
-        const forUseContinue =
-          forUseStart + forUsePeekDuration + cardDuration * 0.16;
-
-        // ----------------------------------------------
-        // 3. LANJUT GESER KE POSISI FINAL
-        //    + WIDTH SEMPURNA
-        //    + TEXT MUNCUL
-        // ----------------------------------------------
-
-        const forUseMoveDuration = cardDuration * 0.42;
-
-        tl.to(
-          forUse,
-          {
-            x: 0,
-            width: forUseFullWidth,
-            duration: forUseMoveDuration,
-            ease: "power2.out",
-          },
-          forUseContinue,
-        );
-
-        if (forUseText) {
-          tl.to(
-            forUseText,
-            {
-              opacity: 1,
-              clipPath: "inset(0 0% 0 0)",
-              duration: forUseMoveDuration * 0.72,
-              ease: "power2.out",
-            },
-            forUseContinue + forUseMoveDuration * 0.1,
-          );
-        }
-
-        // ==================================================
-        // LOGO
-        // ==================================================
-
-        const logoStart =
-          forUseContinue + forUseMoveDuration + cardDuration * 0.14;
-
-        gsap.set(logo, {
-          opacity: 0,
-          scale: 0.65,
-          rotation: -8,
-        });
-
-        tl.to(
-          logo,
-          {
-            opacity: 1,
-            scale: 1,
-            rotation: 0,
-            duration: cardDuration * 0.75,
-            ease: "back.out(1.6)",
-          },
-          logoStart,
-        );
-      }
-    }
-    // ================= CARD--SYSTEM: width-reveal, satu kata per tahap =================
     const systemCard = trackEl.querySelector<HTMLElement>(".card--system");
     if (systemCard) {
       const SYSTEM_DURATION_SCALE = 1.9;
@@ -523,31 +266,122 @@
         systemCard,
         systemCardDuration,
       );
-      const stageDuration = systemCardDuration / sadWords.length;
+
+      // STAGE_GAP = porsi waktu DIAM di antara stage (0–1, relatif terhadap
+      // systemCardDuration). Naikin angka ini buat nambah jeda.
+      const STAGE_GAP = 0.18;
+      const numStages = sadWords.length;
+      const numGaps = numStages - 1;
+      const totalGapTime = systemCardDuration * STAGE_GAP * numGaps;
+      const stageAnimDuration =
+        (systemCardDuration - totalGapTime) / numStages;
+      const stageStep = stageAnimDuration + systemCardDuration * STAGE_GAP;
 
       revealWidths.forEach((revealed, i) => {
         const position = Math.min(
-          systemBasePosition + i * stageDuration,
-          Math.max(0, 1 - stageDuration),
+          systemBasePosition + i * stageStep,
+          Math.max(0, 1 - stageAnimDuration),
         );
         tl.to(
           systemCard,
           {
             clipPath: clipAt(revealed),
-            duration: stageDuration,
+            duration: stageAnimDuration,
             ease: "power2.inOut",
           },
           position,
         );
         tl.to(
           sadWords[i],
-          { opacity: 1, duration: stageDuration * 0.6, ease: "power1.out" },
-          position + stageDuration * 0.35,
+          { opacity: 1, duration: stageAnimDuration * 0.6, ease: "power1.out" },
+          position + stageAnimDuration * 0.35,
         );
       });
     }
 
+    const problemsCard =
+      trackEl.querySelector<HTMLElement>(".card--problems");
+    if (problemsCard) {
+      const PROBLEMS_DURATION_SCALE = 1.4;
+      const problemsCardDuration = cardDuration * PROBLEMS_DURATION_SCALE;
+
+      const chars = Array.from(
+        problemsCard.querySelectorAll<HTMLElement>(".prob-char"),
+      );
+      const problemsStyle = getComputedStyle(problemsCard);
+      const padLeft = parseFloat(problemsStyle.paddingLeft) || 0;
+      const padRight = parseFloat(problemsStyle.paddingRight) || 0;
+      // offsetWidth/offsetLeft dipake (BUKAN getBoundingClientRect) karena
+      // card ini di-rotate(7deg) lewat CSS transform — getBoundingClientRect
+      // akan ngasih bounding box yang udah kemiring/distorsi, sementara
+      // offset* itu murni nilai layout sebelum transform diterapkan, jadi
+      // pengukuran lebar tiap huruf tetap akurat walau card-nya miring.
+      const fullWidth = problemsCard.offsetWidth;
+
+      const revealWidths = chars.map((c, i) => {
+        const isLast = i === chars.length - 1;
+        return c.offsetLeft + c.offsetWidth + (isLast ? padRight : 0);
+      });
+      const emptyWidth = padLeft + padRight;
+
+      const clipAt = (revealed: number) =>
+        `inset(0px ${Math.max(0, fullWidth - revealed)}px 0px 0px)`;
+
+      gsap.set(problemsCard, { opacity: 1, clipPath: clipAt(emptyWidth) });
+      gsap.set(chars, { opacity: 0 });
+
+      const problemsBasePosition = entrancePosition(
+        problemsCard,
+        problemsCardDuration,
+      );
+
+      // STAGE_GAP kecil = ketikan cepat nyaris nempel. Naikin dikit
+      // (0.1–0.2) kalau mau tiap huruf kerasa "diketik" satu-satu jelas.
+      const STAGE_GAP = 0.05;
+      const numStages = chars.length;
+      const numGaps = numStages - 1;
+      const totalGapTime = problemsCardDuration * STAGE_GAP * numGaps;
+
+      const stageAnimDuration =
+        (problemsCardDuration - totalGapTime) / numStages;
+      const stageStep = stageAnimDuration + problemsCardDuration * STAGE_GAP;
+
+      gsap.set(problemsCard, { rotation: 15 }); // mulai lebih miring
+      tl.to(
+        problemsCard,
+        { rotation: 7, duration: problemsCardDuration, ease: "power2.out" },
+        problemsBasePosition,
+      );
+
+      revealWidths.forEach((revealed, i) => {
+        const position = Math.min(
+          problemsBasePosition + i * stageStep,
+          Math.max(0, 1 - stageAnimDuration),
+        );
+        tl.to(
+          problemsCard,
+          {
+            clipPath: clipAt(revealed),
+            duration: stageAnimDuration,
+            ease: "power1.out",
+          },
+          position,
+        );
+        tl.to(
+          chars[i],
+          { opacity: 1, duration: stageAnimDuration * 0.6, ease: "power1.out" },
+          position,
+        );
+      });
+    }
+
+    // Layout bisa geser pas font web selesai load → recalc titik pin biar akurat
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(() => ScrollTrigger.refresh());
+    }
+
     return () => {
+      ScrollTrigger.removeEventListener("refreshInit", computeMaxScroll);
       tl.scrollTrigger?.kill();
       tl.kill();
     };
@@ -559,70 +393,46 @@
     <div class="process__track" bind:this={trackEl}>
       <div class="unit">
         <div class="word">I</div>
-        <div class="word">START</div>
-      </div>
-
-      <div class="cluster cluster--with">
-        <div class="card card--with"><span>WITH</span></div>
-        <div class="card card--problems"><span>PROBLEMS</span></div>
-        <div class="card card--real"><span>REAL</span></div>
-      </div>
-
-      <div class="unit">
-        <div class="word">TURN</div>
-        <div class="word">THEM</div>
-        <div class="word">INTO</div>
-        <div class="word" data-anim="char-reveal">
-          {#each "IDEAS".split("") as ch}
+        <div class="word" data-anim="char-reveal-alt">
+          {#each "START".split("") as ch}
             <span class="char">{ch}</span>
           {/each}
         </div>
       </div>
 
-      <span class="diamond" aria-hidden="true"></span>
+      <div class="cluster cluster--with">
+        <div class="card card--with"><span>WITH</span></div>
+        <div class="card card--problems">
+          {#each "PROBLEMS".split("") as ch}
+            <span class="prob-char">{ch}</span>
+          {/each}
+        </div>
+        <div class="card card--real"><span>REAL</span></div>
+      </div>
 
       <div class="unit">
-        <div class="word">SHAPE</div>
-        <div class="word">THOSE</div>
-        <div class="word">IDEA</div>
+        <div class="word" data-anim="char-reveal">
+          {#each "THEN".split("") as ch}
+            <span class="char">{ch}</span>
+          {/each}
+        </div>
+        <div class="word" data-anim="char-reveal-alt">
+          {#each "TURN".split("") as ch}
+            <span class="char">{ch}</span>
+          {/each}
+        </div>
       </div>
 
       <div class="cluster cluster--into">
         <div class="card card--system">
-          {#each ["SYSTEM", "AND", "DESIGN"] as w}
+          {#each ["WORKING", "SYSTEMS"] as w}
             <span class="sad-word">{w}</span>
           {/each}
         </div>
         <div class="card card--into"><span>INTO</span></div>
       </div>
 
-      <span class="diamond" aria-hidden="true"></span>
-
-      <div class="unit">
-        <div class="word">BUILD</div>
-        <div class="word">WEB</div>
-        <div class="word" data-anim="char-reveal">
-          {#each "APPLICATION".split("") as ch}
-            <span class="char">{ch}</span>
-          {/each}
-        </div>
-      </div>
-
-      <div class="cluster cluster--final">
-        <div class="final-base">
-          <div class="card card--built"><span>BUILT</span></div>
-          <span class="final-logo" aria-hidden="true">
-            <img
-              class="process__logo"
-              src="/logo/logo-trans.png"
-              alt=""
-              draggable="false"
-            />
-          </span>
-          <div class="card card--foruse"><span>FOR USE</span></div>
-        </div>
-        <div class="card card--andready"><span>AND READY</span></div>
-      </div>
+      <div class="track-end-spacer" bind:this={endSpacerEl}></div>
     </div>
   </div>
 </section>
@@ -653,8 +463,12 @@
     width: max-content;
     gap: clamp(1rem, 1.8vw, 2rem);
     padding-left: 85vw;
-    padding-right: 50vw;
     will-change: transform;
+  }
+
+  .track-end-spacer {
+    flex: 0 0 auto;
+    height: 1px;
   }
 
   .unit {
@@ -677,14 +491,6 @@
   }
   .unit .word .char {
     display: inline-block;
-  }
-
-  .diamond {
-    flex: 0 0 auto;
-    width: clamp(2rem, 4vw, 3rem);
-    height: clamp(2rem, 4vw, 3rem);
-    background: var(--black);
-    transform: rotate(45deg);
   }
 
   .card {
@@ -733,11 +539,15 @@
     z-index: 1;
     transform: translateY(-3rem);
   }
-  .card--problems {
-    position: relative;
-    z-index: 1;
-    margin-left: -1.2rem;
-    transform: rotate(7deg);
+  .card--problems .prob-char {
+    display: inline-block;
+    font-family: var(--ff-display);
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: 0.01em;
+    color: var(--white);
+    white-space: pre;
+    font-size: clamp(4.25rem, 10vw, 8.5rem);
   }
   .card--real {
     position: absolute;
@@ -766,57 +576,6 @@
     font-size: clamp(2.75rem, 5.5vw, 4.25rem);
   }
 
-  .cluster--final {
-    position: relative;
-    margin-top: clamp(4.5rem, 9vw, 7rem);
-  }
-
-  .final-base {
-    display: flex;
-    align-items: center;
-    gap: clamp(1.5rem, 3vw, 3rem);
-    transform: translateY(-4rem);
-  }
-
-  .card--built,
-  .card--foruse,
-  .card--andready {
-    box-sizing: border-box;
-    overflow: hidden;
-  }
-
-  .card--built {
-    position: relative;
-    z-index: 3;
-  }
-
-  .card--foruse {
-    position: relative;
-    z-index: 1;
-  }
-
-  .final-logo {
-    position: relative;
-    z-index: 4;
-    display: flex;
-    align-items: center;
-    flex: 0 0 auto;
-  }
-
-  .process__logo {
-    flex: 0 0 auto;
-    width: clamp(3rem, 6vw, 5rem);
-    height: auto;
-    user-select: none;
-  }
-
-  .card--andready {
-    position: absolute;
-    top: clamp(4rem, 7vw, 6rem);
-    left: 20%;
-    z-index: 1;
-  }
-
   @media (max-width: 860px), (prefers-reduced-motion: reduce) {
     .process {
       min-height: auto;
@@ -833,6 +592,9 @@
       padding: 0 clamp(1.5rem, 6vw, 3rem);
       gap: clamp(1.75rem, 5vh, 2.5rem);
     }
+    .track-end-spacer {
+      display: none;
+    }
     .unit .word {
       font-size: clamp(2.2rem, 10vw, 3.4rem);
     }
@@ -848,8 +610,7 @@
       padding-top: clamp(2.5rem, 8vh, 3.5rem);
     }
     .card--real,
-    .card--into,
-    .card--andready {
+    .card--into {
       position: relative;
       top: auto;
       right: auto;
@@ -858,8 +619,11 @@
       transform: none;
       margin-left: 0;
     }
-    .card--foruse {
-      transform: none;
+    .card--problems {
+      clip-path: none !important;
+    }
+    .card--problems .prob-char {
+      opacity: 1 !important;
     }
     .card--system {
       clip-path: none !important;

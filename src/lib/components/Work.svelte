@@ -245,8 +245,12 @@
 	tl.fromTo(outroListEl, { opacity: 0 }, { opacity: 1, duration: 0.03, ease: 'power1.out' }, 0.93);
 	tl.fromTo(outroLinkEl, { opacity: 0 }, { opacity: 1, duration: 0.03, ease: 'power1.out' }, 0.96);
 
-    const onLoad = () => ScrollTrigger.refresh();
-    window.addEventListener("load", onLoad);
+    // Listener window 'load' + ScrollTrigger.refresh() yang tadinya di sini
+    // sudah dicabut — refresh 'load' sekarang dipusatkan sekali di
+    // SmoothScroll.svelte. Sebelumnya listener ini duplikat sama punya
+    // About.svelte + auto-refresh bawaan GSAP, jadi jalan 2-3x beruntun tiap
+    // load dan bikin efek "double refresh"/jump, makin kerasa sejak Manifesto
+    // (timeline paling berat) ikut kena refresh berkali-kali itu.
 
     // ── video swap logic (unchanged) ──
     const pans = gsap.utils.toArray<HTMLElement>(
@@ -345,7 +349,6 @@
     sectionObserver.observe(workEl);
 
     return () => {
-      window.removeEventListener("load", onLoad);
       ScrollTrigger.removeEventListener("refreshInit", setSpacing);
       swapTimers.forEach((id) => window.clearTimeout(id));
       preloadObserver.disconnect();

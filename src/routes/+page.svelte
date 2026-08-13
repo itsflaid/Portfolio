@@ -11,7 +11,7 @@ import Experience from "$lib/components/Experience.svelte";
 import Skills from "$lib/components/Skills.svelte";
 import GithubActivity from "$lib/components/GithubActivity.svelte";
 import Footer from "$lib/components/Footer.svelte";
-import Contact from "$lib/components/Contact.svelte";
+// import Contact from "$lib/components/Contact.svelte";
 import ResumeModal from "$lib/components/ResumeModal.svelte";
 
 </script>
@@ -30,12 +30,26 @@ import ResumeModal from "$lib/components/ResumeModal.svelte";
 <Hero />
 <About />
 <Experience />
+<div class="desktop-only">
+    <Manifesto />
+</div>
 <Marquee />
-<Manifesto />
 <Work />
 <Skills />
 <GithubActivity />
 
-<Contact />
+<!-- <Contact /> -->
 <Footer />
 <ResumeModal />
+
+<style>
+	.desktop-only {
+		display: block;
+	}
+
+	@media (max-width: 767px) {
+		.desktop-only {
+			display: none;
+		}
+	}
+</style>

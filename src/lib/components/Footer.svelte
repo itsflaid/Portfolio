@@ -295,12 +295,12 @@
 		<span class="footer__mark footer__mark--dark" aria-hidden="true">FLAID</span>
 
 		<div class="footer__dark-content">
-			<span class="footer__eyebrow footer__eyebrow--dark" data-reveal>// LET'S CONNECT TO</span>
+			<span class="footer__eyebrow footer__eyebrow--dark" data-reveal>// IF YOU HAVE A PROBLEM WORTH SOLVING</span>
 			<h2 class="footer__heading">
-				<span class="line-mask"><span class="line" bind:this={headingLine1El}>BUILD</span></span>
+				<span class="line-mask"><span class="line" bind:this={headingLine1El}>LETS</span></span>
 				<span class="line-mask"
 					><span class="line" bind:this={headingLine2El}
-						>SOMETHING<span class="cursor" bind:this={cursorEl}>_</span></span
+						>CONNECT<span class="cursor" bind:this={cursorEl}>_</span></span
 					></span
 				>
 			</h2>

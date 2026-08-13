@@ -114,11 +114,14 @@
 			};
 		}
 
-		const onLoad = () => ScrollTrigger.refresh();
-		window.addEventListener('load', onLoad);
-
+		// Listener window 'load' + ScrollTrigger.refresh() yang tadinya di sini
+		// sudah dicabut — refresh 'load' sekarang dipusatkan sekali di
+		// SmoothScroll.svelte (lihat komentar di sana). Sebelumnya listener ini
+		// duplikat sama punya Work.svelte + auto-refresh bawaan GSAP, jadi
+		// jalan 2-3x beruntun tiap load dan bikin efek "double refresh"/jump,
+		// makin kerasa sejak Manifesto (timeline paling berat) ikut kena
+		// refresh berkali-kali itu.
 		return () => {
-			window.removeEventListener('load', onLoad);
 			killTimeline?.();
 		};
 	});
