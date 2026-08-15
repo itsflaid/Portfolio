@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { gsap } from 'gsap';
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
 	import {
@@ -37,27 +37,20 @@
 		return { hex: `#${icon.hex}`, path: icon.path };
 	}
 
-	type SkillItem = {
-		name: string;
-		icon: SkillIcon;
-	};
-
-	type SkillGroup = {
-		label: string;
-		items: SkillItem[];
-	};
+	type SkillItem = { name: string; icon: SkillIcon };
+	type SkillGroup = { label: string; items: SkillItem[] };
 
 	const groups: SkillGroup[] = [
 		{
 			label: 'FRONTEND',
 			items: [
-				{ name: 'Tailwind', icon: si(siTailwindcss) },
-				{ name: 'TypeScript', icon: si(siTypescript) },
-				{ name: 'React', icon: si(siReact) },
 				{ name: 'Next.js', icon: si(siNextdotjs) },
-				{ name: 'TanStack Query', icon: { ...si(siTanstack), hex: '#FF4154' } },
+				{ name: 'React', icon: si(siReact) },
+				{ name: 'TypeScript', icon: si(siTypescript) },
+				{ name: 'Tailwind', icon: si(siTailwindcss) },
+				{ name: 'SvelteKit', icon: si(siSvelte) },
 				{ name: 'Vue', icon: si(siVuedotjs) },
-				{ name: 'SvelteKit', icon: si(siSvelte) }
+				{ name: 'TanStack Query', icon: { ...si(siTanstack), hex: '#FF4154' } }
 			]
 		},
 		{
@@ -65,30 +58,30 @@
 			items: [
 				{ name: 'Node.js', icon: si(siNodedotjs) },
 				{ name: 'Express', icon: si(siExpress) },
-				{ name: 'REST API', icon: restApiIcon },
 				{ name: 'Prisma', icon: si(siPrisma) },
-				{ name: 'PHP', icon: si(siPhp) },
-				{ name: 'Laravel', icon: si(siLaravel) }
+				{ name: 'REST API', icon: restApiIcon },
+				{ name: 'Laravel', icon: si(siLaravel) },
+				{ name: 'PHP', icon: si(siPhp) }
 			]
 		},
 		{
 			label: 'DATABASE',
 			items: [
-				{ name: 'MySQL', icon: si(siMysql) },
 				{ name: 'PostgreSQL', icon: si(siPostgresql) },
-				{ name: 'Neon', icon: si(siNeon) },
-				{ name: 'Supabase', icon: si(siSupabase) }
+				{ name: 'MySQL', icon: si(siMysql) },
+				{ name: 'Supabase', icon: si(siSupabase) },
+				{ name: 'Neon', icon: si(siNeon) }
 			]
 		},
 		{
 			label: 'AI & LLM',
 			items: [
-				{ name: 'Groq', icon: groqIcon },
-				{ name: 'OpenRouter', icon: si(siOpenrouter) },
-				{ name: 'OpenCode', icon: si(siOpencode) },
 				{ name: 'Claude', icon: si(siClaude) },
 				{ name: 'GPT', icon: gptIcon },
-				{ name: 'Codex', icon: codexIcon }
+				{ name: 'Codex', icon: codexIcon },
+				{ name: 'Groq', icon: groqIcon },
+				{ name: 'OpenRouter', icon: si(siOpenrouter) },
+				{ name: 'OpenCode', icon: si(siOpencode) }
 			]
 		},
 		{
@@ -96,18 +89,52 @@
 			items: [
 				{ name: 'GitHub', icon: si(siGithub) },
 				{ name: 'Git', icon: si(siGit) },
-				{ name: 'npm', icon: si(siNpm) },
 				{ name: 'Vercel', icon: si(siVercel) },
 				{ name: 'Vite', icon: si(siVite) },
+				{ name: 'npm', icon: si(siNpm) },
 				{ name: 'Upstash', icon: si(siUpstash) }
 			]
 		}
 	];
 
+	// ── Seeded RNG — layout tiap grup acak tapi deterministik (hash nama
+	// grup jadi seed), beda antar grup, konsisten tiap reload.
+	function hashString(str: string) {
+		let h = 0;
+		for (let i = 0; i < str.length; i++) h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+		return h;
+	}
+	function mulberry32(seed: number) {
+		let s = seed;
+		return () => {
+			s |= 0;
+			s = (s + 0x6d2b79f5) | 0;
+			let t = Math.imul(s ^ (s >>> 15), 1 | s);
+			t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+			return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+		};
+	}
+
+	type Shape = 'wide' | 'tall' | 'normal';
+	type Fill = 'ghost' | 'solid';
+	type LayoutCell = { shape: Shape; fill: Fill };
+
+	function buildLayout(group: SkillGroup): LayoutCell[] {
+		const rng = mulberry32(hashString(group.label));
+		return group.items.map((_, i) => {
+			if (i === 0) return { shape: 'wide', fill: rng() < 0.5 ? 'solid' : 'ghost' };
+			const shapeRoll = rng();
+			const shape: Shape = shapeRoll < 0.14 ? 'wide' : shapeRoll < 0.4 ? 'tall' : 'normal';
+			const fill: Fill = rng() < 0.5 ? 'solid' : 'ghost';
+			return { shape, fill };
+		});
+	}
+
+	const layouts = groups.map(buildLayout);
+
 	let skillsEl: HTMLElement;
 	let darkEl: HTMLElement;
 	let lightEl: HTMLElement;
-	let lightListEl: HTMLElement;
 	let markLightEl: HTMLElement;
 	let headingEl: HTMLElement;
 	let headingLine1El: HTMLElement;
@@ -115,164 +142,156 @@
 	let cursorEl: HTMLElement;
 	let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
+	// Mobile-only tab state — which category's grid is currently shown.
+	// Irrelevant on desktop, where every group renders at once (CSS hides
+	// the tab bar and forces every .skills__group visible there).
+	let activeGroup = 0;
+
 	onMount(() => {
 		gsap.registerPlugin(ScrollTrigger);
 		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		const isMobile = window.matchMedia('(max-width: 860px)').matches;
 
 		const darkContent = gsap.utils.toArray<HTMLElement>(darkEl.querySelectorAll('[data-reveal]'));
-		const listGroups = gsap.utils.toArray<HTMLElement>(lightEl.querySelectorAll('.skills__group'));
+		const groupEls = gsap.utils.toArray<HTMLElement>(lightEl.querySelectorAll('.skills__group'));
+
+		function boxesOf(group: HTMLElement) {
+			return gsap.utils.toArray<HTMLElement>(group.querySelectorAll('.skills__box'));
+		}
 
 		if (reduceMotion) {
 			gsap.set(darkEl, { xPercent: 0 });
 			gsap.set([headingLine1El, headingLine2El], { y: '0%', x: '0rem' });
 			gsap.set(cursorEl, { opacity: 1 });
-			gsap.set([...darkContent, ...listGroups], { opacity: 1, y: 0, x: 0 });
+			gsap.set(darkContent, { opacity: 1, y: 0 });
 			gsap.set(lightEl.querySelectorAll('.skills__rule'), { scaleX: 1 });
-			gsap.set(lightEl.querySelectorAll('.skills__row'), { clipPath: 'inset(0 0% 0 0)' });
-			gsap.set(lightListEl, { y: 0 });
+			gsap.set(lightEl.querySelectorAll('.skills__box'), { opacity: 1, scale: 1, y: 0, rotate: 0 });
 			return;
 		}
 
 		gsap.set(darkEl, { xPercent: -100 });
 
-		const tl = gsap.timeline({
-			scrollTrigger: {
-				trigger: skillsEl,
-				start: 'top bottom',
-				end: 'top top',
-				scrub: 1
-			}
+		const entryTl = gsap.timeline({
+			scrollTrigger: { trigger: skillsEl, start: 'top bottom', end: 'top top', scrub: 1 }
 		});
-
-		// Dark half slides in from off-screen left, same as before.
-		tl.fromTo(darkEl, { xPercent: -100 }, { xPercent: 0, ease: 'none' }, 0);
-		tl.fromTo(
+		entryTl.fromTo(darkEl, { xPercent: -100 }, { xPercent: 0, ease: 'none' }, 0);
+		entryTl.fromTo(
 			darkContent,
 			{ opacity: 0, y: 24 },
 			{ opacity: 1, y: 0, stagger: 0.1, ease: 'power2.out' },
 			0.25
 		);
-
-		tl.fromTo(
+		entryTl.fromTo(
 			headingLine1El,
 			{ y: '105%', x: '-1.4rem' },
 			{ y: '0%', x: '0rem', duration: 0.7, ease: 'power3.out' },
 			0.3
 		);
-		tl.fromTo(
+		entryTl.fromTo(
 			headingLine2El,
 			{ y: '105%', x: '1.4rem' },
 			{ y: '0%', x: '0rem', duration: 0.7, ease: 'power3.out' },
 			0.45
 		);
-		tl.to(cursorEl, { opacity: 1, duration: 0.2 }, 0.95);
+		entryTl.to(cursorEl, { opacity: 1, duration: 0.2 }, 0.95);
+		entryTl.fromTo(markLightEl, { yPercent: -6 }, { yPercent: 0, ease: 'none' }, 0);
 
-		// Light half's watermark drifts opposite the heading — same quiet
-		// parallax treatment as GithubActivity's mark, so the "empty" white
-		// side still has something moving instead of sitting dead still.
-		tl.fromTo(markLightEl, { yPercent: -6 }, { yPercent: 6, ease: 'none' }, 0);
+		const exitTl = gsap.timeline({
+			scrollTrigger: { trigger: skillsEl, start: 'bottom 65%', end: 'bottom top', scrub: 1 }
+		});
+		exitTl.to([...darkContent, headingEl], { opacity: 0, y: -20, duration: 0.5, ease: 'power1.in' }, 0);
+		exitTl.to(darkEl, { width: '100%', duration: 0.9, ease: 'power1.inOut' }, 0.15);
 
-		// Desktop: section pins the moment it fills the screen (layar pas tengah),
-		// lalu list kanan naik pelan-pelan dari FRONTEND sampai TOOLS & INFRA.
-		// Baru setelah list selesai kebaca, section dilepas pin-nya dan
-		// lanjut scroll normal ke section berikutnya.
-		const listTriggers: ScrollTrigger[] = [];
-		if (!isMobile) {
-			gsap.set(listGroups, { opacity: 1, y: 0 });
-			gsap.set(lightEl.querySelectorAll('.skills__rule'), { scaleX: 1 });
-
-			const lightPadTop = parseFloat(getComputedStyle(lightEl).paddingTop) || 0;
-			const lightPadBottom = parseFloat(getComputedStyle(lightEl).paddingBottom) || 0;
-			const overflow = () =>
-				Math.max(0, lightListEl.offsetHeight - (lightEl.clientHeight - lightPadTop - lightPadBottom));
-
-			const listTl = gsap.timeline({
-				scrollTrigger: {
-					trigger: skillsEl,
-					start: 'top top',
-					end: () => '+=' + overflow(),
-					pin: true,
-					anticipatePin: 1,
-					scrub: 1,
-					invalidateOnRefresh: true
-				}
-			});
-			listTl.fromTo(lightListEl, { y: 0 }, { y: () => -overflow(), ease: 'none' }, 0);
-			listTriggers.push(listTl.scrollTrigger!);
-
-			// Exit baru jalan SETELAH pin lepas — fade + lebarkan dark half
-			// selama satu viewport scroll ke depan, pas section mulai naik
-			// meninggalkan layar.
-			const exitTargets = [...darkContent, headingEl, ...listGroups];
-			const exitTl = gsap.timeline({
-				scrollTrigger: {
-					trigger: skillsEl,
-					start: () => listTl.scrollTrigger!.end,
-					end: () => listTl.scrollTrigger!.end + window.innerHeight,
-					scrub: 1,
-					invalidateOnRefresh: true
-				}
-			});
-			exitTl.to(exitTargets, { opacity: 0, y: -24, duration: 0.5, stagger: 0.04, ease: 'power1.in' }, 0);
-			exitTl.to(darkEl, { width: '100%', duration: 0.9, ease: 'power1.inOut' }, 0.25);
-			listTriggers.push(exitTl.scrollTrigger!);
-		}
-
-		// Mobile: each group plays its own entrance once it scrolls into view.
-		// Rows slide in from the left with a quick fade — lighter than the
-		// desktop clip-path wipe, matching how mobile already trades scrub
-		// effects for cheaper play-once ones elsewhere (Footer, GithubActivity).
 		const groupTriggers: ScrollTrigger[] = [];
-		if (isMobile) {
-			listGroups.forEach((group) => {
+
+		if (!isMobile) {
+			// Desktop: every category stacked and visible — each gets its own
+			// ScrollTrigger, replaying forward/back on every pass either
+			// direction (toggleActions), not a one-time intro.
+			groupEls.forEach((group) => {
 				const rule = group.querySelector<HTMLElement>('.skills__rule');
-				const rows = gsap.utils.toArray<HTMLElement>(group.querySelectorAll('.skills__row'));
+				const boxes = boxesOf(group);
+
+				gsap.set(boxes, { opacity: 0, scale: 0.5, y: 14 });
+				if (rule) gsap.set(rule, { scaleX: 0 });
+
 				const groupTl = gsap.timeline({
 					scrollTrigger: {
 						trigger: group,
-						start: 'top 85%',
-						toggleActions: 'play none none none'
+						start: 'top 78%',
+						end: 'bottom 25%',
+						toggleActions: 'restart reverse restart reverse'
 					}
 				});
-				groupTl.fromTo(
-					group,
-					{ opacity: 0, y: 20 },
-					{ opacity: 1, y: 0, duration: 0.55, ease: 'power2.out' },
-					0
-				);
-				if (rule) {
-					groupTl.fromTo(rule, { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: 'power2.out' }, 0);
-				}
-				groupTl.fromTo(
-					rows,
-					{ opacity: 0, x: -14 },
-					{ opacity: 1, x: 0, duration: 0.35, stagger: 0.035, ease: 'power1.out' },
-					0.15
-				);
+				if (rule) groupTl.to(rule, { scaleX: 1, duration: 0.4, ease: 'power2.out' }, 0);
+				boxes.forEach((box, i) => {
+					const kick = (i % 2 === 0 ? 1 : -1) * gsap.utils.random(3, 8);
+					groupTl.fromTo(
+						box,
+						{ opacity: 0, scale: 0.5, y: 14, rotate: kick },
+						{ opacity: 1, scale: 1, y: 0, rotate: 0, duration: 0.45, ease: 'back.out(1.7)' },
+						0.1 + i * 0.045
+					);
+				});
 				if (groupTl.scrollTrigger) groupTriggers.push(groupTl.scrollTrigger);
 			});
+		} else {
+			// Mobile: only one category is ever in the DOM's visible flow at a
+			// time (CSS hides the rest), so a per-group ScrollTrigger on hidden
+			// elements won't fire correctly. Instead, one trigger on the whole
+			// light column replays whichever group is currently active — both
+			// on scroll entry/exit and (via selectGroup below) on tab tap.
+			groupEls.forEach((group) => gsap.set(boxesOf(group), { opacity: 0, scale: 0.5, y: 14 }));
 
-			// Mobile exit: dark half fade + widen as it leaves the viewport.
-			const mobileExitTl = gsap.timeline({
-				scrollTrigger: {
-					trigger: skillsEl,
-					start: 'center center',
-					end: 'bottom top',
-					scrub: 1
-				}
+			const revealActive = () => {
+				const group = groupEls[activeGroup];
+				if (!group) return;
+				const rule = group.querySelector<HTMLElement>('.skills__rule');
+				const boxes = boxesOf(group);
+				gsap.set(boxes, { opacity: 0, scale: 0.5, y: 14 });
+				if (rule) gsap.fromTo(rule, { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: 'power2.out' });
+				gsap.to(boxes, {
+					opacity: 1,
+					scale: 1,
+					y: 0,
+					duration: 0.4,
+					stagger: 0.04,
+					ease: 'back.out(1.7)'
+				});
+			};
+
+			const mobileTrigger = ScrollTrigger.create({
+				trigger: lightEl,
+				start: 'top 78%',
+				end: 'bottom 20%',
+				onEnter: revealActive,
+				onEnterBack: revealActive
 			});
-			mobileExitTl.to([...darkContent, headingEl], { opacity: 0, y: -24, duration: 0.5, stagger: 0.04, ease: 'power1.in' }, 0);
-			mobileExitTl.to(darkEl, { width: '100%', duration: 0.9, ease: 'power1.inOut' }, 0.25);
-			groupTriggers.push(mobileExitTl.scrollTrigger!);
+			groupTriggers.push(mobileTrigger);
+
+			// Exposed to the tab click handler below so switching categories
+			// replays the pop-in for whichever grid just became visible.
+			mobileReveal = revealActive;
 		}
 
 		return () => {
-			tl.scrollTrigger?.kill();
-			listTriggers.forEach((st) => st.kill());
+			entryTl.scrollTrigger?.kill();
+			entryTl.kill();
+			exitTl.scrollTrigger?.kill();
+			exitTl.kill();
 			groupTriggers.forEach((st) => st.kill());
 		};
 	});
+
+	// Set by onMount only on mobile; no-op on desktop where tabs are hidden.
+	let mobileReveal: (() => void) | null = null;
+
+	async function selectGroup(gi: number) {
+		if (gi === activeGroup) return;
+		activeGroup = gi;
+		await tick();
+		mobileReveal?.();
+	}
 </script>
 
 <section class="skills" id="skills" bind:this={skillsEl}>
@@ -299,48 +318,65 @@
 
 	<div class="skills__light" bind:this={lightEl}>
 		<span class="skills__mark" aria-hidden="true" bind:this={markLightEl}>SKILLS</span>
-		<ul class="skills__list" bind:this={lightListEl}>
+
+		<!-- Mobile-only category switcher — hidden on desktop via CSS. -->
+		<div class="skills__tabs" role="tablist" aria-label="Skill category">
 			{#each groups as group, gi}
-				<li class="skills__group">
+				<button
+					type="button"
+					class="skills__tab"
+					class:is-active={gi === activeGroup}
+					role="tab"
+					aria-selected={gi === activeGroup}
+					onclick={() => selectGroup(gi)}
+				>
+					{group.label}
+				</button>
+			{/each}
+		</div>
+
+		<div class="skills__col">
+			{#each groups as group, gi}
+				<div class="skills__group" class:is-active={gi === activeGroup}>
 					<div class="skills__group-head">
 						<span class="skills__group-index">0{gi + 1}</span>
 						<span class="skills__rule" aria-hidden="true"></span>
 						<span class="skills__label">{group.label}</span>
-						<!-- <span class="skills__group-count">{String(group.items.length).padStart(2, '0')}</span> -->
 					</div>
-					<ul class="skills__rows">
-						{#each group.items as item}
-							<li class="skills__row" style="--skill-color: {item.icon.hex}">
+					<div class="skills__grid">
+						{#each group.items as item, ii}
+							{@const cell = layouts[gi][ii]}
+							<div
+								class="skills__box skills__box--{cell.shape} skills__box--{cell.fill}"
+								style="--skill-color: {item.icon.hex}"
+							>
 								<svg class="skill-icon" viewBox="0 0 24 24" aria-hidden="true"
 									><path d={item.icon.path} fill-rule="evenodd" /></svg
 								>
-								<span class="skills__row-name">{item.name}</span>
-								<span class="skills__row-arrow" aria-hidden="true">→</span>
-							</li>
+								<span class="skills__box-label">{item.name}</span>
+							</div>
 						{/each}
-					</ul>
-				</li>
+					</div>
+				</div>
 			{/each}
-		</ul>
+		</div>
 	</div>
 </section>
 
 <style>
 	.skills {
-		height: 100vh;
 		position: relative;
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		overflow: hidden;
 		background: var(--white);
 		z-index: 3;
+		align-items: start;
 	}
+
 	.skills__dark {
-		position: absolute;
+		position: sticky;
 		top: 0;
-		left: 0;
-		bottom: 0;
-		width: 50%;
+		height: 100vh;
 		z-index: 2;
 		background: var(--black);
 		color: var(--fg-dark);
@@ -431,10 +467,7 @@
 		grid-column: 2;
 		background: var(--white);
 		color: var(--black);
-		display: flex;
-		align-items: flex-start;
-		justify-content: flex-start;
-		padding: clamp(1.25rem, 4vh, 2.5rem) clamp(2rem, 6vw, 4rem);
+		padding: clamp(3rem, 8vh, 5rem) clamp(2rem, 6vw, 4rem);
 		overflow: hidden;
 	}
 	.skills__mark {
@@ -460,28 +493,24 @@
 		color: var(--fg-dark);
 	}
 
-	/* ===== manifest list ===== */
-	.skills__list {
+	/* Tab switcher — desktop never sees it. */
+	.skills__tabs {
+		display: none;
+	}
+
+	.skills__col {
 		position: relative;
 		z-index: 1;
-		list-style: none;
-		margin: 0;
-		padding: 0;
 		display: flex;
 		flex-direction: column;
-		width: 100%;
-		max-width: 32rem;
-		will-change: transform;
-	}
-	.skills__group {
-		padding: clamp(0.6rem, 1.4vh, 0.9rem) 0;
-		opacity: 0;
+		gap: clamp(2.5rem, 6vh, 3.75rem);
+		max-width: 30rem;
 	}
 	.skills__group-head {
-		position: relative;
 		display: flex;
 		align-items: baseline;
 		gap: 0.7rem;
+		margin-bottom: clamp(0.75rem, 1.8vh, 1.1rem);
 	}
 	.skills__group-index {
 		font-family: var(--ff-mono);
@@ -494,9 +523,7 @@
 		flex: 1 1 auto;
 		height: 1px;
 		background: rgba(10, 10, 10, 0.16);
-		transform: scaleX(0);
 		transform-origin: left;
-		align-self: center;
 	}
 	.skills__label {
 		font-family: var(--ff-mono);
@@ -506,117 +533,106 @@
 		flex: 0 0 auto;
 		white-space: nowrap;
 	}
-	/* .skills__group-count {
-		font-family: var(--ff-mono);
-		font-size: 0.65rem;
-		color: var(--gray);
-		flex: 0 0 auto;
-	} */
 
-	.skills__rows {
-		list-style: none;
-		margin: 0.3rem 0 0;
-		padding: 0;
-		display: flex;
-		flex-direction: column;
-	}
-	.skills__row {
-		position: relative;
+	.skills__grid {
 		display: grid;
-		grid-template-columns: 1.1rem 1fr auto;
+		grid-template-columns: repeat(4, 1fr);
+		grid-auto-rows: clamp(58px, 7vw, 84px);
+		grid-auto-flow: dense;
+		gap: clamp(0.35rem, 0.9vw, 0.55rem);
+	}
+	.skills__box {
+		position: relative;
+		display: flex;
 		align-items: center;
-		gap: 0.65rem;
-		padding: 0.5rem 0.4rem;
-		border-bottom: 1px solid rgba(10, 10, 10, 0.08);
-		cursor: default;
+		justify-content: center;
 		overflow: hidden;
-		transition: padding-left 0.25s cubic-bezier(0.2, 0.6, 0.2, 1);
+		cursor: default;
+		transition: transform 0.3s cubic-bezier(0.2, 0.6, 0.2, 1), background-color 0.3s ease,
+			border-color 0.3s ease, color 0.3s ease;
 	}
-	.skills__row::before {
-		content: '';
-		position: absolute;
-		inset: 0;
+	.skills__box--wide {
+		grid-column: span 2;
+	}
+	.skills__box--tall {
+		grid-row: span 2;
+	}
+	.skills__box--solid {
 		background: var(--skill-color);
-		transform: scaleX(0);
-		transform-origin: left;
-		z-index: 0;
-		transition: transform 0.3s cubic-bezier(0.2, 0.6, 0.2, 1);
+		color: var(--white);
 	}
-	.skills__row:hover {
-		padding-left: 0.7rem;
+	.skills__box--solid:hover {
+		background: var(--black);
 	}
-	.skills__row:hover::before {
-		transform: scaleX(1);
+	.skills__box--ghost {
+		background: var(--white);
+		border: 1px solid rgba(10, 10, 10, 0.14);
+		color: var(--skill-color);
+	}
+	.skills__box--ghost:hover {
+		color: var(--black);
+		border-color: var(--black);
+	}
+	.skills__box:hover {
+		transform: translateY(-3px);
+		z-index: 2;
 	}
 	.skill-icon {
-		position: relative;
-		z-index: 1;
-		flex-shrink: 0;
-		width: 1rem;
-		height: 1rem;
-		color: var(--skill-color);
-		transition: color 0.25s ease;
+		width: 34%;
+		height: 34%;
+		color: currentColor;
+		transition: transform 0.3s ease, color 0.3s ease;
 	}
 	.skill-icon path {
 		fill: currentColor;
 	}
-	.skills__row-name {
-		position: relative;
-		z-index: 1;
-		font-family: var(--ff-body);
-		font-weight: 500;
-		font-size: 0.9rem;
-		color: var(--black);
-		transition: color 0.25s ease;
+	.skills__box:hover .skill-icon {
+		transform: translateY(-9px);
 	}
-	.skills__row-arrow {
-		position: relative;
-		z-index: 1;
+	.skills__box-label {
+		position: absolute;
+		inset: auto 0 0 0;
+		padding: 0.3rem 0.35rem 0.4rem;
 		font-family: var(--ff-mono);
-		font-size: 0.8rem;
-		color: transparent;
+		font-size: 0.6rem;
+		letter-spacing: 0.02em;
+		text-align: center;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 		opacity: 0;
-		transform: translateX(-6px);
-		transition: opacity 0.25s ease, transform 0.25s ease, color 0.25s ease;
+		transform: translateY(8px);
+		transition: opacity 0.25s ease, transform 0.25s ease;
+		pointer-events: none;
 	}
-	.skills__row:hover .skill-icon,
-	.skills__row:hover .skills__row-name {
+	.skills__box--solid .skills__box-label {
 		color: var(--white);
 	}
-	.skills__row:hover .skills__row-arrow {
-		color: var(--white);
-		opacity: 0.8;
-		transform: translateX(0);
+	.skills__box--ghost .skills__box-label {
+		color: var(--black);
+	}
+	.skills__box:hover .skills__box-label {
+		opacity: 1;
+		transform: translateY(0);
 	}
 
 	@keyframes skills-blink {
-		0%,
-		100% {
-			opacity: 1;
-		}
-		50% {
-			opacity: 0;
-		}
+		0%, 100% { opacity: 1; }
+		50% { opacity: 0; }
 	}
 	@keyframes skills-dot-blink {
-		0%,
-		100% {
-			opacity: 0.08;
-		}
-		50% {
-			opacity: 0.34;
-		}
+		0%, 100% { opacity: 0.08; }
+		50% { opacity: 0.34; }
 	}
 
 	@media (max-width: 860px) {
 		.skills {
 			grid-template-columns: 1fr;
-			height: auto;
 		}
 		.skills__dark {
-			width: 100%;
+			position: relative;
+			top: auto;
 			height: 60vh;
-			bottom: auto;
 		}
 		.skills__dark-content {
 			align-items: center;
@@ -628,11 +644,73 @@
 		}
 		.skills__light {
 			grid-column: 1;
-			margin-top: 60vh;
-			min-height: 70vh;
+			padding: clamp(2.25rem, 7vh, 3rem) clamp(1.5rem, 6vw, 3rem);
 		}
-		.skills__row:hover {
-			padding-left: 0.4rem;
+
+		/* Horizontal chip strip, same family as GithubActivity's year filter —
+		   mono font, underline default, solid-fill active state. */
+		.skills__tabs {
+			display: flex;
+			gap: 1.25rem;
+			overflow-x: auto;
+			-webkit-overflow-scrolling: touch;
+			scrollbar-width: none;
+			padding-bottom: 0.9rem;
+			margin-bottom: clamp(1.25rem, 4vh, 1.75rem);
+			border-bottom: 1px solid rgba(10, 10, 10, 0.14);
+		}
+		.skills__tabs::-webkit-scrollbar {
+			display: none;
+		}
+		.skills__tab {
+			flex: 0 0 auto;
+			background: transparent;
+			border: 0;
+			border-bottom: 1px solid rgba(10, 10, 10, 0.3);
+			padding: 0.3rem 0;
+			font-family: var(--ff-mono);
+			font-size: 0.68rem;
+			letter-spacing: 0.08em;
+			color: var(--gray);
+			white-space: nowrap;
+			cursor: pointer;
+			transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, padding 0.2s ease;
+		}
+		.skills__tab.is-active {
+			background: var(--black);
+			color: var(--white);
+			border-bottom: 0;
+			padding: 0.3rem 0.65rem;
+		}
+
+		.skills__col {
+			max-width: none;
+			gap: 0;
+		}
+		/* Only the active category takes up space — this is what keeps the
+		   section from ballooning to 5 stacked grids tall. */
+		.skills__group {
+			display: none;
+		}
+		.skills__group.is-active {
+			display: block;
+		}
+		.skills__group-head {
+			display: none;
+		}
+
+		.skills__grid {
+			grid-template-columns: repeat(3, 1fr);
+			grid-auto-rows: clamp(58px, 19vw, 78px);
+		}
+		.skills__box-label {
+			opacity: 1;
+			transform: translateY(0);
+			font-size: 0.54rem;
+			padding-bottom: 0.3rem;
+		}
+		.skill-icon {
+			transform: translateY(-6px);
 		}
 	}
 	@media (prefers-reduced-motion: reduce) {
@@ -644,10 +722,7 @@
 			animation: none;
 			opacity: 0.2;
 		}
-		.skills__row {
-			transition: none;
-		}
-		.skills__row::before {
+		.skills__box {
 			transition: none;
 		}
 	}
