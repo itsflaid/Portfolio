@@ -2,157 +2,8 @@
   import { onMount } from "svelte";
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
-  import {
-    siTypescript,
-    siNodedotjs,
-    siAstro,
-    siNextdotjs,
-    siPostgresql,
-    siPrisma,
-    siCodemirror,
-    siUpstash,
-    siReact,
-    siExpress,
-    siMysql,
-    siTailwindcss,
-  } from "simple-icons";
-  import type { SimpleIcon } from "simple-icons";
-  import { groqIcon } from "./icons";
-  import type { SkillIcon } from "./icons";
-
-  function si(icon: SimpleIcon): SkillIcon {
-    return { hex: `#${icon.hex}`, path: icon.path };
-  }
-
-  // Tools without a simple-icons entry (ts-morph, Commander, Recharts, Fonnte)
-  // render as text-only pills — omit `icon` rather than guessing a logo.
-  type TechItem = {
-    name: string;
-    icon?: SkillIcon;
-  };
-
-  type Project = {
-    index: string;
-    title: string;
-    tag: string;
-    thumb: string;
-    // Base path WITHOUT extension — .webm/.mp4 are appended in the
-    // template so the browser can pick whichever it supports.
-    video: string;
-    desc: string;
-    tech: TechItem[];
-    // Optional proof-of-work badges. Only fill these in with numbers you can
-    // actually stand behind — leave undefined rather than inventing stats.
-    metrics?: string[];
-    demo: string;
-    repo: string;
-  };
-
-  const projects: Project[] = [
-    {
-      index: "01",
-      title: "DEVMAP",
-      tag: "Analyze once, reuse context everywhere",
-      thumb: "/preview/image/devmap.webp",
-      video: "/preview/video/devmap",
-      desc: "Maps your codebase through static analysis to give AI agents structured context and a clearer understanding of your project.",
-      tech: [
-        { name: "TypeScript", icon: si(siTypescript) },
-        { name: "Node.js", icon: si(siNodedotjs) },
-        { name: "ts-morph" },
-        { name: "Commander" },
-        { name: "Astro", icon: si(siAstro) },
-      ],
-      metrics: ["282/282 tests passing", "11 framework supported"],
-      demo: "https://devmap-web.vercel.app",
-      repo: "https://github.com/itsflaid/devmap",
-    },
-    {
-      index: "02",
-      title: "DEVNOTE",
-      tag: "A platform for developers to manage and organize code, snippets, resources, and knowledge.",
-      thumb: "/preview/image/devnote.webp",
-      video: "/preview/video/devnote2",
-      desc: "Keep your technical knowledge organized in one place, from reusable snippets and resources to notes and collections.",
-      tech: [
-        { name: "Next.js", icon: si(siNextdotjs) },
-        { name: "TypeScript", icon: si(siTypescript) },
-        { name: "PostgreSQL", icon: si(siPostgresql) },
-        { name: "Codemirror", icon: si(siCodemirror) },
-      ],
-      metrics: ["39 endpoint", "3 role levels"],
-      demo: "https://devnote-five.vercel.app",
-      repo: "https://github.com/itsflaid/devnote",
-    },
-    {
-      index: "03",
-      title: "CHATME",
-      tag: "Chat-UI-based personal notes and reminders web application",
-      thumb: "/preview/image/chatme.webp",
-      video: "/preview/video/chatme2",
-      desc: "A simple way to capture thoughts, save notes, and manage reminders through a familiar chat-based interface.",
-      tech: [
-        { name: "Next.js", icon: si(siNextdotjs) },
-        { name: "TypeScript", icon: si(siTypescript) },
-        { name: "PostgreSQL", icon: si(siPostgresql) },
-        { name: "Upstash", icon: si(siUpstash) },
-      ],
-      metrics: ["offline-ready", "3+ months of daily use"],
-      demo: "https://chatme-jet.vercel.app",
-      repo: "https://github.com/itsflaid/chatme",
-    },
-    {
-      index: "04",
-      title: "DAILYFIT",
-      tag: "Simple daily home workout web application",
-      thumb: "/preview/image/dailyfit.webp",
-      video: "/preview/video/dailyfit",
-      desc: "Follow daily workouts, track completed activities, and keep an eye on your progress through a simple fitness experience.",
-      tech: [
-        { name: "Next.js", icon: si(siNextdotjs) },
-        { name: "TypeScript", icon: si(siTypescript) },
-        { name: "PostgreSQL", icon: si(siPostgresql) },
-        { name: "Prisma", icon: si(siPrisma) },
-      ],
-      metrics: ["PDF reports", "487 movement logged"],
-      demo: "https://dailyfit-alpha.vercel.app",
-      repo: "https://github.com/itsflaid/dailyfit",
-    },
-    {
-      index: "05",
-      title: "MUFADZ PORTAL",
-      tag: "An all-in-one platform for Islamic services, from Quran to prayer schedule.",
-      thumb: "/preview/image/mufadz.webp",
-      video: "/preview/video/mufadz",
-      desc: "Brings Islamic services together in one platform — Quran reader and prayer schedule anchor daily use, alongside dzikir, zakat calculator, and an AI chatbot.",
-      tech: [
-        { name: "React", icon: si(siReact) },
-        { name: "TypeScript", icon: si(siTypescript) },
-        { name: "Express", icon: si(siExpress) },
-        { name: "MySQL", icon: si(siMysql) },
-      ],
-      metrics: ["25 Stars", "3 APIs integrated"],
-      demo: "https://mufadz-app.vercel.app",
-      repo: "https://github.com/itsflaid/mufadz-portal",
-    },
-    {
-      index: "06",
-      title: "DE HOME SPA",
-      tag: "An AI-powered home spa platform for personalized treatment recommendations and guidance.",
-      thumb: "/preview/image/de-home-spa.webp",
-      video: "/preview/video/dehomespa",
-      desc: "Get personalized home spa recommendations based on your needs through guided selections or direct conversations with AI.",
-      tech: [
-        { name: "Next.js", icon: si(siNextdotjs) },
-        { name: "TypeScript", icon: si(siTypescript) },
-        { name: "Groq", icon: groqIcon },
-        { name: "Fonnte" },
-      ],
-      metrics: ["Ranked 6th — TechnoFest 2026 FE AI Hackathon"],
-      demo: "http://de-home-spa-v2-uwxp.vercel.app/",
-      repo: "https://github.com/itsflaid/de-home-spa-v2",
-    },
-  ];
+  import { projects } from "$lib/data/project";
+  import { openCaseStudyModal } from "$lib/caseStudy";
 
   let workEl: HTMLElement;
   let viewportEl: HTMLElement;
@@ -289,6 +140,10 @@
       { threshold: 0, rootMargin: "0px 40%" },
     );
 
+    // Panels with no <video> at all (project.video === "") never match a
+    // querySelector("video") below, so every one of these callbacks already
+    // no-ops for them via the `if (!video) return;` guards — no extra
+    // branching needed here, just don't render the element in the template.
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -415,18 +270,20 @@
                 decoding="async"
                 draggable="false"
               />
-              <video
-                class="media__video"
-                muted
-                loop
-                playsinline
-                preload="metadata"
-                aria-hidden="true"
-                tabindex="-1"
-              >
-                <source src="{project.video}.webm" type="video/webm" />
-                <source src="{project.video}.mp4" type="video/mp4" />
-              </video>
+              {#if project.video}
+                <video
+                  class="media__video"
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                  aria-hidden="true"
+                  tabindex="-1"
+                >
+                  <source src="{project.video}.webm" type="video/webm" />
+                  <source src="{project.video}.mp4" type="video/mp4" />
+                </video>
+              {/if}
             </div>
           </div>
           <div class="card__info">
@@ -462,17 +319,32 @@
               </ul>
             </div>
             <div class="card__actions">
-              <a
-                class="card__btn card__btn--demo"
-                href={project.demo}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span>Live Demo</span>
-                <svg viewBox="0 0 24 24" aria-hidden="true"
-                  ><path d="M7 17 17 7M8 7h9v9" /></svg
+              {#if project.caseStudy}
+                <button
+                  type="button"
+                  class="card__btn card__btn--case"
+                  onclick={() => openCaseStudyModal(project)}
+                  data-cursor-text="READ"
                 >
-              </a>
+                  <span>Case Study</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"
+                    ><path d="M7 17 17 7M8 7h9v9" /></svg
+                  >
+                </button>
+              {/if}
+              {#if project.demo}
+                <a
+                  class="card__btn card__btn--demo"
+                  href={project.demo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span>Live Demo</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"
+                    ><path d="M7 17 17 7M8 7h9v9" /></svg
+                  >
+                </a>
+              {/if}
               <a
                 class="card__btn card__btn--repo"
                 href={project.repo}
@@ -1000,6 +872,8 @@
     font-size: 0.75rem;
     letter-spacing: 0.06em;
     text-decoration: none;
+    border: 0;
+    cursor: pointer;
     transition:
       transform 0.3s cubic-bezier(0.2, 0.6, 0.2, 1),
       background 0.3s ease,
@@ -1015,18 +889,29 @@
     stroke-linecap: round;
     stroke-linejoin: round;
   }
-  .card__btn--demo {
+  .card__btn--case {
     background: var(--black);
     color: var(--white);
   }
-  .card__btn--demo:hover {
+  .card__btn--case:hover {
     background: var(--accent-ph);
+  }
+  .card__btn--demo {
+    background: transparent;
+    color: var(--black);
+    border: 1px solid rgba(10, 10, 10, 0.3);
+  }
+  .card__btn--demo:hover {
+    background: var(--black);
+    color: var(--white);
+    border-color: var(--black);
   }
   .card__btn--repo {
     background: transparent;
     color: var(--black);
     border: 0;
     border-bottom: 1px solid rgba(10, 10, 10, 0.3);
+    border-radius: 0;
     padding-left: 0;
     padding-right: 0;
   }
