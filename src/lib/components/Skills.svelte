@@ -306,7 +306,7 @@
 						<span class="skills__group-index">0{gi + 1}</span>
 						<span class="skills__rule" aria-hidden="true"></span>
 						<span class="skills__label">{group.label}</span>
-						<span class="skills__group-count">{String(group.items.length).padStart(2, '0')}</span>
+						<!-- <span class="skills__group-count">{String(group.items.length).padStart(2, '0')}</span> -->
 					</div>
 					<ul class="skills__rows">
 						{#each group.items as item}
@@ -506,12 +506,12 @@
 		flex: 0 0 auto;
 		white-space: nowrap;
 	}
-	.skills__group-count {
+	/* .skills__group-count {
 		font-family: var(--ff-mono);
 		font-size: 0.65rem;
 		color: var(--gray);
 		flex: 0 0 auto;
-	}
+	} */
 
 	.skills__rows {
 		list-style: none;

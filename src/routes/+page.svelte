@@ -10,8 +10,7 @@ import Marquee from "$lib/components/Marquee.svelte";
 import Experience from "$lib/components/Experience.svelte";
 import Skills from "$lib/components/Skills.svelte";
 import GithubActivity from "$lib/components/GithubActivity.svelte";
-import Footer from "$lib/components/Footer.svelte";
-// import Contact from "$lib/components/Contact.svelte";
+import Contact from "$lib/components/Contact.svelte";
 import ResumeModal from "$lib/components/ResumeModal.svelte";
 import CaseStudyModal from "$lib/components/CaseStudyModal.svelte";
 
@@ -39,8 +38,7 @@ import CaseStudyModal from "$lib/components/CaseStudyModal.svelte";
 <Skills />
 <GithubActivity />
 
-<!-- <Contact /> -->
-<Footer />
+<Contact />
 <ResumeModal />
 <CaseStudyModal />
 
