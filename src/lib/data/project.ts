@@ -99,8 +99,8 @@ export const projects: Project[] = [
 		repo: 'https://github.com/itsflaid/devnote',
 		caseStudy: {
 			problem: {
-				en: 'While working on ChatMe (Project 3) and DailyFit (Project 4), which use similar technologies, it became clear that many parts of development, from project setup to specific code snippets and files, could be reused across different projects. Instead of repeatedly opening an older project just to find and copy code, there was a need for a dedicated place to store and manage reusable snippets, code, and files. That need grew further when a friend at university fell behind on code during a programming class. Code or files could be shared through DevNote, but sending multiple files one by one quickly became impractical. This led to the need for a way to group and share multiple files together.',
-				id: 'Saat mengerjakan ChatMe (Project 3) dan DailyFit (Project 4) yang menggunakan teknologi yang serupa, mulai terlihat bahwa banyak hal dalam development, mulai dari setup hingga potongan kode dan file tertentu, sebenarnya dapat digunakan kembali di project lain. Daripada harus terus membuka project sebelumnya hanya untuk mencari dan menyalin kode, dibutuhkan tempat khusus untuk menyimpan dan mengelola snippet, kode, maupun file yang sering digunakan kembali. Kebutuhan tersebut kemudian berkembang ketika ada teman di kampus yang tertinggal kode saat mata kuliah pemrograman. File atau kode dapat dibagikan melalui DevNote, tetapi ketika harus membagikan banyak file sekaligus, mengirimkannya satu per satu menjadi tidak praktis. Dari situ muncul kebutuhan untuk mengelompokkan dan membagikan beberapa file secara bersamaan'
+				en: 'While working on ChatMe (Project 3) and DailyFit (Project 4), which use similar technologies, it became clear that many parts of development, from project setup to specific code snippets and files, could be reused across different projects. Instead of repeatedly opening an older project just to find and copy code, there was a need for a dedicated place to store and manage reusable snippets, code, and files. That need grew further when a friend at university fell behind on code during a programming class. Code or files could be shared through DevNote, but sending multiple files one by one quickly became impractical. Sharing multiple files would also commonly require creating a repository or pushing the files to GitHub first, even when the goal was simply to share them quickly. This led to the need for a way to group multiple files in one place and share them together without having to create a repository or push anything to GitHub.',
+				id: 'Saat mengerjakan ChatMe (Project 3) dan DailyFit (Project 4) yang menggunakan teknologi yang serupa, mulai terlihat bahwa banyak hal dalam development, mulai dari setup hingga potongan kode dan file tertentu, sebenarnya dapat digunakan kembali di project lain. Daripada harus terus membuka project sebelumnya hanya untuk mencari dan menyalin kode, dibutuhkan tempat khusus untuk menyimpan dan mengelola snippet, kode, maupun file yang sering digunakan kembali.Kebutuhan tersebut kemudian berkembang ketika ada teman di kampus yang tertinggal kode saat mata kuliah pemrograman.File atau kode dapat dibagikan melalui DevNote, tetapi ketika harus membagikan banyak file sekaligus, mengirimkannya satu per satu menjadi tidak praktis.Selain itu, membagikan banyak file biasanya membutuhkan repository atau harus melakukan push ke GitHub terlebih dahulu, padahal untuk kebutuhan berbagi cepat, hal tersebut terasa berlebihan.Dari situ muncul kebutuhan untuk mengelompokkan banyak file dalam satu tempat dan membagikannya sekaligus tanpa harus membuat repository atau melakukan push ke GitHub'
 			},
 			solution: {
 				en: 'DevNote is a platform for storing, managing, and reusing snippets, code, and files needed throughout development. Beyond acting as a personal code library, it includes sharing so code or files can be handed off to others directly. Workspace extends that further, grouping several files into one shareable space instead of sending them one by one. What started as a personal snippet store grew into a way to manage and share knowledge and resources across developers.',
@@ -189,7 +189,7 @@ export const projects: Project[] = [
 			}
 		}
 	},
-    {
+	{
 		index: '06',
 		title: 'DE HOME SPA',
 		tag: 'An AI-powered home spa platform for personalized treatment recommendations and guidance.',
@@ -207,8 +207,8 @@ export const projects: Project[] = [
 		repo: 'https://github.com/itsflaid/de-home-spa-v2',
 		caseStudy: {
 			problem: {
-				en: 'Home massage booking sites typically list dozens of treatments in technical language with no real guidance, and no space to describe symptoms or set a pressure preference. That made it easy to pick the wrong treatment, leave unsatisfied, or just abandon the site — a lost customer for the business and an underused home-service offering.',
-				id: 'Website booking pijat pada umumnya menampilkan puluhan treatment dengan istilah teknis tanpa panduan yang jelas, dan tidak ada ruang untuk menjelaskan keluhan atau menentukan preferensi tekanan. Akibatnya, salah pilih treatment, merasa kurang puas, atau akhirnya meninggalkan situs jadi hal yang mudah terjadi — bisnis kehilangan calon pelanggan dan potensi layanan home service kurang optimal.'
+				en: 'Built for Frontend AI Augmented Hackathon TechnoFest 2026. Home massage booking sites typically list dozens of treatments in technical language with no real guidance, and no space to describe symptoms or set a pressure preference. That made it easy to pick the wrong treatment, leave unsatisfied, or just abandon the site — a lost customer for the business and an underused home-service offering.',
+				id: 'dibangun untuk HackathonFrontend AI Augmented pada TechnoFest 2026. Website booking pijat pada umumnya menampilkan puluhan treatment dengan istilah teknis tanpa panduan yang jelas, dan tidak ada ruang untuk menjelaskan keluhan atau menentukan preferensi tekanan. Akibatnya, salah pilih treatment, merasa kurang puas, atau akhirnya meninggalkan situs jadi hal yang mudah terjadi — bisnis kehilangan calon pelanggan dan potensi layanan home service kurang optimal.'
 			},
 			solution: {
 				en: 'De Home Spa is a massage-booking landing page pairing AI recommendations with WhatsApp to simplify treatment selection. Users describe what\u2019s bothering them in plain language, and a Groq-powered model recommends a treatment — name, duration, scent, and pressure — along with a quick tip, while also picking up on preferences like soft, normal, or firm pressure automatically. Once a treatment\u2019s chosen, a short form (name, address, schedule, phone, payment method) sends the booking straight to the admin over WhatsApp. An interactive price list covers 26+ treatments across 4 duration options, viewable in a modal with no login or database needed — the whole flow is built responsively with Tailwind CSS, targeting a booking completed in under a minute.',
@@ -216,11 +216,11 @@ export const projects: Project[] = [
 			}
 		}
 	},
-    {
+	{
 		index: '07',
 		title: 'KASBON.IN',
 		tag: 'Real-time Shared Ledger System for a family-run store',
-		
+
 		thumb: '/preview/image/kasbonin.webp',
 		video: '',
 		desc: 'Multi-user debt tracking for a family store, so every transaction anyone logs is visible to the whole family in real time.',
@@ -243,5 +243,5 @@ export const projects: Project[] = [
 			}
 		}
 	},
-	
+
 ];

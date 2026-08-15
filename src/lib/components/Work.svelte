@@ -191,13 +191,23 @@
               swapped.add(pan);
               primeVideo(pan, video);
               const id = window.setTimeout(() => {
-                if (modalOpen) return;
+                if (modalOpen) {
+                  // Modal is open — don't swap in, and clear the pending
+                  // state so the pan retries cleanly after the modal closes.
+                  swapTimers.delete(pan);
+                  swapped.delete(pan);
+                  return;
+                }
                 swapTimers.delete(pan);
                 pan.classList.add("is-video");
                 video.play().catch(() => {});
               }, VIDEO_SWAP_DELAY);
               swapTimers.set(pan, id);
             } else {
+              // Already swapped before — restore the swap state (pausePreviews
+              // strips is-video from every pan on modal open, so re-add it here
+              // instead of only calling play()).
+              pan.classList.add("is-video");
               video.play().catch(() => {});
             }
           } else {

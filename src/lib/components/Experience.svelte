@@ -17,10 +17,9 @@
 			side: 'left',
 			date: 'JUL 2021 — MAR 2024',
 			type: 'EDUCATION',
-			title: 'COMPUTER ENGINEERING & NETWORKING (TKJ)',
+			title: '   COMPUTER ENGINEERING & NETWORKING (TKJ)',
 			org: 'SMK Muhammadiyah Loa Janan',
 			desc: 'Started my journey in IT, building a foundation in computer systems, hardware & networking.'
-
 		},
 		{
 			side: 'right',
@@ -29,7 +28,6 @@
 			title: 'PRAKTIK KERJA INDUSTRI - LOGISTICS',
 			org: 'PT. Anugerah Bara Kaltim',
 			desc: 'Worked in a real-world logistics environment, handling inventory records, checking incoming goods, and scanning docs.'
-
 		},
 		{
 			side: 'left',
@@ -38,7 +36,6 @@
 			title: 'INFORMATION SYSTEM (S1)',
 			org: 'UIN Sultan Aji Muhammad Idris Samarinda',
 			desc: 'Studying information systems, with coursework in web dev, databases, software eng, & UI/UX'
-
 		},
 		{
 			side: 'right',
@@ -50,10 +47,21 @@
 		}
 	];
 
+	const headingText = 'Experience & Education';
+	const eyebrowText = '// BACKGROUND';
+
 	let sectionEl: HTMLElement;
 	let spineEl: HTMLElement;
+	let headingEl: HTMLHeadingElement;
+	let eyebrowEl: HTMLSpanElement;
+	let dotsWrapEl: HTMLElement;
 	let entryEls: HTMLElement[] = [];
+	let tickEls: HTMLElement[] = [];
+	// char spans per-entry title, indexed same as entries[]
+	let titleCharEls: HTMLSpanElement[][] = entries.map(() => []);
 	let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+
+	let triggers: (ScrollTrigger | undefined)[] = [];
 
 	onMount(() => {
 		gsap.registerPlugin(ScrollTrigger);
@@ -62,48 +70,177 @@
 		if (reduceMotion) {
 			gsap.set(spineEl, { scaleY: 1 });
 			gsap.set(entryEls, { opacity: 1, x: 0 });
+			gsap.set(tickEls, { scale: 1 });
+			gsap.set(headingEl, { opacity: 1, y: 0 });
+			gsap.set(titleCharEls.flat(), { opacity: 1, y: 0, rotateX: 0 });
+			gsap.set(eyebrowEl, { clipPath: 'inset(0 0% 0 0)' });
+			gsap.set('.xp__dots i', { opacity: 0.06, scale: 1 });
 			return;
 		}
 
-		const tl = gsap.timeline({
-			scrollTrigger: {
-				trigger: sectionEl,
-				start: 'top 70%',
-				end: 'bottom 75%',
-				scrub: 0.8
-			}
-		});
-
-		// The spine draws itself top-to-bottom across the whole scrub range;
-		// each entry lights up right as the line reaches it.
-		tl.fromTo(spineEl, { scaleY: 0 }, { scaleY: 1, ease: 'none', duration: entries.length }, 0);
-
-		entryEls.forEach((entry, i) => {
-			const fromX = entries[i].side === 'right' ? -18 : 18;
-			const body = entry.querySelector('.xp__body');
-			if (!body) return;
-			tl.fromTo(
-				body,
-				{ opacity: 0, x: fromX },
-				{ opacity: 1, x: 0, ease: 'power1.out', duration: 0.6 },
-				i
+		const ctx = gsap.context(() => {
+			// --- 1. Dot grid stagger-in ---
+			gsap.fromTo(
+				'.xp__dots i',
+				{ opacity: 0, scale: 0 },
+				{
+					opacity: 0.06,
+					scale: 1,
+					duration: 0.3,
+					stagger: 0.04,
+					ease: 'power1.out',
+					scrollTrigger: {
+						trigger: sectionEl,
+						start: 'top 75%',
+						toggleActions: 'play none none reverse'
+					}
+				}
 			);
-		});
 
-		return () => tl.scrollTrigger?.kill();
+			// --- 2. Eyebrow typewriter ---
+			gsap.fromTo(
+				eyebrowEl,
+				{ clipPath: 'inset(0 100% 0 0)' },
+				{
+					clipPath: 'inset(0 0% 0 0)',
+					duration: 0.5,
+					ease: 'steps(12)',
+					scrollTrigger: {
+						trigger: headingEl,
+						start: 'top 85%',
+						toggleActions: 'play none none reverse'
+					}
+				}
+			);
+
+			// --- 3. Section heading: simple fade + rise (delayed slightly after eyebrow) ---
+			gsap.fromTo(
+				headingEl,
+				{ opacity: 0, y: 16 },
+				{
+					opacity: 1,
+					y: 0,
+					ease: 'power2.out',
+					duration: 0.7,
+					delay: 0.3,
+					scrollTrigger: {
+						trigger: headingEl,
+						start: 'top 85%',
+						toggleActions: 'play none none reverse'
+					}
+				}
+			);
+
+			// --- 4. Watermark parallax drift ---
+			gsap.to('.xp__mark--edu', {
+				y: -40,
+				ease: 'none',
+				scrollTrigger: { trigger: sectionEl, start: 'top bottom', end: 'bottom top', scrub: 1 }
+			});
+			gsap.to('.xp__mark--exp', {
+				y: 40,
+				ease: 'none',
+				scrollTrigger: { trigger: sectionEl, start: 'top bottom', end: 'bottom top', scrub: 1 }
+			});
+
+			// --- 5. Spine grows with overall section scroll ---
+			gsap.fromTo(
+				spineEl,
+				{ scaleY: 0 },
+				{
+					scaleY: 1,
+					ease: 'none',
+					scrollTrigger: {
+						trigger: sectionEl,
+						start: 'top 70%',
+						end: 'bottom 75%',
+						scrub: 0.8
+					}
+				}
+			);
+
+			// --- 6. Each entry reveals based on its own viewport position (fixes lag bug) ---
+			entryEls.forEach((entry, i) => {
+				const fromX = entries[i].side === 'right' ? -18 : 18;
+				const body = entry.querySelector('.xp__body');
+				const tick = tickEls[i];
+				const chars = titleCharEls[i];
+
+				if (body) {
+					const bodyTween = gsap.fromTo(
+						body,
+						{ opacity: 0, x: fromX },
+						{
+							opacity: 1,
+							x: 0,
+							ease: 'power1.out',
+							scrollTrigger: {
+								trigger: entry,
+								start: 'top 85%',
+								end: 'top 55%',
+								scrub: 0.6
+							}
+						}
+					);
+					triggers.push(bodyTween.scrollTrigger);
+				}
+
+				if (tick) {
+					const tickTween = gsap.fromTo(
+						tick,
+						{ scale: 0 },
+						{
+							scale: 1,
+							ease: 'back.out(3)',
+							duration: 0.3,
+							scrollTrigger: {
+								trigger: entry,
+								start: 'top 85%',
+								toggleActions: 'play none none reverse'
+							}
+						}
+					);
+					triggers.push(tickTween.scrollTrigger);
+				}
+
+				// --- Per-item title char reveal ("ketik" per huruf), triggered by this entry's own position ---
+				if (chars && chars.length) {
+					const titleTween = gsap.fromTo(
+						chars,
+						{ opacity: 0, y: '0.5em', rotateX: -30 },
+						{
+							opacity: 1,
+							y: '0em',
+							rotateX: 0,
+							ease: 'power3.out',
+							duration: 0.5,
+							stagger: 0.018,
+							scrollTrigger: {
+								trigger: entry,
+								start: 'top 85%',
+								toggleActions: 'play none none reverse'
+							}
+						}
+					);
+					triggers.push(titleTween.scrollTrigger);
+				}
+			});
+		}, sectionEl);
+
+		return () => ctx.revert();
 	});
 </script>
 
 <section class="xp" id="experience" bind:this={sectionEl}>
 	<span class="xp__mark xp__mark--edu" aria-hidden="true">EDU</span>
 	<span class="xp__mark xp__mark--exp" aria-hidden="true">EXP</span>
-	<span class="xp__dots" aria-hidden="true">
+	<span class="xp__dots" aria-hidden="true" bind:this={dotsWrapEl}>
 		{#each dots as _}<i></i>{/each}
 	</span>
 	<span class="xp__spin" aria-hidden="true"></span>
 	<div class="xp__head">
-		<span class="xp__eyebrow">// BACKGROUND</span>
-		<h2 class="xp__heading">Experience &amp; Education</h2>
+		<span class="xp__eyebrow" bind:this={eyebrowEl}>{eyebrowText}</span>
+		<h2 class="xp__heading" bind:this={headingEl}>{headingText}</h2>
 	</div>
 
 	<div class="xp__timeline">
@@ -111,14 +248,21 @@
 		<ul class="xp__list">
 			{#each entries as entry, i (entry.title)}
 				<li class="xp__entry xp__entry--{entry.side}" bind:this={entryEls[i]}>
-					<span class="xp__tick" aria-hidden="true"></span>
+					<span class="xp__tick" aria-hidden="true" bind:this={tickEls[i]}></span>
 					<div class="xp__body">
 						<span class="xp__date">{entry.date} · {entry.type}</span>
-						<span class="xp__title">{entry.title}</span>
+						<span class="xp__title" aria-label={entry.title}>
+							{#each entry.title.split('') as char, j}
+								<span
+									class="xp__char"
+									bind:this={titleCharEls[i][j]}
+									aria-hidden="true"
+									>{char === ' ' ? '\u00A0' : char}</span
+								>
+							{/each}
+						</span>
 						<span class="xp__org">{entry.org}</span>
-						
-							<p class="xp__desc">{entry.desc}</p>
-					
+						<p class="xp__desc">{entry.desc}</p>
 					</div>
 				</li>
 			{/each}
@@ -135,7 +279,6 @@
 		padding: clamp(5rem, 12vh, 9rem) clamp(1.5rem, 5vw, 4rem) clamp(7rem, 16vh, 11rem);
 		overflow: hidden;
 	}
-	/* Siluet watermark "EDU"/"EXP" — same treatment as the hero's FLAID mark. */
 	.xp__mark {
 		position: absolute;
 		font-family: var(--ff-display);
@@ -148,6 +291,7 @@
 		z-index: 0;
 		user-select: none;
 		pointer-events: none;
+		will-change: transform;
 	}
 	.xp__mark--edu {
 		top: -3vw;
@@ -157,7 +301,6 @@
 		bottom: -3vw;
 		left: -2vw;
 	}
-	/* Dot grid + spinning cross, same treatment as the hero's decor. */
 	.xp__dots {
 		position: absolute;
 		right: clamp(1.5rem, 4vw, 3rem);
@@ -227,10 +370,12 @@
 		margin-bottom: clamp(3rem, 8vh, 5rem);
 	}
 	.xp__eyebrow {
+		display: inline-block;
 		font-family: var(--ff-mono);
 		font-size: 0.8rem;
 		letter-spacing: 0.08em;
 		color: var(--gray);
+		white-space: nowrap;
 	}
 	.xp__heading {
 		margin: 0;
@@ -239,6 +384,11 @@
 		line-height: 1;
 		letter-spacing: 0.005em;
 		font-size: clamp(2rem, 5vw, 3.5rem);
+		perspective: 400px;
+	}
+	.xp__char {
+		display: inline-block;
+		will-change: transform, opacity;
 	}
 	.xp__timeline {
 		position: relative;
@@ -281,6 +431,7 @@
 		background: var(--black);
 		position: relative;
 		z-index: 1;
+		will-change: transform;
 	}
 	.xp__body {
 		display: flex;
@@ -304,10 +455,12 @@
 		color: var(--gray);
 	}
 	.xp__title {
+		display: inline-block;
 		font-family: var(--ff-display);
 		font-weight: 400;
 		line-height: 1.05;
 		font-size: clamp(1.4rem, 3vw, 2.1rem);
+		perspective: 400px;
 	}
 	.xp__org {
 		font-family: var(--ff-body);
