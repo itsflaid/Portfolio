@@ -3,7 +3,7 @@
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
   import { projects } from "$lib/data/project";
-  import { openCaseStudyModal } from "$lib/caseStudy";
+  import { openCaseStudyModal, registerCaseStudyClose } from "$lib/caseStudy";
 
   let workEl: HTMLElement;
   let viewportEl: HTMLElement;
@@ -19,6 +19,42 @@
   let outroLinkEl: HTMLElement;
   let activeIndex = 0;
   let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+
+  let modalOpen = false;
+  let pausedPreviews = new Set<HTMLElement>();
+
+  function pausePreviews() {
+    modalOpen = true;
+    if (!trackEl) return;
+    const pans = gsap.utils.toArray<HTMLElement>(
+      trackEl.querySelectorAll(".media__pan"),
+    );
+    pausedPreviews.clear();
+    pans.forEach((pan) => {
+      const video = pan.querySelector("video");
+      if (!video) return;
+      if (!video.paused) pausedPreviews.add(pan);
+      video.pause();
+      pan.classList.remove("is-video");
+    });
+  }
+
+  function resumePreviews() {
+    modalOpen = false;
+    if (!trackEl) return;
+    const pans = gsap.utils.toArray<HTMLElement>(
+      trackEl.querySelectorAll(".media__pan"),
+    );
+    pans.forEach((pan) => {
+      const video = pan.querySelector("video");
+      if (!video) return;
+      if (pausedPreviews.has(pan)) {
+        pan.classList.add("is-video");
+        video.play().catch(() => {});
+      }
+    });
+    pausedPreviews.clear();
+  }
 
   onMount(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -155,6 +191,7 @@
               swapped.add(pan);
               primeVideo(pan, video);
               const id = window.setTimeout(() => {
+                if (modalOpen) return;
                 swapTimers.delete(pan);
                 pan.classList.add("is-video");
                 video.play().catch(() => {});
@@ -202,6 +239,8 @@
       { threshold: 0 },
     );
     sectionObserver.observe(workEl);
+
+    registerCaseStudyClose(resumePreviews);
 
     return () => {
       ScrollTrigger.removeEventListener("refreshInit", setSpacing);
@@ -323,12 +362,16 @@
                 <button
                   type="button"
                   class="card__btn card__btn--case"
-                  onclick={() => openCaseStudyModal(project)}
+                  onclick={() => {
+                      pausePreviews();
+                      openCaseStudyModal(project);
+                    }}
                   data-cursor-text="READ"
                 >
                   <span>Case Study</span>
                   <svg viewBox="0 0 24 24" aria-hidden="true"
-                    ><path d="M7 17 17 7M8 7h9v9" /></svg
+                    ><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path
+                      d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg
                   >
                 </button>
               {/if}
@@ -338,6 +381,7 @@
                   href={project.demo}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label="Live Demo"
                 >
                   <span>Live Demo</span>
                   <svg viewBox="0 0 24 24" aria-hidden="true"
@@ -350,6 +394,7 @@
                 href={project.repo}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Repository"
               >
                 <svg class="card__btn-gh" viewBox="0 0 24 24" aria-hidden="true"
                   ><path
@@ -965,6 +1010,32 @@
       flex: 0 0 auto;
       width: 100%;
       max-height: clamp(180px, 32vh, 300px);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .card__actions {
+      flex-wrap: nowrap;
+      gap: 0.5rem;
+    }
+    .card__btn {
+      flex: 1 1 0%;
+      justify-content: center;
+      padding: 0.6rem;
+    }
+    .card__btn--case {
+      flex: 2 1 0%;
+      padding: 0.6rem 0.9rem;
+    }
+    .card__btn--demo span,
+    .card__btn--repo span {
+      display: none;
+    }
+    .card__btn--repo {
+      border: 1px solid rgba(10, 10, 10, 0.3);
+      border-radius: 0;
+      padding-left: 0.6rem;
+      padding-right: 0.6rem;
     }
   }
 

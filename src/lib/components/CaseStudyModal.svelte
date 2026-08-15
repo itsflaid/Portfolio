@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { gsap } from 'gsap';
-	import { registerCaseStudyModal } from '$lib/caseStudy';
+	import { registerCaseStudyModal, onCaseStudyClose } from '$lib/caseStudy';
 	import { stopLenis, startLenis } from '$lib/scroll';
 	import { caseStudyLang, type Lang } from '$lib/lang';
 	import type { Project } from '$lib/data/project';
@@ -93,6 +93,7 @@
 		project = null;
 		document.body.style.overflow = '';
 		startLenis();
+		onCaseStudyClose();
 	}
 
 	function onKey(e: KeyboardEvent) {
@@ -445,6 +446,24 @@
 		color: var(--gray);
 		border: 1px dashed rgba(241, 241, 239, 0.25);
 		padding: 0.5rem 0.75rem;
+	}
+
+	@media (max-width: 640px) {
+		.cs-modal__panel {
+			height: min(92vh, 36rem);
+		}
+		.cs-modal__actions {
+			flex-direction: column;
+			align-items: stretch;
+		}
+		.cs-modal__btn {
+			width: 100%;
+			flex: none;
+		}
+		.cs-modal__badge {
+			width: 100%;
+			flex: none;
+		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
