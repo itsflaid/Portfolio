@@ -92,7 +92,7 @@
 			]
 		},
 		{
-			label: 'DESIGN & ANIMATION',
+			label: 'DESIGN & MOTION',
 			items: [
 				{ name: 'Figma', icon: figmaIcon },
 				{ name: 'Canva', icon: canvaIcon },
