@@ -24,3 +24,8 @@ export const restApiIcon: SkillIcon = {
 	hex: '#336791',
 	path: 'M4 3h4v2H6v3H4zM4 10h2v4H4v3h6v2H4a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2V8a2 2 0 0 1 2-2V5a2 2 0 0 1 2-2h6v2H8v3zM20 3h-4v2h2v3h2zM20 10h-2v4h2v3h-6v2h6a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2V8a2 2 0 0 0-2-2V5a2 2 0 0 0-2-2h-6v2h6zM9 8h6v2H9zm0 6h6v2H9z'
 };
+
+export const nextAuthIcon: SkillIcon = {
+	hex: '#8315FD',
+	path: 'M12 1L3.2 4.2C2.5 4.5 2 5.2 2 6v6c0 5 4 9.9 9.1 11.9c.6.2 1.2.2 1.8 0c5-2 9-6.9 9.1-11.9V6c0-.8-.5-1.5-1.2-1.8L12 1zM12 7.2a4.4 4.4 0 1 0 0 8.8a4.4 4.4 0 1 0 0-8.8zM11.508 11.0H15.2V12.2H14.7V14.6H13.5V12.2H11.508A2.0 2.0 0 1 0 11.508 11.0Z'
+};

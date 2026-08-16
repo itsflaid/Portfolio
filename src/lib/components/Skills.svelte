@@ -16,6 +16,8 @@
 		siPrisma,
 		siPhp,
 		siLaravel,
+		siGoogle,
+		siBetterauth,
 		siMysql,
 		siPostgresql,
 		siNeon,
@@ -31,7 +33,7 @@
 		siVercel
 	} from 'simple-icons';
 	import type { SimpleIcon } from 'simple-icons';
-	import { groqIcon, gptIcon, codexIcon, restApiIcon } from './icons';
+	import { groqIcon, gptIcon, codexIcon, restApiIcon, nextAuthIcon } from './icons';
 	import type { SkillIcon } from './icons';
 
 	function si(icon: SimpleIcon): SkillIcon {
@@ -64,8 +66,11 @@
 				{ name: 'Express', icon: si(siExpress) },
 				{ name: 'Prisma', icon: si(siPrisma) },
 				{ name: 'REST API', icon: restApiIcon },
+				{ name: 'PHP', icon: si(siPhp) },
 				{ name: 'Laravel', icon: si(siLaravel) },
-				{ name: 'PHP', icon: si(siPhp) }
+				{ name: 'NextAuth', icon: nextAuthIcon },
+				{ name: 'Google OAuth', icon: si(siGoogle) },
+				{ name: 'BetterAuth', icon: { ...si(siBetterauth), hex: '#000000' } }
 			]
 		},
 		{
