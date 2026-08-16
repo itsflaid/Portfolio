@@ -55,11 +55,8 @@
 				}
 			});
 
-			// Eyebrow leads, same rhythm as the Hero's own eyebrow-first rise.
 			tl.fromTo(eyebrowEl, { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0);
 
-			// Two headline lines mask-wipe up with a slight opposite-direction glide,
-			// so the pair reads as converging rather than "everything just rises."
 			tl.fromTo(
 				line1El,
 				{ y: '105%', x: '-1.4rem' },
@@ -74,17 +71,11 @@
 			);
 			tl.to(cursorEl, { opacity: 1, duration: 0.25 }, 1.05);
 
-			// Spine divider between the two columns draws top-to-bottom right as the
-			// headline lands — same device as Experience's timeline spine, quieter.
 			tl.fromTo(dividerEl, { scaleY: 0 }, { scaleY: 1, duration: 0.7, ease: 'power2.inOut' }, 1.0);
 
-			// Bio fades in, then its characters colorize gray → white one by one,
-			// tied to scroll — the facts only step in once the bio is fully white.
 			tl.to(bioEl, { opacity: 1, duration: 0.4, ease: 'power1.out' }, 1.25);
 			tl.to(bioChars, { color: '#f1f1ef', duration: 0.3, ease: 'none', stagger: 0.02 }, 1.5);
 
-			// Facts tick in like a spec sheet rendering line by line, each hairline
-			// drawing alongside its row — only once the bio's last character is white.
 			tl.fromTo(
 				rows,
 				{ opacity: 0, y: 16 },
@@ -98,8 +89,6 @@
 				'>+=0.2'
 			);
 
-			// Exit: headline and body drift out at slightly different rates for a
-			// touch of depth, instead of one flat block sliding up together.
 			tl.to(
 				headlineEl,
 				{ y: '-22vh', opacity: 0.75, duration: 1.3, ease: 'power1.inOut' },
@@ -114,13 +103,6 @@
 			};
 		}
 
-		// Listener window 'load' + ScrollTrigger.refresh() yang tadinya di sini
-		// sudah dicabut — refresh 'load' sekarang dipusatkan sekali di
-		// SmoothScroll.svelte (lihat komentar di sana). Sebelumnya listener ini
-		// duplikat sama punya Work.svelte + auto-refresh bawaan GSAP, jadi
-		// jalan 2-3x beruntun tiap load dan bikin efek "double refresh"/jump,
-		// makin kerasa sejak Manifesto (timeline paling berat) ikut kena
-		// refresh berkali-kali itu.
 		return () => {
 			killTimeline?.();
 		};
@@ -193,8 +175,6 @@
 		z-index: 2;
 	}
 
-	/* Watermark + dot grid + spin cross — the same decorative family Hero and
-	   Experience already use, so About stops being the one undressed section. */
 	.about__mark {
 		position: absolute;
 		bottom: -2.5vw;

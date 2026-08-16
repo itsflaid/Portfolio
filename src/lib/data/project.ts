@@ -22,17 +22,11 @@ function si(icon: SimpleIcon): SkillIcon {
 	return { hex: `#${icon.hex}`, path: icon.path };
 }
 
-// Tools without a simple-icons entry (ts-morph, Commander, Recharts, Fonnte)
-// render as text-only pills — omit `icon` rather than guessing a logo.
 export type TechItem = {
 	name: string;
 	icon?: SkillIcon;
 };
 
-// Case study copy, dual-language. Kept short on purpose — this renders inside
-// a modal, not a dedicated page, so each field is capped at roughly 130-150
-// words. Kasbon.in's original draft ran to six paragraphs for the problem
-// alone; trimmed to the same cap as every other project here.
 export type CaseStudyContent = {
 	problem: { en: string; id: string };
 	solution: { en: string; id: string };

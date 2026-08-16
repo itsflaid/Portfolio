@@ -13,15 +13,12 @@
 		{ label: 'CONTACT', href: '#contact' }
 	];
 
-	// TODO: LinkedIn & Instagram belum diisi — ganti '#' dengan link asli
 	const socials: ContactLink[] = [
 		{ label: 'GITHUB', href: 'https://github.com/itsflaid' },
-		{ label: 'LINKEDIN', href: '#' },
-		{ label: 'INSTAGRAM', href: '#' }
+		{ label: 'LINKEDIN', href: 'https://www.linkedin.com/in/muhammad-fadil-1264b82a9' },
+		{ label: 'INSTAGRAM', href: 'https://www.instagram.com/sebutsajamf?igsh=N2xjdnVobmthdGU0' }
 	];
 
-	// Info singkat di kolom terang — konsisten dengan pola "spec-sheet" yang
-	// dipakai About.svelte (dl.facts), biar kolom kiri gak cuma link kosong.
 	type ContactFact = { label: string; value: string };
 	const facts: ContactFact[] = [
 		{ label: 'STATUS', value: 'Open for freelance & collab' },
@@ -53,11 +50,6 @@
 	let curtainTransitioning = false;
 	let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
-	// BACK TO TOP: layar ending udah full black frame, jadi daripada fast-scroll
-	// keliatan lewat semua section, tirai fixed (hitam sama, jadi swap-in-nya
-	// invisible) nutup layar, posisi scroll loncat ke atas di baliknya (gak
-	// keliatan), lalu tirai naik dari tepi atas kayak tirai teater —
-	// mengungkap Hero dari atas ke bawah, pas di titik "back to top" mendarat.
 	function handleBackToTop() {
 		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		if (reduceMotion || !curtainEl || curtainTransitioning) {
@@ -90,9 +82,6 @@
 		const lightContent = gsap.utils.toArray<HTMLElement>(
 			contactEl.querySelectorAll('[data-reveal-light]')
 		);
-		// Facts row (STATUS/BASED IN/REPLY TIME) dianimasikan terpisah dari
-		// lightContent biar hairline rule-nya bisa scaleX in bareng row-nya,
-		// sama seperti pola About.svelte.
 		const factsRows = gsap.utils.toArray<HTMLElement>(contactEl.querySelectorAll('.contact__facts-row'));
 		const factsRules = gsap.utils.toArray<HTMLElement>(contactEl.querySelectorAll('.contact__rule'));
 
@@ -103,8 +92,6 @@
 			gsap.set(lightContent, { opacity: 1, y: 0 });
 			gsap.set(factsRows, { opacity: 1, y: 0 });
 			gsap.set(factsRules, { scaleX: 1 });
-			// Mobile: bg dark tetap ada; ending desktop (curtain-pin) di-skip, tapi
-			// ending mobile-nya sendiri (band statis di bawah) tetap ditampilkan.
 			gsap.set(darkContent, { opacity: isMobile ? 1 : 0 });
 			if (!isMobile) {
 				gsap.set(endingCursorEl, { opacity: 1 });
@@ -121,7 +108,6 @@
 			return;
 		}
 
-		// Dark half start off-screen ke KANAN (kebalikan Skills yang dari kiri)
 		gsap.set(darkEl, { xPercent: 100 });
 
 		const tl = gsap.timeline({
@@ -175,10 +161,6 @@
 		);
 		tl.to(cursorEl, { opacity: 1, duration: 0.2 }, 0.95);
 
-		// ==== FASE PENUTUP ====
-		// Contact section dipin: posisinya diam, sisanya dihabiskan untuk
-		// membesarkan panel dark (kiri-bergerak) hingga full width, lalu
-		// konten ending muncul.
 		const curtain = gsap.timeline({
 			scrollTrigger: {
 				trigger: contactEl,
@@ -194,8 +176,6 @@
 			curtain.to(lightContent, { opacity: 0, duration: 0.4, ease: 'power1.in' }, 0.2);
 			curtain.to(factsRows, { opacity: 0, duration: 0.3, ease: 'power1.in' }, 0.2);
 
-			// Konten contact (LET'S TALK / BUILD SOMETHING_ / email) hilang DULU
-			// baru teks ending muncul, supaya tidak bertabrakan.
 			const revealOut = [...darkContent, headingLine1El, headingLine2El];
 			curtain.to(revealOut, { opacity: 0, y: -16, duration: 0.35, ease: 'power2.in' }, 0.4);
 			curtain.fromTo(
@@ -231,12 +211,6 @@
 			);
 		}
 
-		// Mobile: no pin, no curtain-growth — band ending cuma sit sebagai
-		// blok dark statis di bawah menu/connect info dan main sekali reveal
-		// (un-scrubbed) begitu masuk viewport — sama seperti pola "play once,
-		// stay" yang dipakai Skills groups di mobile. Beats-nya sama seperti
-		// ending desktop — eyebrow, headline mask-wipe, credits, tombol — cuma
-		// ditembak sebagai satu sequence cepat, bukan pinned scroll panjang.
 		const mobileEndingTriggers: ScrollTrigger[] = [];
 		if (isMobile) {
 			const mobileEndingTl = gsap.timeline({
@@ -421,9 +395,6 @@
 		background: var(--white);
 		z-index: 3;
 	}
-	/* Fixed, independent of scroll — covers the whole viewport while the jump
-	   to top happens underneath it, then rises away to reveal Hero. Same
-	   black as the ending screen so engaging it is an invisible swap. */
 	.contact__curtain {
 		display: none;
 		position: fixed;
@@ -433,8 +404,6 @@
 		pointer-events: none;
 		will-change: transform;
 	}
-	/* Stage sticky — pola sama dengan About: section 200vh, stage menempel
-	   di viewport selama 100vh kedua, dan scrubbing menggerakkan panel dark. */
 	.contact__stage {
 		position: sticky;
 		top: 0;
@@ -444,7 +413,6 @@
 		overflow: hidden;
 	}
 
-	/* ===== LIGHT (kiri, info kontak) ===== */
 	.contact__light {
 		position: relative;
 		grid-column: 1;
@@ -477,9 +445,6 @@
 		color: var(--ink-soft);
 	}
 
-	/* Spec-sheet facts row — sama pola dengan About.svelte (.facts), biar
-	   kolom kiri bawa info nyata (status/lokasi/response time), bukan cuma
-	   watermark + daftar link kosong. */
 	.contact__facts {
 		margin: 0;
 		display: flex;
@@ -574,7 +539,6 @@
 		border-top: 1px solid rgba(10, 10, 10, 0.14);
 	}
 
-	/* ===== DARK (kanan, statement/CTA) ===== */
 	.contact__dark {
 		position: absolute;
 		top: 0;
@@ -640,7 +604,6 @@
 		border-color: var(--fg-dark);
 	}
 
-	/* ===== FASE ENDING (muncul saat panel dark full width) ===== */
 	.contact__ending {
 		position: absolute;
 		inset: 0;
@@ -703,7 +666,6 @@
 		transform: translateY(-2px);
 	}
 
-	/* ===== ENDING MOBILE (band statis, ditampilkan lewat @media di bawah) ===== */
 	.contact__ending-mobile {
 		display: none;
 	}
@@ -751,7 +713,6 @@
 		border-color: var(--fg-dark);
 	}
 
-	/* ===== dekorasi (dot grid + ghost mark), reuse motif Skills/Work ===== */
 	.contact__dots {
 		position: absolute;
 		top: clamp(1.5rem, 4vw, 3rem);
@@ -850,8 +811,6 @@
 		.contact__copy {
 			text-align: left;
 		}
-		/* Mobile: bukan curtain-pin kayak desktop — cukup band statis, reveal
-		   sekali pas discroll ke situ (lihat .contact__ending-mobile di bawah). */
 		.contact__ending {
 			display: none;
 		}

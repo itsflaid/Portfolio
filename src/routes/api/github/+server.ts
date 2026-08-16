@@ -2,9 +2,6 @@ import { json } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import type { RequestHandler } from './$types';
 
-// Statistik (TOTAL, COMMIT, HARI AKTIF, STREAK) dihitung all-time — di-loop
-// per tahun karena GitHub cuma ngasih satu jendela waktu (biasanya ~setahun)
-// per contributionsCollection. Profil (followers/repos/stars) cukup sekali.
 const PROFILE_QUERY = `
 	query {
 		viewer {
@@ -24,7 +21,6 @@ const PROFILE_QUERY = `
 	}
 `;
 
-// Heatmap + bar bulanan DEFAULT: 12 bulan terakhir (koleksi default GitHub).
 const TRAILING_QUERY = `
 	query {
 		viewer {
@@ -42,7 +38,6 @@ const TRAILING_QUERY = `
 	}
 `;
 
-// Satu tahun penuh — dipakai buat filter tahun & agregat all-time.
 const YEAR_QUERY = `
 	query($from: DateTime!, $to: DateTime!) {
 		viewer {
@@ -64,16 +59,12 @@ const YEAR_QUERY = `
 
 type ContributionDay = { contributionCount: number; date: string };
 
-// Bentuk yang dikirim ke client buat render heatmap — cuma butuh count + date.
 type DayCell = { count: number; date: string };
 
 type CacheEntry = { data: unknown; expiresAt: number };
 let cache: CacheEntry | null = null;
-const TTL_MS = 60 * 60 * 1000; // 1 jam — cukup buat data yang cuma berubah kalau ngoding lagi
+const TTL_MS = 60 * 60 * 1000;
 
-// Jangan di-prerender jadi file statis: endpoint ini butuh baca GH_TOKEN dari
-// runtime env (serverless function) di Vercel, bukan dari build time. Kalau
-// di-prerender, data kebeku saat build dan env gak kebaca.
 export const prerender = false;
 
 async function ghGraphQL(token: string, query: string, variables: Record<string, unknown> = {}) {
@@ -140,26 +131,18 @@ export const GET: RequestHandler = async () => {
 			for (const w of yearWeeks) days.push(...w.contributionDays);
 
 			total += calendar?.totalContributions ?? 0;
-			// totalCommitContributions ada di contributionsCollection, BUKAN di
-			// contributionCalendar. Dulu dibaca dari objek yang salah, makanya
-			// selalu balik undefined -> 0.
 			commits += yearViewer?.contributionsCollection?.totalCommitContributions ?? 0;
 		}
 
 		const { current, longest } = computeStreaks(days);
 		const activeDays = days.filter((d) => d.contributionCount > 0).length;
 
-		// Repo publik non-fork lu > 100? Stars dari sisanya gak ke-hitung —
-		// GitHub gak punya field agregat langsung, jadi ini di-sum manual
-		// dari first 100. Cukup buat hampir semua profile portfolio.
 		const repoNodes: { stargazerCount: number }[] = profile?.repositories?.nodes ?? [];
 		const stars = repoNodes.reduce((sum, r) => sum + (r.stargazerCount ?? 0), 0);
 
 		const responseData = {
 			years,
-			// Heatmap & bar bulanan default: 12 bulan terakhir.
 			weeks: mapWeeks(trailingViewer?.contributionsCollection?.contributionCalendar?.weeks ?? []),
-			// Pilihan filter per tahun: { "2025": DayCell[][], ... }
 			byYear,
 			stats: {
 				total,
@@ -182,8 +165,6 @@ export const GET: RequestHandler = async () => {
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-// "2026-08-12" (UTC). GitHub menghitung hari kontribusi per UTC, jadi anchor
-// streak juga pakai UTC biar konsisten sama data yang dikasih API.
 function utcDateStr(offsetDays: number): string {
 	return new Date(Date.now() + offsetDays * DAY_MS).toISOString().slice(0, 10);
 }
@@ -196,10 +177,6 @@ function computeStreaks(days: ContributionDay[]) {
 	const sorted = [...days].sort((a, b) => a.date.localeCompare(b.date));
 	const counts = new Map(sorted.map((d) => [d.date, d.contributionCount]));
 
-	// Longest streak = rentang hari beruntun terpanjang, dan wajib kontigu
-	// (selisih tanggal tepat 1 hari). Cek tanggal, bukan cuma count > 0 —
-	// kalau ada tahun tanpa kontribusi (gap di antara contributionYears),
-	// streak harus putus di situ.
 	let longest = 0;
 	let run = 0;
 	for (let i = 0; i < sorted.length; i++) {
@@ -212,9 +189,6 @@ function computeStreaks(days: ContributionDay[]) {
 		}
 	}
 
-	// Current streak dihitung mundur dari hari ini (UTC). Kalau hari ini masih
-	// 0 kontribusi, itu wajar — belum tentu udah ngoding hari ini, bukan berarti
-	// streak putus. Lanjut hitung dari kemarin.
 	let current = 0;
 	let offset = 0;
 	if ((counts.get(utcDateStr(offset)) ?? 0) === 0) {

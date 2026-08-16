@@ -37,12 +37,10 @@
 	let loading = true;
 	let loadError = false;
 
-	// Filter tahun heatmap & bar bulanan. Default 'trailing' = 12 bulan terakhir.
 	let trailingWeeks: Day[][] = [];
 	let byYear: Record<string, Day[][]> = {};
 	let years: number[] = [];
 	let yearFilter: 'trailing' | number = 'trailing';
-	// Value select dropdown (mobile) — string karena bind:value di <select>.
 	let selectValue = 'trailing';
 
 	let sectionEl: HTMLElement;
@@ -80,9 +78,6 @@
 	}
 
 	function formatDate(dateStr: string) {
-		// Parsed as local midnight, not naive `new Date(dateStr)` — the latter
-		// reads as UTC and can silently shift a day depending on the visitor's
-		// timezone offset (same family of bug as the DailyFit checklist fix).
 		const d = new Date(`${dateStr}T00:00:00`);
 		return new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).format(d);
 	}
@@ -91,15 +86,10 @@
 		return `${stats.activeDays} HARI AKTIF · ${stats.longestStreak} HARI TERPANJANG`;
 	}
 
-	// "1,2rb" instead of "1234" — stars/followers bisa gede angkanya, jadi
-	// diringkes pake locale yang sama dengan formatDate.
 	function formatCompact(n: number) {
 		return new Intl.NumberFormat('id-ID', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
 	}
 
-	/** Aggregates the same daily data already fetched for the heatmap into a
-	 * all-time monthly breakdown — real data, not a filler visual, so it
-	 * earns the extra space on the right side instead of just padding it. */
 	function computeMonthly(weeksData: Day[][]): MonthBucket[] {
 		const buckets = new Map<string, MonthBucket>();
 		for (const day of weeksData.flat()) {
@@ -114,15 +104,9 @@
 		}
 		const sorted = [...buckets.values()].sort((a, b) => a.sortKey.localeCompare(b.sortKey));
 		const max = Math.max(1, ...sorted.map((m) => m.count));
-		// Floor at 4% so a zero-contribution month still shows a faint nub
-		// instead of vanishing — consistent with the heatmap's "always show
-		// something faint" treatment for empty days.
 		return sorted.map((m) => ({ ...m, pct: Math.max(4, Math.round((m.count / max) * 100)) }));
 	}
 
-	// Geser filter: setel ulang heatmap & bar bulanan, lalu tampilkan semua
-	// cell pada opacity finalnya (skip animasi scrub biar simpel & konsisten).
-	// Counter (TOTAL/COMMIT/dst) tetap all-time, gak ikut kebawa filter.
 	async function applyYear(value: 'trailing' | number) {
 		yearFilter = value;
 		selectValue = value === 'trailing' ? 'trailing' : String(value);
@@ -134,8 +118,6 @@
 		lockMonthlyWidth();
 	}
 
-	// Bar bulanan mengikuti lebar heatmap (min: konten heatmap, kolom kanan)
-	// biar ujung kiri-kanannya selalu sejajar, di semua ukuran layar.
 	function lockMonthlyWidth() {
 		const container = monthlyEl.parentElement?.clientWidth ?? 0;
 		const target = Math.min(heatmapEl.offsetWidth, container);
@@ -175,11 +157,6 @@
 			const rows = gsap.utils.toArray<HTMLElement>(statsEl.querySelectorAll('.stats__row'));
 			const bars = gsap.utils.toArray<HTMLElement>(monthlyEl.querySelectorAll('.monthly__bar'));
 
-			// Lock the monthly strip to the heatmap's width so keduanya share
-			// edge kiri-kanan yang sama. Width = min(lebar konten heatmap,
-			// lebar kolom kanan), diselaraskan ke sisi yang sama dengan heatmap
-			// (margin-left: auto) — jalan di desktop & mobile, mau heatmap
-			// overflow scroller-nya atau nggak.
 			lockMonthlyWidth();
 
 			if (reduceMotion) {
@@ -202,13 +179,6 @@
 			}
 
 			if (isMobile) {
-				// No sticky-scrub theatre on mobile — a single play-once reveal
-				// covering every element in the section (heading, stats, meta,
-				// heatmap, monthly strip, legend), same "family" treatment
-				// Skills/Footer already use below 860px. Numbers count up via a
-				// tween instead of snapping straight to their final value, so
-				// this row visibly animates in step with the row fade-in, same
-				// spirit as desktop.
 				gsap.set(cells, { opacity: 0 });
 				gsap.set(rows, { opacity: 0, y: 16 });
 				gsap.set([metaEl, yearsEl], { opacity: 0, y: 10 });
@@ -282,9 +252,6 @@
 				return;
 			}
 
-			// Desktop: sticky "stage" (same technique as About.svelte) + one scrub
-			// timeline over a tall section — scroll position directly drives how
-			// far through the year the heatmap has filled in, not an autoplay.
 			gsap.set(cells, { opacity: 0 });
 			gsap.set(rows, { opacity: 0, y: 16 });
 			gsap.set([metaEl, yearsEl], { opacity: 0, y: 10 });
@@ -348,9 +315,6 @@
 				0.15
 			);
 
-			// Monthly strip catches up partway through the daily heatmap reveal,
-			// then the legend settles right after — closing out the sequence
-			// just before the insight line starts scrambling in.
 			tl.to(bars, { scaleY: 1, stagger: 0.03, duration: 0.35, ease: 'power2.out' }, 0.5);
 			tl.to(legendEl, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' }, 0.9);
 
@@ -732,24 +696,14 @@
 		display: flex;
 		flex-direction: column;
 		gap: clamp(1.5rem, 4vh, 2.5rem);
-		/* Grid items default to a min-width that hugs their content's
-		   min-content size, which can silently force the whole track (and
-		   the page with it) wider than the viewport once any descendant has
-		   an intrinsically wide box. This keeps it shrinkable so the
-		   heatmap's own overflow-x:auto is what scrolls — not the page. */
 		min-width: 0;
 	}
 
-	/* Stars + followers — sits above the monthly strip, pinned to the right
-	   edge of the right column via align-self so it doesn't need its own
-	   grid track or disturb the stack below it. */
 	.ghactivity__meta {
 		display: flex;
 		align-self: flex-end;
 		gap: 1.1rem;
 	}
-	/* Filter tahun (12 BULAN default + tiap tahun) — nempel di bawah
-	   blok stars/followers, sejajar kanan. */
 	.ghactivity__years {
 		display: flex;
 		align-items: center;
@@ -764,7 +718,6 @@
 		flex-wrap: wrap;
 		gap: 1rem;
 	}
-	/* Dropdown filter cuma untuk mobile — tombol disembunyikan di <860px. */
 	.ghactivity__years-mobile {
 		display: none;
 	}
@@ -902,8 +855,6 @@
 		font-size: 0.7rem;
 		letter-spacing: 0.05em;
 		color: var(--gray);
-		/* Pin ke tepi kiri scroller: waktu heatmap di-scroll horizontal (mobile),
-		   legend Less→More gak ikut keseret ke samping. */
 		position: sticky;
 		left: 0;
 		width: max-content;
@@ -915,16 +866,9 @@
 		height: 9px;
 	}
 
-	/* Monthly strip — trailing 12-month totals aggregated from the same
-	   fetch as the heatmap, so this is a second read of real data rather
-	   than decoration filling space. Bars grow via scaleY (compositor-only,
-	   no layout thrash) off a track whose final height is set once by CSS.
-	   Width is locked to the heatmap's measured width in JS on desktop only
-	   — see onMount — so on mobile it just fills 100% here. */
 	.monthly {
 		display: flex;
 		align-items: flex-end;
-		/* Sama kayak gap antar kolom heatmap (3px) biar rapat & proporsional. */
 		gap: 3px;
 		margin-top: auto;
 		margin-left: auto;

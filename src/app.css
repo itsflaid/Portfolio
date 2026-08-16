@@ -12,7 +12,6 @@
 	--accent-ph: #3a3a38;
 	--heading-desc-gap: clamp(48px, 7vh, 88px);
 
-	/* Font utama/display situs (Hero name + heading "About Myself") */
 	--ff-display: 'Bebas Neue', sans-serif;
 	--ff-body: 'Hanken Grotesk', system-ui, sans-serif;
 	--ff-mono: 'JetBrains Mono', 'Courier New', monospace;
@@ -64,7 +63,6 @@ span {
 	outline-offset: 4px;
 }
 
-/* Custom scrollbar */
 html {
 	scrollbar-width: thin;
 	scrollbar-color: #1c1c1a var(--white);

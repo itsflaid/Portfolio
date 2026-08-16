@@ -30,10 +30,21 @@
 		siUpstash,
 		siGit,
 		siNpm,
-		siVercel
+		siVercel,
+		siGsap,
+		siFramer
 	} from 'simple-icons';
 	import type { SimpleIcon } from 'simple-icons';
-	import { groqIcon, gptIcon, codexIcon, restApiIcon, nextAuthIcon } from './icons';
+	import {
+		groqIcon,
+		gptIcon,
+		codexIcon,
+		restApiIcon,
+		nextAuthIcon,
+		figmaIcon,
+		canvaIcon,
+		pixellabIcon
+	} from './icons';
 	import type { SkillIcon } from './icons';
 
 	function si(icon: SimpleIcon): SkillIcon {
@@ -43,8 +54,6 @@
 	type SkillItem = { name: string; icon: SkillIcon };
 	type SkillGroup = { label: string; items: SkillItem[] };
 
-	// Item pertama tiap grup = "hero" — selalu dapet slot wide di buildLayout
-	// di bawah, jadi urutannya sengaja: logo paling identik duluan.
 	const groups: SkillGroup[] = [
 		{
 			label: 'FRONTEND',
@@ -83,6 +92,16 @@
 			]
 		},
 		{
+			label: 'DESIGN & ANIMATION',
+			items: [
+				{ name: 'Figma', icon: figmaIcon },
+				{ name: 'Canva', icon: canvaIcon },
+				{ name: 'Pixellab', icon: pixellabIcon },
+				{ name: 'GSAP', icon: si(siGsap) },
+				{ name: 'Framer Motion', icon: si(siFramer) }
+			]
+		},
+		{
 			label: 'AI & LLM',
 			items: [
 				{ name: 'Claude', icon: si(siClaude) },
@@ -106,7 +125,6 @@
 		}
 	];
 
-	// ── Seeded RNG — layout tiap grup acak tapi deterministik.
 	function hashString(str: string) {
 		let h = 0;
 		for (let i = 0; i < str.length; i++) h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
@@ -129,11 +147,28 @@
 
 	function buildLayout(group: SkillGroup): LayoutCell[] {
 		const rng = mulberry32(hashString(group.label));
-		return group.items.map((_, i) => {
-			if (i === 0) return { shape: 'wide', fill: rng() < 0.5 ? 'solid' : 'ghost' };
+		const n = group.items.length;
+		// Kuota kotak besar per grup, proporsional ke jumlah item — biar kolom gak
+		// jomplang. ~1 "tall" per kolom (grid 4 kolom), "wide" dijatah lebih longgar
+		// karena dia gak nambah tinggi kolom, cuma lebar.
+		let tallLeft = Math.max(1, Math.round(n / 4));
+		let wideLeft = Math.max(1, Math.round(n / 6));
+		return group.items.map((item) => {
+			// Icon multicolor asli (svg dengan fill hardcoded per path, kayak Figma) selalu
+			// dipaksa ghost/bg-putih — warna brand-nya sendiri udah "dibawa" logonya, jadi
+			// gak boleh ketiban solid background warna lain yang bisa clash. Svg custom yang
+			// cuma pakai currentColor (kayak Pixellab) gak kena aturan ini, tetap boleh solid.
+			const isMulticolor = !!item.icon.multicolor;
 			const shapeRoll = rng();
-			const shape: Shape = shapeRoll < 0.14 ? 'wide' : shapeRoll < 0.4 ? 'tall' : 'normal';
-			const fill: Fill = rng() < 0.5 ? 'solid' : 'ghost';
+			let shape: Shape = 'normal';
+			if (shapeRoll < 0.14 && wideLeft > 0) {
+				shape = 'wide';
+				wideLeft--;
+			} else if (shapeRoll < 0.4 && tallLeft > 0) {
+				shape = 'tall';
+				tallLeft--;
+			}
+			const fill: Fill = isMulticolor ? 'ghost' : rng() < 0.5 ? 'solid' : 'ghost';
 			return { shape, fill };
 		});
 	}
@@ -148,7 +183,7 @@
 	let headingLine1El: HTMLElement;
 	let headingLine2El: HTMLElement;
 	let cursorEl: HTMLElement;
-	let stackEl: HTMLElement; // .skills__col — stacked overlay on mobile
+	let stackEl: HTMLElement;
 	let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
 	onMount(() => {
@@ -162,9 +197,6 @@
 		function boxesOf(group: HTMLElement) {
 			return gsap.utils.toArray<HTMLElement>(group.querySelectorAll('.skills__box'));
 		}
-		// Rule AND the label text (index + name) both live in the "head" —
-		// both now travel together, since the label was the piece that was
-		// never being hidden before (hence the overlap bug).
 		function headPartsOf(group: HTMLElement) {
 			const rule = group.querySelector<HTMLElement>('.skills__rule');
 			const labelText = group.querySelectorAll<HTMLElement>(
@@ -186,9 +218,6 @@
 
 		gsap.set(darkEl, { xPercent: -100 });
 
-		// ── Dark panel intro: unchanged — slide in + heading mask-wipe,
-		// finishing right as 'top top' is reached (exactly when the mobile
-		// pin below would engage).
 		const entryTl = gsap.timeline({
 			scrollTrigger: { trigger: skillsEl, start: 'top bottom', end: 'top top', scrub: 1 }
 		});
@@ -219,10 +248,6 @@
 		let exitTl: gsap.core.Timeline | null = null;
 
 		if (!isMobile) {
-			// Desktop: unchanged — every category stacked in normal flow and
-			// visible, each with its own ScrollTrigger replaying forward/back
-			// every pass. Labels here were never overlapping (groups aren't
-			// absolutely positioned on desktop), so no label fade needed.
 			groupEls.forEach((group) => {
 				const { rule } = headPartsOf(group);
 				const boxes = boxesOf(group);
@@ -257,18 +282,8 @@
 			exitTl.to([...darkContent, headingEl], { opacity: 0, y: -20, duration: 0.5, ease: 'power1.in' }, 0);
 			exitTl.to(darkEl, { width: '100%', duration: 0.9, ease: 'power1.inOut' }, 0.15);
 		} else {
-			// ── Mobile: every group's grid sits stacked on top of each other
-			// (absolute, same box) inside .skills__col — no horizontal shift,
-			// no tabs. Section pins in place; ordinary vertical scroll steps
-			// through categories, and at each step the CURRENT category's
-			// boxes AND head (rule + label text) fade/scale out while the
-			// NEXT category's fade/scale in, in the same spot. Everything
-			// lives on one continuous scrub timeline, so scrolling up
-			// naturally reverses the exact same transition.
 			const n = groups.length;
 
-			// Measure each group's natural height BEFORE stacking them, so
-			// the pinned container can be sized to the tallest one.
 			const heights = groupEls.map((g) => g.offsetHeight);
 			const maxHeight = Math.max(...heights, 0);
 			if (stackEl) stackEl.style.height = `${maxHeight}px`;
@@ -279,10 +294,6 @@
 				g.style.right = '0';
 			});
 
-			// Initial state: group 0 fully visible (its own pop-in plays once
-			// the section nears view), every other group's boxes AND label
-			// text hidden and inert — this is the fix for the overlap bug,
-			// the label text was never being hidden before.
 			groupEls.forEach((group, i) => {
 				const boxes = boxesOf(group);
 				const { rule, labelText } = headPartsOf(group);
@@ -291,8 +302,6 @@
 				if (rule) gsap.set(rule, { scaleX: i === 0 ? 1 : 0 });
 				group.style.pointerEvents = i === 0 ? 'auto' : 'none';
 			});
-			// Group 0's rule/label start "already drawn" above so the very
-			// first paint looks settled; its box pop-in still plays fresh.
 			const firstHead = headPartsOf(groupEls[0]);
 			if (firstHead.rule) gsap.set(firstHead.rule, { scaleX: 0 });
 			gsap.set(firstHead.labelText, { opacity: 0 });
@@ -312,8 +321,6 @@
 				});
 			}
 
-			// First category pops in once, exactly as before — pure entrance,
-			// unrelated to the pinned transition mechanics below.
 			const firstReveal = ScrollTrigger.create({
 				trigger: lightEl,
 				start: 'top 85%',
@@ -347,9 +354,6 @@
 				}
 			});
 
-			// One transition per adjacent pair: current group's boxes AND
-			// label text fade out, then next group's fade/pop in — nothing
-			// ever moves sideways, and only one label is ever visible.
 			for (let i = 0; i < n - 1; i++) {
 				const outGroup = groupEls[i];
 				const inGroup = groupEls[i + 1];
@@ -443,9 +447,18 @@
 								class="skills__box skills__box--{cell.shape} skills__box--{cell.fill}"
 								style="--skill-color: {item.icon.hex}"
 							>
-								<svg class="skill-icon" viewBox="0 0 24 24" aria-hidden="true"
-									><path d={item.icon.path} fill-rule="evenodd" /></svg
+								<svg
+									class="skill-icon"
+									class:skill-icon--multicolor={!!item.icon.svg}
+									viewBox={item.icon.viewBox ?? '0 0 24 24'}
+									aria-hidden="true"
 								>
+									{#if item.icon.svg}
+										{@html item.icon.svg}
+									{:else}
+										<path d={item.icon.path} fill-rule="evenodd" />
+									{/if}
+								</svg>
 								<span class="skills__box-label">{item.name}</span>
 							</div>
 						{/each}
@@ -672,7 +685,7 @@
 		color: currentColor;
 		transition: transform 0.3s ease, color 0.3s ease;
 	}
-	.skill-icon path {
+	.skill-icon:not(.skill-icon--multicolor) path {
 		fill: currentColor;
 	}
 	.skills__box:hover .skill-icon {
@@ -735,10 +748,6 @@
 			grid-column: 1;
 			padding: clamp(2.25rem, 7vh, 3rem) clamp(1.5rem, 6vw, 3rem);
 		}
-
-		/* Stacked overlay — every group occupies the exact same box (height
-		   set via JS to the tallest group's measured height); only their
-		   head text/rule and boxes opacity/scale change, nothing shifts. */
 		.skills__col {
 			position: relative;
 			max-width: none;

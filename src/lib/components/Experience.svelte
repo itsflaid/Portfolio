@@ -57,7 +57,6 @@
 	let dotsWrapEl: HTMLElement;
 	let entryEls: HTMLElement[] = [];
 	let tickEls: HTMLElement[] = [];
-	// char spans per-entry title, indexed same as entries[]
 	let titleCharEls: HTMLSpanElement[][] = entries.map(() => []);
 	let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -79,7 +78,6 @@
 		}
 
 		const ctx = gsap.context(() => {
-			// --- 1. Dot grid stagger-in ---
 			gsap.fromTo(
 				'.xp__dots i',
 				{ opacity: 0, scale: 0 },
@@ -97,7 +95,6 @@
 				}
 			);
 
-			// --- 2. Eyebrow typewriter ---
 			gsap.fromTo(
 				eyebrowEl,
 				{ clipPath: 'inset(0 100% 0 0)' },
@@ -113,7 +110,6 @@
 				}
 			);
 
-			// --- 3. Section heading: simple fade + rise (delayed slightly after eyebrow) ---
 			gsap.fromTo(
 				headingEl,
 				{ opacity: 0, y: 16 },
@@ -131,7 +127,6 @@
 				}
 			);
 
-			// --- 4. Watermark parallax drift ---
 			gsap.to('.xp__mark--edu', {
 				y: -40,
 				ease: 'none',
@@ -143,7 +138,6 @@
 				scrollTrigger: { trigger: sectionEl, start: 'top bottom', end: 'bottom top', scrub: 1 }
 			});
 
-			// --- 5. Spine grows with overall section scroll ---
 			gsap.fromTo(
 				spineEl,
 				{ scaleY: 0 },
@@ -159,7 +153,6 @@
 				}
 			);
 
-			// --- 6. Each entry reveals based on its own viewport position (fixes lag bug) ---
 			entryEls.forEach((entry, i) => {
 				const fromX = entries[i].side === 'right' ? -18 : 18;
 				const body = entry.querySelector('.xp__body');
@@ -203,7 +196,6 @@
 					triggers.push(tickTween.scrollTrigger);
 				}
 
-				// --- Per-item title char reveal ("ketik" per huruf), triggered by this entry's own position ---
 				if (chars && chars.length) {
 					const titleTween = gsap.fromTo(
 						chars,

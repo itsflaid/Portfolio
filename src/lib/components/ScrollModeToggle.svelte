@@ -4,16 +4,14 @@
 	import { scrollMode, type ScrollMode } from '$lib/scrollMode';
 	import { getLenis } from '$lib/scroll';
 
-	// Kecepatan tur AUTO — pelan biar animasi GSAP + section pinned bisa dinikmati.
-	const AUTO_SPEED = 280; // px per detik
-	const AUTO_LEAD = AUTO_SPEED * 0.45; // jarak target di depan scroll saat ini
-	const IDLE_RESUME_MS = 6000; // jeda tanpa input user sebelum tur AUTO lanjut
+	const AUTO_SPEED = 280;
+	const AUTO_LEAD = AUTO_SPEED * 0.45;
+	const IDLE_RESUME_MS = 6000;
 
 	let mounted = false;
 	let reduceMotion = false;
 	let mode: ScrollMode = 'manual';
 
-	// ---- auto-driver ----
 	let autoEngaged = false;
 	let userHold = false;
 	let lastTick = 0;
@@ -53,8 +51,6 @@
 			return;
 		}
 
-		// "Chase": target selalu relatif ke posisi sekarang, jadi ikut menyesuaikan
-		// ketika spacer pinned ScrollTrigger bertambah/berkurang (tanpa overshoot).
 		lenis.scrollTo(lenis.scroll + AUTO_LEAD, {
 			duration: 0.45,
 			easing: (t: number) => t
@@ -68,8 +64,6 @@
 	}
 
 	function onVirtual() {
-		// User scroll saat tur masih "memutar balik ke atas" → urungkan rewind,
-		// langsung serahkan kontrol, lalu tur lanjut dari posisi user.
 		if (rewindPending) {
 			rewindPending = false;
 			userHold = false;
@@ -90,7 +84,6 @@
 		lastTick = 0;
 		offVirtual = lenis.on('virtual-scroll', onVirtual);
 
-		// Kalau sudah di ujung bawah, balik ke atas dulu biar tur dijalani dari awal.
 		if (lenis.limit - lenis.scroll < Math.min(window.innerHeight * 1.5, 1200)) {
 			rewindPending = true;
 			lenis.scrollTo(0, {
@@ -130,8 +123,6 @@
 		else disengageAuto();
 	}
 
-	// Klik user (nav, CTA, Resume, dsb.) ikut menunda drift saat AUTO — supaya
-	// scroll programmatic dari scrollToTarget tidak bentrok dengan chase.
 	function onPointer() {
 		if (autoEngaged) pauseDrift();
 	}

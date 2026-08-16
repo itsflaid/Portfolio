@@ -80,8 +80,6 @@
 		edgeGap = Math.max(0, (viewportEl.clientWidth - card.offsetWidth) / 2);
 		trackEl.style.paddingLeft = `${edgeGap}px`;
 		trackEl.style.paddingRight = `${edgeGap}px`;
-		// Koreksi statis aja (bukan animasi) — posisi awal tetap center,
-		// tapi geraknya nanti murni ikut transform trackEl, gak ada delay.
 		if (introContentEl) gsap.set(introContentEl, { x: -edgeGap });
 		if (outroContentEl) gsap.set(outroContentEl, { x: edgeGap });
 	};
@@ -90,16 +88,12 @@
 
 	const getScroll = () => Math.max(0, trackEl.scrollWidth - viewportEl.clientWidth);
 
-	// ── Entrance reveal — full scroll-scrubbed, tanpa autoplay/durasi tetap ──
-	// Progress-nya nempel langsung ke posisi scroll (gak snap, gak lag aneh).
-	// Selesai pas 'top top', jadi begitu pin aktif (section di tengah), teks
-	// udah full kebentuk duluan.
 	const introTl = gsap.timeline({
 		scrollTrigger: {
 			trigger: workEl,
 			start: 'top 90%',
 			end: 'top top',
-			scrub: 0.4 // naikkan buat lebih "lag"/smooth, turunkan biar makin nempel ke scroll
+			scrub: 0.4
 		}
 	});
 	introTl
@@ -121,25 +115,13 @@
 		}
 	});
 
-	// Horizontal track only — introContentEl sekarang child biasa dari
-	// track, jadi gerak barengan persis sama rate-nya kayak dots grid
-	// dan card lain sejak scroll pertama dimulai.
 	tl.to(trackEl, { x: () => -getScroll(), duration: 1, ease: 'none' }, 0);
 
-	// Outro (still scrubbed)
 	tl.fromTo(outroLine1El, { y: '105%' }, { y: '0%', duration: 0.05, ease: 'power2.out' }, 0.85);
 	tl.fromTo(outroLine2El, { y: '105%' }, { y: '0%', duration: 0.05, ease: 'power2.out' }, 0.89);
 	tl.fromTo(outroListEl, { opacity: 0 }, { opacity: 1, duration: 0.03, ease: 'power1.out' }, 0.93);
 	tl.fromTo(outroLinkEl, { opacity: 0 }, { opacity: 1, duration: 0.03, ease: 'power1.out' }, 0.96);
 
-    // Listener window 'load' + ScrollTrigger.refresh() yang tadinya di sini
-    // sudah dicabut — refresh 'load' sekarang dipusatkan sekali di
-    // SmoothScroll.svelte. Sebelumnya listener ini duplikat sama punya
-    // About.svelte + auto-refresh bawaan GSAP, jadi jalan 2-3x beruntun tiap
-    // load dan bikin efek "double refresh"/jump, makin kerasa sejak Manifesto
-    // (timeline paling berat) ikut kena refresh berkali-kali itu.
-
-    // ── video swap logic (unchanged) ──
     const pans = gsap.utils.toArray<HTMLElement>(
       trackEl.querySelectorAll(".media__pan"),
     );
@@ -176,10 +158,6 @@
       { threshold: 0, rootMargin: "0px 40%" },
     );
 
-    // Panels with no <video> at all (project.video === "") never match a
-    // querySelector("video") below, so every one of these callbacks already
-    // no-ops for them via the `if (!video) return;` guards — no extra
-    // branching needed here, just don't render the element in the template.
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -192,8 +170,6 @@
               primeVideo(pan, video);
               const id = window.setTimeout(() => {
                 if (modalOpen) {
-                  // Modal is open — don't swap in, and clear the pending
-                  // state so the pan retries cleanly after the modal closes.
                   swapTimers.delete(pan);
                   swapped.delete(pan);
                   return;
@@ -204,9 +180,6 @@
               }, VIDEO_SWAP_DELAY);
               swapTimers.set(pan, id);
             } else {
-              // Already swapped before — restore the swap state (pausePreviews
-              // strips is-video from every pan on modal open, so re-add it here
-              // instead of only calling play()).
               pan.classList.add("is-video");
               video.play().catch(() => {});
             }
@@ -786,9 +759,6 @@
     transition: opacity 0.6s ease;
   }
   .media__pan video {
-    /* Source clips are 4:3, matching .card__media 1:1 now that the pan
-		   box is no longer oversized for the old parallax slide, so `cover`
-		   fills the frame with no extra crop. */
     object-fit: cover;
     background: #000;
     opacity: 0;
@@ -1066,11 +1036,6 @@
       animation: none;
     }
 
-    /* No pin/scrub runs at all in this mode (see reduceMotion branch in
-		   the script), so the track must lay out as a normal stacked column
-		   that flows with ordinary page scroll — otherwise work__viewport's
-		   overflow:hidden would leave every card past the first one
-		   permanently unreachable. */
     .work__viewport {
       overflow: visible;
       align-items: flex-start;

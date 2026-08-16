@@ -29,8 +29,6 @@
 		caseStudyLang.set(next);
 	}
 
-	// Slides the pill behind whichever tab is active — measured off the
-	// actual button rects so it stays correct regardless of label width.
 	function moveIndicator(animate: boolean) {
 		if (!indicatorEl || !tabsEl) return;
 		const target = activeTab === 'problem' ? tabProblemEl : tabSolutionEl;

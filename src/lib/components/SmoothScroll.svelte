@@ -10,22 +10,6 @@
 	onMount(() => {
 		gsap.registerPlugin(ScrollTrigger);
 
-		// ---- Refresh terpusat, sekali aja ----
-		// Sebelumnya About.svelte & Work.svelte masing-masing punya listener
-		// window 'load' sendiri yang manggil ScrollTrigger.refresh() (global —
-		// re-measure SEMUA trigger di halaman, bukan cuma punya masing-masing).
-		// Ditambah GSAP sendiri juga auto-refresh di 'load' secara default.
-		// Totalnya jadi 2-3x full-refresh beruntun tiap kali halaman kelar
-		// dimuat. Ini selalu ada dari dulu, tapi baru kerasa jadi "double
-		// refresh"/jump sejak Manifesto masuk — timeline-nya paling berat di
-		// halaman (banyak getBoundingClientRect + puluhan tween), jadi tiap
-		// refresh ekstra itu kena biaya besar & keliatan sebagai kedip/lompat.
-		//
-		// 'load' dicabut dari autoRefreshEvents bawaan GSAP, dan satu-satunya
-		// refresh manual ditunda sampai window 'load' DAN font (Bebas Neue dkk,
-		// font-display: swap — bisa nyusul kapan aja, nggak terikat 'load')
-		// sama-sama siap, biar ukuran section yang dipakai buat itung jarak
-		// pin (termasuk Manifesto) udah final saat di-refresh.
 		ScrollTrigger.config({ autoRefreshEvents: 'visibilitychange,DOMContentLoaded,resize' });
 
 		let cancelled = false;

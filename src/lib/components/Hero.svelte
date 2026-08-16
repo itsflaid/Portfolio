@@ -85,8 +85,6 @@
 		background: var(--white);
 	}
 
-	/* Siluet watermark "FLAID" di belakang hero — dijaga tetap tebal & solid
-	   walau Bebas Neue cuma punya satu ketebalan (regular). */
 	.hero__mark {
 		position: absolute;
 		font-family: var(--ff-display);
