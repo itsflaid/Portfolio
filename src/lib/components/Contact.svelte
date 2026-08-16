@@ -4,9 +4,9 @@
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
 	import { scrollToTarget, jumpToTop } from '$lib/scroll';
 
-	type FooterLink = { label: string; href: string };
+	type ContactLink = { label: string; href: string };
 
-	const quickLinks: FooterLink[] = [
+	const quickLinks: ContactLink[] = [
 		{ label: 'ABOUT', href: '#about' },
 		{ label: 'WORK', href: '#work' },
 		{ label: 'SKILLS', href: '#skills' },
@@ -14,15 +14,24 @@
 	];
 
 	// TODO: LinkedIn & Instagram belum diisi — ganti '#' dengan link asli
-	const socials: FooterLink[] = [
+	const socials: ContactLink[] = [
 		{ label: 'GITHUB', href: 'https://github.com/itsflaid' },
 		{ label: 'LINKEDIN', href: '#' },
 		{ label: 'INSTAGRAM', href: '#' }
 	];
 
+	// Info singkat di kolom terang — konsisten dengan pola "spec-sheet" yang
+	// dipakai About.svelte (dl.facts), biar kolom kiri gak cuma link kosong.
+	type ContactFact = { label: string; value: string };
+	const facts: ContactFact[] = [
+		{ label: 'STATUS', value: 'Open for freelance & collab' },
+		{ label: 'BASED IN', value: 'Kutai Kartanegara, ID' },
+		{ label: 'REPLY TIME', value: 'Usually within 24 hours' }
+	];
+
 	const year = new Date().getFullYear();
 
-	let footerEl: HTMLElement;
+	let contactEl: HTMLElement;
 	let darkEl: HTMLElement;
 	let headingLine1El: HTMLElement;
 	let headingLine2El: HTMLElement;
@@ -44,12 +53,11 @@
 	let curtainTransitioning = false;
 	let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
-	// BACK TO TOP: the ending screen is already a full black frame, so instead
-	// of a visible fast-scroll back through every section, a fixed curtain
-	// (same black, so the swap-in is invisible) holds the screen, the scroll
-	// position jumps to the top underneath it unseen, then the curtain rises
-	// off the top edge like a theatre curtain — revealing the Hero from the
-	// top down, right where "back to top" actually lands.
+	// BACK TO TOP: layar ending udah full black frame, jadi daripada fast-scroll
+	// keliatan lewat semua section, tirai fixed (hitam sama, jadi swap-in-nya
+	// invisible) nutup layar, posisi scroll loncat ke atas di baliknya (gak
+	// keliatan), lalu tirai naik dari tepi atas kayak tirai teater —
+	// mengungkap Hero dari atas ke bawah, pas di titik "back to top" mendarat.
 	function handleBackToTop() {
 		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		if (reduceMotion || !curtainEl || curtainTransitioning) {
@@ -80,14 +88,21 @@
 
 		const darkContent = gsap.utils.toArray<HTMLElement>(darkEl.querySelectorAll('[data-reveal]'));
 		const lightContent = gsap.utils.toArray<HTMLElement>(
-			footerEl.querySelectorAll('[data-reveal-light]')
+			contactEl.querySelectorAll('[data-reveal-light]')
 		);
+		// Facts row (STATUS/BASED IN/REPLY TIME) dianimasikan terpisah dari
+		// lightContent biar hairline rule-nya bisa scaleX in bareng row-nya,
+		// sama seperti pola About.svelte.
+		const factsRows = gsap.utils.toArray<HTMLElement>(contactEl.querySelectorAll('.contact__facts-row'));
+		const factsRules = gsap.utils.toArray<HTMLElement>(contactEl.querySelectorAll('.contact__rule'));
 
 		if (reduceMotion) {
 			gsap.set(darkEl, { xPercent: 0, width: '100%' });
 			gsap.set([headingLine1El, headingLine2El], { y: '0%', x: '0rem' });
 			gsap.set(cursorEl, { opacity: 1 });
 			gsap.set(lightContent, { opacity: 1, y: 0 });
+			gsap.set(factsRows, { opacity: 1, y: 0 });
+			gsap.set(factsRules, { scaleX: 1 });
 			// Mobile: bg dark tetap ada; ending desktop (curtain-pin) di-skip, tapi
 			// ending mobile-nya sendiri (band statis di bawah) tetap ditampilkan.
 			gsap.set(darkContent, { opacity: isMobile ? 1 : 0 });
@@ -111,7 +126,7 @@
 
 		const tl = gsap.timeline({
 			scrollTrigger: {
-				trigger: footerEl,
+				trigger: contactEl,
 				start: 'top 75%',
 				end: 'top 5%',
 				scrub: 1
@@ -125,6 +140,18 @@
 			{ opacity: 0, y: 20 },
 			{ opacity: 1, y: 0, stagger: 0.08, ease: 'power2.out' },
 			0.1
+		);
+		tl.fromTo(
+			factsRows,
+			{ opacity: 0, y: 16 },
+			{ opacity: 1, y: 0, stagger: 0.08, ease: 'power2.out' },
+			0.14
+		);
+		tl.fromTo(
+			factsRules,
+			{ scaleX: 0 },
+			{ scaleX: 1, duration: 0.4, stagger: 0.08, ease: 'power2.out' },
+			0.14
 		);
 
 		tl.fromTo(
@@ -149,11 +176,12 @@
 		tl.to(cursorEl, { opacity: 1, duration: 0.2 }, 0.95);
 
 		// ==== FASE PENUTUP ====
-		// Footer dipin: posisinya diam, sisanya dihabiskan untuk membesarkan panel
-		// dark (kiri-bergerak) hingga full width, lalu konten ending muncul.
+		// Contact section dipin: posisinya diam, sisanya dihabiskan untuk
+		// membesarkan panel dark (kiri-bergerak) hingga full width, lalu
+		// konten ending muncul.
 		const curtain = gsap.timeline({
 			scrollTrigger: {
-				trigger: footerEl,
+				trigger: contactEl,
 				start: 'top top',
 				end: 'bottom bottom',
 				scrub: 1,
@@ -164,8 +192,9 @@
 		if (!isMobile) {
 			curtain.fromTo(darkEl, { width: '50%' }, { width: '100%', ease: 'none' }, 0);
 			curtain.to(lightContent, { opacity: 0, duration: 0.4, ease: 'power1.in' }, 0.2);
+			curtain.to(factsRows, { opacity: 0, duration: 0.3, ease: 'power1.in' }, 0.2);
 
-			// Konten footer (LET'S TALK / BUILD SOMETHING_ / email) hilang DULU
+			// Konten contact (LET'S TALK / BUILD SOMETHING_ / email) hilang DULU
 			// baru teks ending muncul, supaya tidak bertabrakan.
 			const revealOut = [...darkContent, headingLine1El, headingLine2El];
 			curtain.to(revealOut, { opacity: 0, y: -16, duration: 0.35, ease: 'power2.in' }, 0.4);
@@ -202,12 +231,12 @@
 			);
 		}
 
-		// Mobile: no pin, no curtain-growth — the ending band just sits as a
-		// static dark block below the menu/connect info and plays a single,
-		// un-scrubbed reveal once it scrolls into view (same "play once, stay"
-		// approach as the Skills groups on mobile). Same beats as the desktop
-		// ending — eyebrow, headline mask-wipe, credits, button — just fired
-		// as one quick sequence instead of tied to a long pinned scroll.
+		// Mobile: no pin, no curtain-growth — band ending cuma sit sebagai
+		// blok dark statis di bawah menu/connect info dan main sekali reveal
+		// (un-scrubbed) begitu masuk viewport — sama seperti pola "play once,
+		// stay" yang dipakai Skills groups di mobile. Beats-nya sama seperti
+		// ending desktop — eyebrow, headline mask-wipe, credits, tombol — cuma
+		// ditembak sebagai satu sequence cepat, bukan pinned scroll panjang.
 		const mobileEndingTriggers: ScrollTrigger[] = [];
 		if (isMobile) {
 			const mobileEndingTl = gsap.timeline({
@@ -261,87 +290,124 @@
 	});
 </script>
 
-<footer class="contact" id="contact" bind:this={footerEl}>
-	<div class="footer__curtain" bind:this={curtainEl} aria-hidden="true"></div>
-	<div class="footer__stage">
-		<div class="footer__light">
-		<span class="footer__mark footer__mark--light" aria-hidden="true">FLAID</span>
+<footer class="contact" id="contact" bind:this={contactEl}>
+	<div class="contact__curtain" bind:this={curtainEl} aria-hidden="true"></div>
+	<div class="contact__stage">
+		<div class="contact__light">
+			<span class="contact__mark contact__mark--light" aria-hidden="true">FLAID</span>
 
-			<nav class="footer__col footer__col--menu" data-reveal-light>
-				<span class="footer__label">MENU</span>
-				<ul class="footer__list">
-					{#each quickLinks as link}
-						<li><a href={link.href}>{link.label}</a></li>
-					{/each}
-				</ul>
-			</nav>
+			<div class="contact__light-head" data-reveal-light>
+				<span class="contact__eyebrow-light">// SAY HELLO</span>
+				<p class="contact__light-lead">
+					If you have a problem worth solving? let's talk.
+				</p>
+			</div>
 
-			<div class="footer__col footer__col--connect" data-reveal-light>
-			<span class="footer__label">CONNECT</span>
-			<ul class="footer__list">
-				{#each socials as s}
-					<li><a href={s.href} target="_blank" rel="noopener noreferrer">{s.label}</a></li>
+			<dl class="contact__facts">
+				{#each facts as fact}
+					<div class="contact__facts-row">
+						<span class="contact__rule" aria-hidden="true"></span>
+						<dt>{fact.label}</dt>
+						<dd>{fact.value}</dd>
+					</div>
 				{/each}
-			</ul>
+			</dl>
+
+			<div class="contact__groups">
+				<nav class="contact__group" data-reveal-light aria-label="Menu">
+					<span class="contact__group-label">MENU</span>
+					<ul class="contact__group-list">
+						{#each quickLinks as link, i}
+							<li>
+								<a href={link.href}>
+									<span class="contact__group-index">0{i + 1}</span>
+									<span>{link.label}</span>
+								</a>
+							</li>
+						{/each}
+					</ul>
+				</nav>
+
+				<div class="contact__group" data-reveal-light>
+					<span class="contact__group-label">CONNECT</span>
+					<ul class="contact__group-list">
+						{#each socials as s, i}
+							<li>
+								<a href={s.href} target="_blank" rel="noopener noreferrer">
+									<span class="contact__group-index">0{i + 1}</span>
+									<span>{s.label}</span>
+								</a>
+							</li>
+						{/each}
+					</ul>
+				</div>
+			</div>
+
+			<p class="contact__copy" data-reveal-light>© {year} Muhammad Fadil — FLAID</p>
 		</div>
 
-		<p class="footer__copy" data-reveal-light>© {year} Muhammad Fadil — FLAID</p>
-	</div>
+		<div class="contact__dark" bind:this={darkEl}>
+			<span class="contact__dots" aria-hidden="true">
+				{#each dots as _}<i></i>{/each}
+			</span>
+			<span class="contact__mark contact__mark--dark" aria-hidden="true">FLAID</span>
 
-	<div class="footer__dark" bind:this={darkEl}>
-		<span class="footer__dots" aria-hidden="true">
-			{#each dots as _}<i></i>{/each}
-		</span>
-		<span class="footer__mark footer__mark--dark" aria-hidden="true">FLAID</span>
-
-		<div class="footer__dark-content">
-			<span class="footer__eyebrow footer__eyebrow--dark" data-reveal>// IF YOU HAVE A PROBLEM WORTH SOLVING</span>
-			<h2 class="footer__heading">
-				<span class="line-mask"><span class="line" bind:this={headingLine1El}>LETS</span></span>
-				<span class="line-mask"
-					><span class="line" bind:this={headingLine2El}
-						>CONNECT<span class="cursor" bind:this={cursorEl}>_</span></span
-					></span
+			<div class="contact__dark-content">
+				<span class="contact__eyebrow contact__eyebrow--dark" data-reveal
+					>// Have an idea?</span
 				>
-			</h2>
-			<a class="footer__cta" href="mailto:mfadil.coder@gmail.com" data-reveal
-				>mfadil.coder@gmail.com →</a
-			>
-		</div>
-
-		<div class="footer__ending">
-			<span class="footer__ending-eyebrow" bind:this={endingEyebrowEl}>// THE END</span>
-			<h2 class="footer__ending-heading">
-				<span class="line-mask"><span class="line" bind:this={endingLine1El}>THANKS FOR</span></span>
-				<span class="line-mask"
-					><span class="line" bind:this={endingLine2El}
-						>SCROLLING<span class="cursor" bind:this={endingCursorEl}>_</span></span
-					></span
+				<h2 class="contact__heading">
+					<span class="line-mask"><span class="line" bind:this={headingLine1El}>LETS</span></span>
+					<span class="line-mask"
+						><span class="line" bind:this={headingLine2El}
+							>CONNECT<span class="cursor" bind:this={cursorEl}>_</span></span
+						></span
+					>
+				</h2>
+				<a class="contact__cta" href="mailto:mfadil.coder@gmail.com" data-reveal
+					>mfadil.coder@gmail.com →</a
 				>
-			</h2>
-			<span class="footer__ending-credits" bind:this={endingCreditsEl}
-				>DESIGNED &amp; BUILT BY MUHAMMAD FADIL — FLAID</span
-			>
-			<button class="footer__ending-back" bind:this={endingBackEl} onclick={handleBackToTop}>
-				BACK TO TOP ↑
-			</button>
-		</div>
+			</div>
+
+			<div class="contact__ending">
+				<span class="contact__ending-eyebrow" bind:this={endingEyebrowEl}>// THE END</span>
+				<h2 class="contact__ending-heading">
+					<span class="line-mask"><span class="line" bind:this={endingLine1El}>THANKS FOR</span></span>
+					<span class="line-mask"
+						><span class="line" bind:this={endingLine2El}
+							>SCROLLING<span class="cursor" bind:this={endingCursorEl}>_</span></span
+						></span
+					>
+				</h2>
+				<span class="contact__ending-credits" bind:this={endingCreditsEl}
+					>DESIGNED &amp; BUILT BY MUHAMMAD FADIL — FLAID</span
+				>
+				<button class="contact__ending-back" bind:this={endingBackEl} onclick={handleBackToTop}>
+					BACK TO TOP ↑
+				</button>
+			</div>
 		</div>
 
-		<div class="footer__ending-mobile" bind:this={mobileEndingEl}>
-			<span class="footer__ending-mobile-eyebrow" bind:this={mobileEndingEyebrowEl}>// THE END</span>
-			<h2 class="footer__ending-mobile-heading">
-				<span class="line-mask"><span class="line" bind:this={mobileEndingLine1El}>THANKS FOR</span></span>
+		<div class="contact__ending-mobile" bind:this={mobileEndingEl}>
+			<span class="contact__ending-mobile-eyebrow" bind:this={mobileEndingEyebrowEl}>// THE END</span>
+			<h2 class="contact__ending-mobile-heading">
+				<span class="line-mask"
+					><span class="line" bind:this={mobileEndingLine1El}>THANKS FOR</span></span
+				>
 				<span class="line-mask"
 					><span class="line" bind:this={mobileEndingLine2El}
 						>SCROLLING<span class="cursor" bind:this={mobileEndingCursorEl}>_</span></span
 					></span
 				>
 			</h2>
-			<span class="footer__ending-mobile-credits" bind:this={mobileEndingCreditsEl}
+			<span class="contact__ending-mobile-credits" bind:this={mobileEndingCreditsEl}
 				>DESIGNED &amp; BUILT BY MUHAMMAD FADIL — FLAID</span
 			>
-			<button class="footer__ending-mobile-back" bind:this={mobileEndingBackEl} onclick={handleBackToTop}>
+			<button
+				class="contact__ending-mobile-back"
+				bind:this={mobileEndingBackEl}
+				onclick={handleBackToTop}
+			>
 				BACK TO TOP ↑
 			</button>
 		</div>
@@ -358,7 +424,7 @@
 	/* Fixed, independent of scroll — covers the whole viewport while the jump
 	   to top happens underneath it, then rises away to reveal Hero. Same
 	   black as the ending screen so engaging it is an invisible swap. */
-	.footer__curtain {
+	.contact__curtain {
 		display: none;
 		position: fixed;
 		inset: 0;
@@ -367,9 +433,9 @@
 		pointer-events: none;
 		will-change: transform;
 	}
-	/* Stage sticky — pola yang sama dengan About: section 200vh, stage menempel
+	/* Stage sticky — pola sama dengan About: section 200vh, stage menempel
 	   di viewport selama 100vh kedua, dan scrubbing menggerakkan panel dark. */
-	.footer__stage {
+	.contact__stage {
 		position: sticky;
 		top: 0;
 		height: 100vh;
@@ -378,8 +444,8 @@
 		overflow: hidden;
 	}
 
-	/* ===== LIGHT (kiri, info praktis) ===== */
-	.footer__light {
+	/* ===== LIGHT (kiri, info kontak) ===== */
+	.contact__light {
 		position: relative;
 		grid-column: 1;
 		background: var(--white);
@@ -387,53 +453,129 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		gap: clamp(1.2rem, 3vh, 2rem);
+		gap: clamp(1.75rem, 4vh, 2.5rem);
 		padding: clamp(1.5rem, 4vh, 2.5rem) clamp(2rem, 6vw, 4rem);
 		overflow: hidden;
 	}
-	.footer__eyebrow {
+	.contact__light-head {
+		display: flex;
+		flex-direction: column;
+		gap: 0.6rem;
+		max-width: 26rem;
+		opacity: 0;
+	}
+	.contact__eyebrow-light {
 		font-family: var(--ff-mono);
 		font-size: 0.8rem;
 		letter-spacing: 0.08em;
 		color: var(--gray);
+	}
+	.contact__light-lead {
+		font-family: var(--ff-body);
+		font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+		line-height: 1.55;
+		color: var(--ink-soft);
+	}
+
+	/* Spec-sheet facts row — sama pola dengan About.svelte (.facts), biar
+	   kolom kiri bawa info nyata (status/lokasi/response time), bukan cuma
+	   watermark + daftar link kosong. */
+	.contact__facts {
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+	}
+	.contact__facts-row {
+		position: relative;
+		display: flex;
+		align-items: baseline;
+		gap: 1.25rem;
+		padding: 0.6rem 0;
 		opacity: 0;
 	}
-	.footer__col {
+	.contact__rule {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 1px;
+		background: rgba(10, 10, 10, 0.14);
+		transform: scaleX(0);
+		transform-origin: left;
+	}
+	.contact__facts-row dt {
+		flex: 0 0 auto;
+		width: clamp(6rem, 10vw, 7.5rem);
+		margin: 0;
+		font-family: var(--ff-mono);
+		font-size: 0.68rem;
+		letter-spacing: 0.08em;
+		color: var(--gray);
+	}
+	.contact__facts-row dd {
+		margin: 0;
+		font-family: var(--ff-body);
+		font-size: 0.88rem;
+		color: var(--black);
+		opacity: 0.85;
+	}
+
+	.contact__groups {
+		display: flex;
+		gap: clamp(2rem, 6vw, 3.5rem);
+	}
+	.contact__group {
+		flex: 1 1 0%;
+		min-width: 0;
 		opacity: 0;
 	}
-	.footer__label {
+	.contact__group-label {
+		display: block;
 		font-family: var(--ff-mono);
 		font-size: 0.72rem;
 		letter-spacing: 0.08em;
 		color: var(--gray);
+		margin-bottom: 0.6rem;
 	}
-	.footer__list {
+	.contact__group-list {
 		list-style: none;
-		margin: 0.6rem 0 0;
+		margin: 0;
 		padding: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 0.35rem;
+		gap: 0.4rem;
 	}
-	.footer__list a {
+	.contact__group-list a {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.55rem;
 		font-family: var(--ff-body);
 		font-size: clamp(0.95rem, 1.3vw, 1.05rem);
 		color: var(--black);
 		transition: opacity 0.2s ease;
 	}
-	.footer__list a:hover {
+	.contact__group-index {
+		font-family: var(--ff-mono);
+		font-size: 0.65rem;
+		color: var(--accent-ph);
+	}
+	.contact__group-list a:hover {
 		opacity: 0.55;
 	}
-	.footer__copy {
+
+	.contact__copy {
 		font-family: var(--ff-mono);
 		font-size: 0.72rem;
 		letter-spacing: 0.03em;
 		color: var(--gray);
 		opacity: 0;
+		padding-top: clamp(1rem, 2.5vh, 1.5rem);
+		margin-top: clamp(0.25rem, 1vh, 0.5rem);
+		border-top: 1px solid rgba(10, 10, 10, 0.14);
 	}
 
 	/* ===== DARK (kanan, statement/CTA) ===== */
-	.footer__dark {
+	.contact__dark {
 		position: absolute;
 		top: 0;
 		right: 0;
@@ -449,7 +591,7 @@
 		overflow: hidden;
 		will-change: transform, width;
 	}
-	.footer__dark-content {
+	.contact__dark-content {
 		position: relative;
 		z-index: 1;
 		display: flex;
@@ -458,10 +600,10 @@
 		gap: clamp(1rem, 2.5vh, 1.5rem);
 		max-width: 24rem;
 	}
-	.footer__eyebrow--dark {
+	.contact__eyebrow--dark {
 		color: var(--gray);
 	}
-	.footer__heading {
+	.contact__heading {
 		margin: 0;
 		font-family: var(--ff-display);
 		font-weight: 400;
@@ -482,9 +624,9 @@
 		font-family: var(--ff-mono);
 		margin-left: 0.05em;
 		opacity: 0;
-		animation: footer-blink 1s step-end infinite;
+		animation: contact-blink 1s step-end infinite;
 	}
-	.footer__cta {
+	.contact__cta {
 		font-family: var(--ff-mono);
 		font-size: clamp(0.9rem, 1.2vw, 1rem);
 		letter-spacing: 0.02em;
@@ -494,12 +636,12 @@
 		opacity: 0;
 		transition: border-color 0.2s ease, opacity 0.2s ease;
 	}
-	.footer__cta:hover {
+	.contact__cta:hover {
 		border-color: var(--fg-dark);
 	}
 
 	/* ===== FASE ENDING (muncul saat panel dark full width) ===== */
-	.footer__ending {
+	.contact__ending {
 		position: absolute;
 		inset: 0;
 		z-index: 2;
@@ -514,14 +656,14 @@
 		width: 100%;
 		pointer-events: none;
 	}
-	.footer__ending-eyebrow {
+	.contact__ending-eyebrow {
 		font-family: var(--ff-mono);
 		font-size: 0.8rem;
 		letter-spacing: 0.1em;
 		color: var(--gray);
 		opacity: 0;
 	}
-	.footer__ending-heading {
+	.contact__ending-heading {
 		margin: 0;
 		font-family: var(--ff-display);
 		font-weight: 400;
@@ -529,14 +671,14 @@
 		letter-spacing: 0.01em;
 		font-size: clamp(2.6rem, 8vw, 6.5rem);
 	}
-	.footer__ending-credits {
+	.contact__ending-credits {
 		font-family: var(--ff-mono);
 		font-size: clamp(0.72rem, 1.1vw, 0.85rem);
 		letter-spacing: 0.08em;
 		color: var(--gray);
 		opacity: 0;
 	}
-	.footer__ending-back {
+	.contact__ending-back {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
@@ -554,7 +696,7 @@
 		transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease,
 			transform 0.3s cubic-bezier(0.2, 0.6, 0.2, 1);
 	}
-	.footer__ending-back:hover {
+	.contact__ending-back:hover {
 		background: var(--fg-dark);
 		color: var(--black);
 		border-color: var(--fg-dark);
@@ -562,17 +704,17 @@
 	}
 
 	/* ===== ENDING MOBILE (band statis, ditampilkan lewat @media di bawah) ===== */
-	.footer__ending-mobile {
+	.contact__ending-mobile {
 		display: none;
 	}
-	.footer__ending-mobile-eyebrow {
+	.contact__ending-mobile-eyebrow {
 		font-family: var(--ff-mono);
 		font-size: 0.78rem;
 		letter-spacing: 0.1em;
 		color: var(--gray);
 		opacity: 0;
 	}
-	.footer__ending-mobile-heading {
+	.contact__ending-mobile-heading {
 		margin: 0;
 		font-family: var(--ff-display);
 		font-weight: 400;
@@ -580,14 +722,14 @@
 		letter-spacing: 0.01em;
 		font-size: clamp(2.2rem, 11vw, 3.2rem);
 	}
-	.footer__ending-mobile-credits {
+	.contact__ending-mobile-credits {
 		font-family: var(--ff-mono);
 		font-size: 0.7rem;
 		letter-spacing: 0.06em;
 		color: var(--gray);
 		opacity: 0;
 	}
-	.footer__ending-mobile-back {
+	.contact__ending-mobile-back {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
@@ -603,14 +745,14 @@
 		opacity: 0;
 		transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 	}
-	.footer__ending-mobile-back:active {
+	.contact__ending-mobile-back:active {
 		background: var(--fg-dark);
 		color: var(--black);
 		border-color: var(--fg-dark);
 	}
 
 	/* ===== dekorasi (dot grid + ghost mark), reuse motif Skills/Work ===== */
-	.footer__dots {
+	.contact__dots {
 		position: absolute;
 		top: clamp(1.5rem, 4vw, 3rem);
 		right: clamp(1.5rem, 4vw, 3rem);
@@ -621,25 +763,25 @@
 		z-index: 1;
 		pointer-events: none;
 	}
-	.footer__dots i {
+	.contact__dots i {
 		display: block;
 		width: 8px;
 		height: 8px;
 		background: var(--fg-dark);
 		font-style: normal;
 		opacity: 0.08;
-		animation: footer-dot-blink 3s ease-in-out infinite;
+		animation: contact-dot-blink 3s ease-in-out infinite;
 	}
-	.footer__dots i:nth-child(2) { animation-delay: 0.3s; }
-	.footer__dots i:nth-child(3) { animation-delay: 0.6s; }
-	.footer__dots i:nth-child(4) { animation-delay: 0.9s; }
-	.footer__dots i:nth-child(5) { animation-delay: 1.2s; }
-	.footer__dots i:nth-child(6) { animation-delay: 1.5s; }
-	.footer__dots i:nth-child(7) { animation-delay: 1.8s; }
-	.footer__dots i:nth-child(8) { animation-delay: 2.1s; }
-	.footer__dots i:nth-child(9) { animation-delay: 2.4s; }
+	.contact__dots i:nth-child(2) { animation-delay: 0.3s; }
+	.contact__dots i:nth-child(3) { animation-delay: 0.6s; }
+	.contact__dots i:nth-child(4) { animation-delay: 0.9s; }
+	.contact__dots i:nth-child(5) { animation-delay: 1.2s; }
+	.contact__dots i:nth-child(6) { animation-delay: 1.5s; }
+	.contact__dots i:nth-child(7) { animation-delay: 1.8s; }
+	.contact__dots i:nth-child(8) { animation-delay: 2.1s; }
+	.contact__dots i:nth-child(9) { animation-delay: 2.4s; }
 
-	.footer__mark {
+	.contact__mark {
 		position: absolute;
 		font-family: var(--ff-display);
 		font-weight: 400;
@@ -651,22 +793,22 @@
 		pointer-events: none;
 		opacity: 0.05;
 	}
-	.footer__mark--light {
+	.contact__mark--light {
 		top: -2.5vw;
 		left: -0.5vw;
 		color: var(--black);
 	}
-	.footer__mark--dark {
+	.contact__mark--dark {
 		bottom: -2.5vw;
 		right: -0.5vw;
 		color: var(--fg-dark);
 	}
 
-	@keyframes footer-blink {
+	@keyframes contact-blink {
 		0%, 100% { opacity: 1; }
 		50% { opacity: 0; }
 	}
-	@keyframes footer-dot-blink {
+	@keyframes contact-dot-blink {
 		0%, 100% { opacity: 0.08; }
 		50% { opacity: 0.34; }
 	}
@@ -675,13 +817,13 @@
 		.contact {
 			height: auto;
 		}
-		.footer__stage {
+		.contact__stage {
 			position: relative;
 			top: auto;
 			height: auto;
 			display: block;
 		}
-		.footer__dark {
+		.contact__dark {
 			position: absolute;
 			top: 0;
 			right: 0;
@@ -690,42 +832,30 @@
 			height: 60vh;
 			bottom: auto;
 		}
-		.footer__light {
+		.contact__light {
 			grid-column: 1;
 			margin-top: 60vh;
-			/* Kurangi tinggi & padding vertikal supaya tidak terlalu luas atas-bawah. */
 			min-height: auto;
 			padding: clamp(2rem, 8vh, 3.5rem) clamp(1.5rem, 6vw, 3rem);
-			/* MENU kiri, CONNECT kanan — dua kolom sejajar. */
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			align-content: center;
-			align-items: start;
-			gap: clamp(0.75rem, 2vh, 1.25rem) clamp(1.5rem, 6vw, 3rem);
-		}
-		.footer__col {
 			display: flex;
 			flex-direction: column;
-			align-items: flex-start;
+			justify-content: flex-start;
+			gap: clamp(1.5rem, 4vh, 2rem);
 		}
-		.footer__col--menu {
-			grid-column: 1;
-			justify-self: start;
+		.contact__groups {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: clamp(1rem, 4vw, 2rem);
 		}
-		.footer__col--connect {
-			grid-column: 2;
-			justify-self: start;
-		}
-		.footer__copy {
-			grid-column: 1 / -1;
+		.contact__copy {
 			text-align: left;
 		}
 		/* Mobile: bukan curtain-pin kayak desktop — cukup band statis, reveal
-		   sekali pas discroll ke situ (lihat .footer__ending-mobile di bawah). */
-		.footer__ending {
+		   sekali pas discroll ke situ (lihat .contact__ending-mobile di bawah). */
+		.contact__ending {
 			display: none;
 		}
-		.footer__ending-mobile {
+		.contact__ending-mobile {
 			display: flex;
 			flex-direction: column;
 			align-items: center;
@@ -742,7 +872,7 @@
 			animation: none;
 			opacity: 1;
 		}
-		.footer__dots i {
+		.contact__dots i {
 			animation: none;
 			opacity: 0.2;
 		}
