@@ -2,6 +2,7 @@
 	import { onMount, tick } from 'svelte';
 	import { gsap } from 'gsap';
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
+	import { getLenis } from '$lib/scroll';
 	import {
 		siTailwindcss,
 		siTypescript,
@@ -38,8 +39,10 @@
 	}
 
 	type SkillItem = { name: string; icon: SkillIcon };
-	type SkillGroup = { label: string; items: SkillItem[] };
+	type SkillGroup = { label: string; shortLabel?: string; items: SkillItem[] };
 
+	// Item pertama tiap grup = "hero" — selalu dapet slot wide di buildLayout
+	// di bawah, jadi urutannya sengaja: logo paling identik duluan.
 	const groups: SkillGroup[] = [
 		{
 			label: 'FRONTEND',
@@ -75,6 +78,7 @@
 		},
 		{
 			label: 'AI & LLM',
+			shortLabel: 'AI/LLM',
 			items: [
 				{ name: 'Claude', icon: si(siClaude) },
 				{ name: 'GPT', icon: gptIcon },
@@ -86,6 +90,7 @@
 		},
 		{
 			label: 'TOOLS & INFRA',
+			shortLabel: 'TOOLS',
 			items: [
 				{ name: 'GitHub', icon: si(siGithub) },
 				{ name: 'Git', icon: si(siGit) },
@@ -97,8 +102,7 @@
 		}
 	];
 
-	// ── Seeded RNG — layout tiap grup acak tapi deterministik (hash nama
-	// grup jadi seed), beda antar grup, konsisten tiap reload.
+	// ── Seeded RNG — layout tiap grup acak tapi deterministik.
 	function hashString(str: string) {
 		let h = 0;
 		for (let i = 0; i < str.length; i++) h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
@@ -140,12 +144,30 @@
 	let headingLine1El: HTMLElement;
 	let headingLine2El: HTMLElement;
 	let cursorEl: HTMLElement;
+	let tabsEl: HTMLElement;
+	let stackEl: HTMLElement; // .skills__col — stacked overlay on mobile
 	let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
-	// Mobile-only tab state — which category's grid is currently shown.
-	// Irrelevant on desktop, where every group renders at once (CSS hides
-	// the tab bar and forces every .skills__group visible there).
 	let activeGroup = 0;
+	let pinScrollTrigger: ScrollTrigger | null = null;
+
+	$: if (tabsEl) {
+		const btn = tabsEl.querySelectorAll<HTMLElement>('.skills__tab')[activeGroup];
+		btn?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+	}
+
+	function selectGroup(gi: number) {
+		if (!pinScrollTrigger) return; // desktop: tabs aren't rendered anyway
+		const n = groups.length;
+		const st = pinScrollTrigger;
+		const target = st.start + (gi / (n - 1)) * (st.end - st.start);
+		const lenis = getLenis();
+		if (lenis) {
+			lenis.scrollTo(target, { duration: 1 });
+		} else {
+			window.scrollTo({ top: target, behavior: 'smooth' });
+		}
+	}
 
 	onMount(() => {
 		gsap.registerPlugin(ScrollTrigger);
@@ -157,6 +179,11 @@
 
 		function boxesOf(group: HTMLElement) {
 			return gsap.utils.toArray<HTMLElement>(group.querySelectorAll('.skills__box'));
+		}
+		function headPartsOf(group: HTMLElement) {
+			const rule = group.querySelector<HTMLElement>('.skills__rule');
+			const label = group.querySelector<HTMLElement>('.skills__group-head');
+			return { rule, label };
 		}
 
 		if (reduceMotion) {
@@ -171,6 +198,9 @@
 
 		gsap.set(darkEl, { xPercent: -100 });
 
+		// ── Dark panel intro: unchanged — slide in + heading mask-wipe,
+		// finishing right as 'top top' is reached (exactly when the mobile
+		// pin below would engage).
 		const entryTl = gsap.timeline({
 			scrollTrigger: { trigger: skillsEl, start: 'top bottom', end: 'top top', scrub: 1 }
 		});
@@ -196,20 +226,15 @@
 		entryTl.to(cursorEl, { opacity: 1, duration: 0.2 }, 0.95);
 		entryTl.fromTo(markLightEl, { yPercent: -6 }, { yPercent: 0, ease: 'none' }, 0);
 
-		const exitTl = gsap.timeline({
-			scrollTrigger: { trigger: skillsEl, start: 'bottom 65%', end: 'bottom top', scrub: 1 }
-		});
-		exitTl.to([...darkContent, headingEl], { opacity: 0, y: -20, duration: 0.5, ease: 'power1.in' }, 0);
-		exitTl.to(darkEl, { width: '100%', duration: 0.9, ease: 'power1.inOut' }, 0.15);
-
 		const groupTriggers: ScrollTrigger[] = [];
+		let pinTl: gsap.core.Timeline | null = null;
+		let exitTl: gsap.core.Timeline | null = null;
 
 		if (!isMobile) {
-			// Desktop: every category stacked and visible — each gets its own
-			// ScrollTrigger, replaying forward/back on every pass either
-			// direction (toggleActions), not a one-time intro.
+			// Desktop: unchanged — every category stacked and visible, each
+			// with its own ScrollTrigger replaying forward/back every pass.
 			groupEls.forEach((group) => {
-				const rule = group.querySelector<HTMLElement>('.skills__rule');
+				const { rule } = headPartsOf(group);
 				const boxes = boxesOf(group);
 
 				gsap.set(boxes, { opacity: 0, scale: 0.5, y: 14 });
@@ -235,63 +260,158 @@
 				});
 				if (groupTl.scrollTrigger) groupTriggers.push(groupTl.scrollTrigger);
 			});
-		} else {
-			// Mobile: only one category is ever in the DOM's visible flow at a
-			// time (CSS hides the rest), so a per-group ScrollTrigger on hidden
-			// elements won't fire correctly. Instead, one trigger on the whole
-			// light column replays whichever group is currently active — both
-			// on scroll entry/exit and (via selectGroup below) on tab tap.
-			groupEls.forEach((group) => gsap.set(boxesOf(group), { opacity: 0, scale: 0.5, y: 14 }));
 
-			const revealActive = () => {
-				const group = groupEls[activeGroup];
-				if (!group) return;
-				const rule = group.querySelector<HTMLElement>('.skills__rule');
+			exitTl = gsap.timeline({
+				scrollTrigger: { trigger: skillsEl, start: 'bottom 65%', end: 'bottom top', scrub: 1 }
+			});
+			exitTl.to([...darkContent, headingEl], { opacity: 0, y: -20, duration: 0.5, ease: 'power1.in' }, 0);
+			exitTl.to(darkEl, { width: '100%', duration: 0.9, ease: 'power1.inOut' }, 0.15);
+		} else {
+			// ── Mobile: every group's grid sits stacked on top of each other
+			// (absolute, same box) inside .skills__col — no horizontal shift
+			// at all. Section pins in place; ordinary vertical scroll steps
+			// through categories, and at each step the CURRENT category's
+			// boxes fade/scale out while the NEXT category's boxes fade/scale
+			// in, in the same spot. Everything lives on one continuous scrub
+			// timeline, so scrolling up naturally reverses the exact same
+			// transition — no toggleActions needed, infinite both ways.
+			const n = groups.length;
+
+			// Measure each group's natural height BEFORE stacking them, so
+			// the pinned container can be sized to the tallest one.
+			const heights = groupEls.map((g) => g.offsetHeight);
+			const maxHeight = Math.max(...heights, 0);
+			if (stackEl) stackEl.style.height = `${maxHeight}px`;
+			groupEls.forEach((g) => {
+				g.style.position = 'absolute';
+				g.style.top = '0';
+				g.style.left = '0';
+				g.style.right = '0';
+			});
+
+			// Initial state: group 0 hidden (pops in once section is nearly in
+			// view, same as before), every other group hidden and inert.
+			groupEls.forEach((group, i) => {
 				const boxes = boxesOf(group);
+				const { rule } = headPartsOf(group);
 				gsap.set(boxes, { opacity: 0, scale: 0.5, y: 14 });
-				if (rule) gsap.fromTo(rule, { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: 'power2.out' });
+				if (rule) gsap.set(rule, { scaleX: 0 });
+				group.style.pointerEvents = i === 0 ? 'auto' : 'none';
+			});
+
+			function playIn(group: HTMLElement) {
+				const boxes = boxesOf(group);
+				const { rule } = headPartsOf(group);
+				if (rule) gsap.to(rule, { scaleX: 1, duration: 0.4, ease: 'power2.out' });
 				gsap.to(boxes, {
 					opacity: 1,
 					scale: 1,
 					y: 0,
 					duration: 0.4,
-					stagger: 0.04,
+					stagger: 0.035,
 					ease: 'back.out(1.7)'
 				});
-			};
+			}
+			function playOut(group: HTMLElement) {
+				const boxes = boxesOf(group);
+				const { rule } = headPartsOf(group);
+				if (rule) gsap.to(rule, { scaleX: 0, duration: 0.3, ease: 'power1.in' });
+				gsap.to(boxes, { opacity: 0, scale: 0.9, y: -10, duration: 0.3, ease: 'power1.in' });
+			}
 
-			const mobileTrigger = ScrollTrigger.create({
+			// First category pops in once, exactly as it did before — pure
+			// entrance, unrelated to the pinned transition mechanics.
+			const firstReveal = ScrollTrigger.create({
 				trigger: lightEl,
-				start: 'top 78%',
-				end: 'bottom 20%',
-				onEnter: revealActive,
-				onEnterBack: revealActive
+				start: 'top 85%',
+				once: true,
+				onEnter: () => playIn(groupEls[0])
 			});
-			groupTriggers.push(mobileTrigger);
+			groupTriggers.push(firstReveal);
 
-			// Exposed to the tab click handler below so switching categories
-			// replays the pop-in for whichever grid just became visible.
-			mobileReveal = revealActive;
+			let stepPx = 0;
+			function computeStep() {
+				stepPx = window.innerHeight * 0.85;
+			}
+			computeStep();
+			ScrollTrigger.addEventListener('refreshInit', computeStep);
+			const getTotalScroll = () => stepPx * (n - 1);
+
+			pinTl = gsap.timeline({
+				scrollTrigger: {
+					trigger: lightEl,
+					start: 'top top',
+					end: () => '+=' + Math.max(getTotalScroll(), 1),
+					pin: true,
+					scrub: 1,
+					invalidateOnRefresh: true,
+					anticipatePin: 1,
+					snap: {
+						snapTo: 1 / (n - 1),
+						duration: 0.35,
+						ease: 'power1.inOut'
+					},
+					onUpdate: (self) => {
+						const idx = Math.round(self.progress * (n - 1));
+						if (idx !== activeGroup) activeGroup = idx;
+					}
+				}
+			});
+
+			// One transition per adjacent pair: current group's boxes fade
+			// out, then next group's boxes pop in — no x movement anywhere.
+			for (let i = 0; i < n - 1; i++) {
+				const outGroup = groupEls[i];
+				const inGroup = groupEls[i + 1];
+				const outBoxes = boxesOf(outGroup);
+				const { rule: outRule } = headPartsOf(outGroup);
+				const inBoxes = boxesOf(inGroup);
+				const { rule: inRule } = headPartsOf(inGroup);
+
+				pinTl.to(outBoxes, { opacity: 0, scale: 0.9, y: -10, duration: 0.3, stagger: 0.015, ease: 'power1.in' }, i);
+				if (outRule) pinTl.to(outRule, { scaleX: 0, duration: 0.25, ease: 'power1.in' }, i);
+				pinTl.set(outGroup, { pointerEvents: 'none' }, i + 0.32);
+				pinTl.set(inGroup, { pointerEvents: 'auto' }, i + 0.32);
+				if (inRule) pinTl.fromTo(inRule, { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: 'power2.out' }, i + 0.32);
+				pinTl.fromTo(
+					inBoxes,
+					{ opacity: 0, scale: 0.5, y: 14 },
+					{ opacity: 1, scale: 1, y: 0, duration: 0.4, stagger: 0.03, ease: 'back.out(1.7)' },
+					i + 0.35
+				);
+			}
+
+			if (pinTl.scrollTrigger) {
+				pinScrollTrigger = pinTl.scrollTrigger;
+				groupTriggers.push(pinTl.scrollTrigger);
+			}
+
+			exitTl = gsap.timeline({
+				scrollTrigger: { trigger: skillsEl, start: 'bottom 65%', end: 'bottom top', scrub: 1 }
+			});
+			exitTl.to([...darkContent, headingEl], { opacity: 0, y: -20, duration: 0.5, ease: 'power1.in' }, 0);
+			exitTl.to(darkEl, { width: '100%', duration: 0.9, ease: 'power1.inOut' }, 0.15);
+
+			return () => {
+				ScrollTrigger.removeEventListener('refreshInit', computeStep);
+				entryTl.scrollTrigger?.kill();
+				entryTl.kill();
+				exitTl?.scrollTrigger?.kill();
+				exitTl?.kill();
+				pinTl?.scrollTrigger?.kill();
+				pinTl?.kill();
+				groupTriggers.forEach((st) => st.kill());
+			};
 		}
 
 		return () => {
 			entryTl.scrollTrigger?.kill();
 			entryTl.kill();
-			exitTl.scrollTrigger?.kill();
-			exitTl.kill();
+			exitTl?.scrollTrigger?.kill();
+			exitTl?.kill();
 			groupTriggers.forEach((st) => st.kill());
 		};
 	});
-
-	// Set by onMount only on mobile; no-op on desktop where tabs are hidden.
-	let mobileReveal: (() => void) | null = null;
-
-	async function selectGroup(gi: number) {
-		if (gi === activeGroup) return;
-		activeGroup = gi;
-		await tick();
-		mobileReveal?.();
-	}
 </script>
 
 <section class="skills" id="skills" bind:this={skillsEl}>
@@ -319,8 +439,8 @@
 	<div class="skills__light" bind:this={lightEl}>
 		<span class="skills__mark" aria-hidden="true" bind:this={markLightEl}>SKILLS</span>
 
-		<!-- Mobile-only category switcher — hidden on desktop via CSS. -->
-		<div class="skills__tabs" role="tablist" aria-label="Skill category">
+		<!-- Mobile-only nav: shows which category is active, tap to jump. -->
+		<div class="skills__tabs" role="tablist" aria-label="Skill category" bind:this={tabsEl}>
 			{#each groups as group, gi}
 				<button
 					type="button"
@@ -330,14 +450,14 @@
 					aria-selected={gi === activeGroup}
 					onclick={() => selectGroup(gi)}
 				>
-					{group.label}
+					{group.shortLabel ?? group.label}
 				</button>
 			{/each}
 		</div>
 
-		<div class="skills__col">
+		<div class="skills__col" bind:this={stackEl}>
 			{#each groups as group, gi}
-				<div class="skills__group" class:is-active={gi === activeGroup}>
+				<div class="skills__group">
 					<div class="skills__group-head">
 						<span class="skills__group-index">0{gi + 1}</span>
 						<span class="skills__rule" aria-hidden="true"></span>
@@ -493,7 +613,6 @@
 		color: var(--fg-dark);
 	}
 
-	/* Tab switcher — desktop never sees it. */
 	.skills__tabs {
 		display: none;
 	}
@@ -645,10 +764,10 @@
 		.skills__light {
 			grid-column: 1;
 			padding: clamp(2.25rem, 7vh, 3rem) clamp(1.5rem, 6vw, 3rem);
+			display: flex;
+			flex-direction: column;
 		}
 
-		/* Horizontal chip strip, same family as GithubActivity's year filter —
-		   mono font, underline default, solid-fill active state. */
 		.skills__tabs {
 			display: flex;
 			gap: 1.25rem;
@@ -658,6 +777,7 @@
 			padding-bottom: 0.9rem;
 			margin-bottom: clamp(1.25rem, 4vh, 1.75rem);
 			border-bottom: 1px solid rgba(10, 10, 10, 0.14);
+			flex: 0 0 auto;
 		}
 		.skills__tabs::-webkit-scrollbar {
 			display: none;
@@ -683,20 +803,16 @@
 			padding: 0.3rem 0.65rem;
 		}
 
+		/* Stacked overlay — all groups occupy the exact same box (set via JS
+		   to the tallest group's measured height); only opacity/scale on
+		   their boxes changes, nothing shifts sideways. */
 		.skills__col {
+			position: relative;
 			max-width: none;
 			gap: 0;
 		}
-		/* Only the active category takes up space — this is what keeps the
-		   section from ballooning to 5 stacked grids tall. */
 		.skills__group {
-			display: none;
-		}
-		.skills__group.is-active {
-			display: block;
-		}
-		.skills__group-head {
-			display: none;
+			width: 100%;
 		}
 
 		.skills__grid {
@@ -723,6 +839,9 @@
 			opacity: 0.2;
 		}
 		.skills__box {
+			transition: none;
+		}
+		.skills__tab {
 			transition: none;
 		}
 	}
