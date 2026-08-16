@@ -17,7 +17,7 @@
 			side: 'left',
 			date: 'JUL 2021 — MAR 2024',
 			type: 'EDUCATION',
-			title: '   COMPUTER ENGINEERING & NETWORKING (TKJ)',
+			title: 'COMPUTER ENGINEERING & NETWORKING',
 			org: 'SMK Muhammadiyah Loa Janan',
 			desc: 'Started my journey in IT, building a foundation in computer systems, hardware & networking.'
 		},
@@ -27,7 +27,7 @@
 			type: 'EXPERIENCE',
 			title: 'PRAKTIK KERJA INDUSTRI - LOGISTICS',
 			org: 'PT. Anugerah Bara Kaltim',
-			desc: 'Worked in a real-world logistics environment, handling inventory records, checking incoming goods, and scanning docs.'
+			desc: 'Worked in a real-world mining logistics environment, handling inventory records, checking incoming goods, and scanning docs.'
 		},
 		{
 			side: 'left',
@@ -43,7 +43,7 @@
 			type: 'SELF-TAUGHT',
 			title: 'Full-Stack Development',
 			org: 'Independent',
-			desc: 'Learning by building through personal projects, courses, Youtube, & community events'
+			desc: 'Learning by building through personal projects, courses, youtube tutorials, & community events'
 		}
 	];
 
