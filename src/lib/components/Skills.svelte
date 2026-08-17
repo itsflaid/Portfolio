@@ -32,7 +32,8 @@
 		siNpm,
 		siVercel,
 		siGsap,
-		siFramer
+		siFramer,
+		siDocker
 	} from 'simple-icons';
 	import type { SimpleIcon } from 'simple-icons';
 	import {
@@ -120,7 +121,8 @@
 				{ name: 'Vercel', icon: si(siVercel) },
 				{ name: 'Vite', icon: si(siVite) },
 				{ name: 'npm', icon: si(siNpm) },
-				{ name: 'Upstash', icon: si(siUpstash) }
+				{ name: 'Upstash', icon: si(siUpstash) },
+				{ name: 'Docker', icon: si(siDocker) }
 			]
 		}
 	];
