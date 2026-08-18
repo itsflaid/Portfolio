@@ -4,6 +4,7 @@
   import { ScrollTrigger } from "gsap/ScrollTrigger";
   import { projects } from "$lib/data/project";
   import { openCaseStudyModal, registerCaseStudyClose } from "$lib/caseStudy";
+  import { openTechModal, registerTechModalClose } from "$lib/techModal";
 
   let workEl: HTMLElement;
   let viewportEl: HTMLElement;
@@ -22,6 +23,10 @@
 
   let modalOpen = false;
   let pausedPreviews = new Set<HTMLElement>();
+
+  function techTotalCount(project: (typeof projects)[number]) {
+    return project.techGroups?.reduce((sum, g) => sum + g.items.length, 0) ?? 0;
+  }
 
   function pausePreviews() {
     modalOpen = true;
@@ -224,6 +229,7 @@
     sectionObserver.observe(workEl);
 
     registerCaseStudyClose(resumePreviews);
+    registerTechModalClose(resumePreviews);
 
     return () => {
       ScrollTrigger.removeEventListener("refreshInit", setSpacing);
@@ -325,19 +331,56 @@
             <div class="card__tech">
               <span class="tech__label">STACK</span>
               <ul class="tech__list">
-                {#each project.tech as tech}
-                  <li style={tech.icon ? `--tech-color: ${tech.icon.hex}` : ""}>
-                    {#if tech.icon}
-                      <svg
-                        class="tech-icon"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                        ><path d={tech.icon.path} fill-rule="evenodd" /></svg
-                      >
-                    {/if}
-                    <span>{tech.name}</span>
-                  </li>
-                {/each}
+                {#if project.techPreview && project.techGroups}
+                  {#each project.techPreview as tech}
+                    <li style={tech.icon ? `--tech-color: ${tech.icon.hex}` : ""}>
+                      {#if tech.icon}
+                        <svg
+                          class="tech-icon"
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                          ><path d={tech.icon.path} fill-rule="evenodd" /></svg
+                        >
+                      {/if}
+                      <span>{tech.name}</span>
+                    </li>
+                  {/each}
+                  {#if techTotalCount(project) > project.techPreview.length}
+                    <!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
+                    <li
+                      class="tech__more"
+                      role="button"
+                      tabindex="0"
+                      onclick={() => {
+                        pausePreviews();
+                        openTechModal(project);
+                      }}
+                      onkeydown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          pausePreviews();
+                          openTechModal(project);
+                        }
+                      }}
+                    >
+                      <span>+{techTotalCount(project) - project.techPreview.length} MORE</span>
+                    </li>
+                  {/if}
+                {:else}
+                  {#each project.tech as tech}
+                    <li style={tech.icon ? `--tech-color: ${tech.icon.hex}` : ""}>
+                      {#if tech.icon}
+                        <svg
+                          class="tech-icon"
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                          ><path d={tech.icon.path} fill-rule="evenodd" /></svg
+                        >
+                      {/if}
+                      <span>{tech.name}</span>
+                    </li>
+                  {/each}
+                {/if}
               </ul>
             </div>
             <div class="card__actions">
@@ -872,6 +915,20 @@
     background: var(--tech-color, var(--black));
     border-color: transparent;
     color: var(--white);
+  }
+  .tech__list li.tech__more {
+    cursor: pointer;
+    border-style: dashed;
+    background: none;
+  }
+  .tech__list li.tech__more:hover {
+    background: var(--black);
+    border-color: transparent;
+    color: var(--white);
+  }
+  .tech__list li.tech__more:focus-visible {
+    outline: 2px solid var(--black);
+    outline-offset: 2px;
   }
   .tech-icon {
     flex-shrink: 0;

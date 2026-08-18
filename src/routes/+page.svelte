@@ -13,6 +13,7 @@ import GithubActivity from "$lib/components/GithubActivity.svelte";
 import Contact from "$lib/components/Contact.svelte";
 import ResumeModal from "$lib/components/ResumeModal.svelte";
 import CaseStudyModal from "$lib/components/CaseStudyModal.svelte";
+import TechModal from "$lib/components/TechModal.svelte";
 
 </script>
 
@@ -42,6 +43,7 @@ import CaseStudyModal from "$lib/components/CaseStudyModal.svelte";
 <Contact />
 <ResumeModal />
 <CaseStudyModal />
+<TechModal />
 
 <style>
 	.desktop-only {

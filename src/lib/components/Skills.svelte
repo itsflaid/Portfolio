@@ -771,6 +771,7 @@
 		.skills__light {
 			grid-column: 1;
 			padding: clamp(2.25rem, 7vh, 3rem) clamp(1.5rem, 6vw, 3rem);
+			margin-top: 30px;
 		}
 		.skills__col {
 			position: relative;

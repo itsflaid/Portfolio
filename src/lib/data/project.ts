@@ -12,10 +12,18 @@ import {
 	siMysql,
 	siSupabase,
 	siVuedotjs,
-	siLaravel
+	siLaravel,
+	siTrpc,
+	siVite,
+	siReactrouter,
+	siRadixui,
+	siFramer,
+	siJsonwebtokens,
+	siTailwindcss,
+	siGreensock
 } from 'simple-icons';
 import type { SimpleIcon } from 'simple-icons';
-import { groqIcon, inertiaIcon } from '../components/icons';
+import { groqIcon, inertiaIcon, nextAuthIcon } from '../components/icons';
 import type { SkillIcon } from '../components/icons';
 
 function si(icon: SimpleIcon): SkillIcon {
@@ -25,6 +33,11 @@ function si(icon: SimpleIcon): SkillIcon {
 export type TechItem = {
 	name: string;
 	icon?: SkillIcon;
+};
+
+export type TechGroup = {
+	label: string;
+	items: TechItem[];
 };
 
 export type CaseStudyContent = {
@@ -40,6 +53,8 @@ export type Project = {
 	video: string;
 	desc: string;
 	tech: TechItem[];
+	techPreview?: TechItem[];
+	techGroups?: TechGroup[];
 	metrics?: string[];
 	demo?: string;
 	repo: string;
@@ -60,6 +75,30 @@ export const projects: Project[] = [
 			{ name: 'ts-morph' },
 			{ name: 'Commander' },
 			{ name: 'Astro', icon: si(siAstro) }
+		],
+		techPreview: [
+			{ name: 'ts-morph' },
+			{ name: 'Commander' },
+			{ name: 'Astro', icon: si(siAstro) }
+		],
+		techGroups: [
+			{
+				label: 'CLI & ENGINE',
+				items: [
+					{ name: 'TypeScript', icon: si(siTypescript) },
+					{ name: 'Commander' },
+					{ name: 'ts-morph' }
+				]
+			},
+			{
+				label: 'WEB & LANDING',
+				items: [
+					{ name: 'Astro', icon: si(siAstro) },
+					{ name: 'Tailwind CSS', icon: si(siTailwindcss) },
+					{ name: 'GSAP', icon: si(siGreensock) },
+					{ name: 'Lenis' }
+				]
+			}
 		],
 		metrics: ['282/282 tests passing', '11 framework supported'],
 		demo: 'https://devmap-web.vercel.app',
@@ -88,6 +127,43 @@ export const projects: Project[] = [
 			{ name: 'PostgreSQL', icon: si(siPostgresql) },
 			{ name: 'Codemirror', icon: si(siCodemirror) }
 		],
+		techPreview: [
+			{ name: 'Next.js', icon: si(siNextdotjs) },
+			{ name: 'TypeScript', icon: si(siTypescript) },
+			{ name: 'PostgreSQL', icon: si(siPostgresql) }
+		],
+		techGroups: [
+			{
+				label: 'FRAMEWORK & LANG',
+				items: [
+					{ name: 'Next.js', icon: si(siNextdotjs) },
+					{ name: 'TypeScript', icon: si(siTypescript) }
+				]
+			},
+			{
+				label: 'BACKEND & API',
+				items: [
+					{ name: 'tRPC', icon: si(siTrpc) },
+					{ name: 'NextAuth', icon: nextAuthIcon }
+				]
+			},
+			{
+				label: 'DATABASE',
+				items: [
+					{ name: 'PostgreSQL', icon: si(siPostgresql) },
+					{ name: 'Prisma', icon: si(siPrisma) }
+				]
+			},
+			{
+				label: 'EDITOR & TOOLS',
+				items: [
+					{ name: 'CodeMirror', icon: si(siCodemirror) },
+					{ name: 'Shiki' },
+					{ name: 'VS Code Extension' },
+					{ name: 'Zustand' }
+				]
+			}
+		],
 		metrics: ['39 endpoint', '3 role levels'],
 		demo: 'https://devnote-five.vercel.app',
 		repo: 'https://github.com/itsflaid/devnote',
@@ -114,6 +190,41 @@ export const projects: Project[] = [
 			{ name: 'TypeScript', icon: si(siTypescript) },
 			{ name: 'PostgreSQL', icon: si(siPostgresql) },
 			{ name: 'Upstash', icon: si(siUpstash) }
+		],
+		techPreview: [
+			{ name: 'Next.js', icon: si(siNextdotjs) },
+			{ name: 'TypeScript', icon: si(siTypescript) },
+			{ name: 'PostgreSQL', icon: si(siPostgresql) }
+		],
+		techGroups: [
+			{
+				label: 'FRAMEWORK & LANG',
+				items: [
+					{ name: 'Next.js', icon: si(siNextdotjs) },
+					{ name: 'TypeScript', icon: si(siTypescript) }
+				]
+			},
+			{
+				label: 'BACKEND & API',
+				items: [
+					{ name: 'tRPC', icon: si(siTrpc) },
+					{ name: 'NextAuth', icon: nextAuthIcon },
+					{ name: 'Upstash QStash', icon: si(siUpstash) },
+					{ name: 'Upstash Ratelimit', icon: si(siUpstash) }
+				]
+			},
+			{
+				label: 'DATABASE',
+				items: [
+					{ name: 'PostgreSQL', icon: si(siPostgresql) },
+					{ name: 'Prisma', icon: si(siPrisma) },
+					{ name: 'Upstash Redis', icon: si(siUpstash) }
+				]
+			},
+			{
+				label: 'PWA & REALTIME',
+				items: [{ name: 'Serwist' }, { name: 'Web Push' }]
+			}
 		],
 		metrics: ['offline-ready', '3+ months of daily use'],
 		demo: 'https://chatme-jet.vercel.app',
@@ -142,6 +253,39 @@ export const projects: Project[] = [
 			{ name: 'PostgreSQL', icon: si(siPostgresql) },
 			{ name: 'Prisma', icon: si(siPrisma) }
 		],
+		techPreview: [
+			{ name: 'Next.js', icon: si(siNextdotjs) },
+			{ name: 'TypeScript', icon: si(siTypescript) },
+			{ name: 'PostgreSQL', icon: si(siPostgresql) }
+		],
+		techGroups: [
+			{
+				label: 'FRAMEWORK & LANG',
+				items: [
+					{ name: 'Next.js', icon: si(siNextdotjs) },
+					{ name: 'TypeScript', icon: si(siTypescript) }
+				]
+			},
+			{
+				label: 'BACKEND & API',
+				items: [{ name: 'NextAuth', icon: nextAuthIcon }]
+			},
+			{
+				label: 'DATABASE',
+				items: [
+					{ name: 'PostgreSQL', icon: si(siPostgresql) },
+					{ name: 'Prisma', icon: si(siPrisma) }
+				]
+			},
+			{
+				label: 'FEATURES',
+				items: [
+					{ name: 'React-PDF' },
+					{ name: 'Recharts' },
+					{ name: 'Radix UI', icon: si(siRadixui) }
+				]
+			}
+		],
 		metrics: ['PDF reports', '487 movement logged'],
 		demo: 'https://dailyfit-alpha.vercel.app',
 		repo: 'https://github.com/itsflaid/dailyfit',
@@ -168,6 +312,40 @@ export const projects: Project[] = [
 			{ name: 'TypeScript', icon: si(siTypescript) },
 			{ name: 'Express', icon: si(siExpress) },
 			{ name: 'MySQL', icon: si(siMysql) }
+		],
+		techPreview: [
+			{ name: 'React', icon: si(siReact) },
+			{ name: 'Express', icon: si(siExpress) },
+			{ name: 'MySQL', icon: si(siMysql) }
+		],
+		techGroups: [
+			{
+				label: 'FRONTEND',
+				items: [
+					{ name: 'React (Vite)', icon: si(siReact) },
+					{ name: 'TypeScript', icon: si(siTypescript) },
+					{ name: 'React Router', icon: si(siReactrouter) }
+				]
+			},
+			{
+				label: 'BACKEND',
+				items: [
+					{ name: 'Express', icon: si(siExpress) },
+					{ name: 'JWT', icon: si(siJsonwebtokens) },
+					{ name: 'Multer' }
+				]
+			},
+			{
+				label: 'DATABASE',
+				items: [{ name: 'MySQL', icon: si(siMysql) }]
+			},
+			{
+				label: 'AI & PWA',
+				items: [
+					{ name: 'Groq', icon: groqIcon },
+					{ name: 'Vite PWA', icon: si(siVite) }
+				]
+			}
 		],
 		metrics: ['25 Stars', '3 APIs integrated'],
 		demo: 'https://mufadz-app.vercel.app',
@@ -196,6 +374,33 @@ export const projects: Project[] = [
 			{ name: 'Groq', icon: groqIcon },
 			{ name: 'Fonnte' }
 		],
+		techPreview: [
+			{ name: 'Next.js', icon: si(siNextdotjs) },
+			{ name: 'TypeScript', icon: si(siTypescript) },
+			{ name: 'Groq', icon: groqIcon }
+		],
+		techGroups: [
+			{
+				label: 'FRAMEWORK & LANG',
+				items: [
+					{ name: 'Next.js', icon: si(siNextdotjs) },
+					{ name: 'TypeScript', icon: si(siTypescript) }
+				]
+			},
+			{
+				label: 'BACKEND & API',
+				items: [{ name: 'Groq', icon: groqIcon }, { name: 'Vercel Functions' }]
+			},
+			{
+				label: 'UI & BOOKING',
+				items: [
+					{ name: 'Radix UI', icon: si(siRadixui) },
+					{ name: 'React Day Picker' },
+					{ name: 'Framer Motion', icon: si(siFramer) },
+					{ name: 'Sonner' }
+				]
+			}
+		],
 		metrics: ['Ranked 6th — TechnoFest 2026 FE AI Hackathon'],
 		demo: 'http://de-home-spa-v2-uwxp.vercel.app/',
 		repo: 'https://github.com/itsflaid/de-home-spa-v2',
@@ -223,6 +428,25 @@ export const projects: Project[] = [
 			{ name: 'Laravel', icon: si(siLaravel) },
 			{ name: 'Inertia', icon: inertiaIcon },
 			{ name: 'MySQL', icon: si(siMysql) }
+		],
+		techPreview: [
+			{ name: 'Vue', icon: si(siVuedotjs) },
+			{ name: 'Laravel', icon: si(siLaravel) },
+			{ name: 'MySQL', icon: si(siMysql) }
+		],
+		techGroups: [
+			{
+				label: 'FRAMEWORK & LANG',
+				items: [
+					{ name: 'Vue', icon: si(siVuedotjs) },
+					{ name: 'Laravel', icon: si(siLaravel) },
+					{ name: 'Inertia', icon: inertiaIcon }
+				]
+			},
+			{
+				label: 'DATABASE',
+				items: [{ name: 'MySQL', icon: si(siMysql) }]
+			}
 		],
 
 		repo: 'https://github.com/itsflaid/kasbonin',
