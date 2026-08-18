@@ -67,7 +67,6 @@
 			</a>
 		</nav>
 	</div>
-	<div class="hero__scroll"><i></i>SCROLL</div>
 </section>
 
 <style>
@@ -237,30 +236,6 @@
 		height: 1rem;
 		background: rgba(10, 10, 10, 0.2);
 	}
-	.hero__scroll {
-		position: absolute;
-		bottom: clamp(1.5rem, 4vw, 3rem);
-		left: 50%;
-		transform: translateX(-50%);
-		font-family: var(--ff-mono);
-		font-size: 0.7rem;
-		letter-spacing: 0.1em;
-		color: var(--gray);
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.75rem;
-		z-index: 2;
-		animation: scroll-float 2.2s ease-in-out infinite alternate;
-	}
-	.hero__scroll i {
-		display: inline-block;
-		width: 1px;
-		height: 2rem;
-		background: var(--gray);
-		font-style: normal;
-	}
-
 	.hero__dots {
 		position: absolute;
 		bottom: clamp(1.5rem, 4vw, 3rem);
@@ -333,14 +308,6 @@
 			transform: translateY(0);
 		}
 	}
-	@keyframes scroll-float {
-		from {
-			transform: translate(-50%, 0);
-		}
-		to {
-			transform: translate(-50%, 8px);
-		}
-	}
 	@keyframes dot-blink {
 		0%,
 		100% {
@@ -365,9 +332,6 @@
 		.hero__cta {
 			animation: none;
 			opacity: 1;
-		}
-		.hero__scroll {
-			animation: none;
 		}
 		.hero__dots i {
 			animation: none;

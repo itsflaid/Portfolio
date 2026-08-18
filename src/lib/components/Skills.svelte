@@ -145,7 +145,7 @@
 
 	type Shape = 'wide' | 'tall' | 'normal';
 	type Fill = 'ghost' | 'solid';
-	type LayoutCell = { shape: Shape; fill: Fill };
+	type LayoutCell = { shape: Shape; fill: Fill; tone?: string };
 
 	function buildLayout(group: SkillGroup): LayoutCell[] {
 		const rng = mulberry32(hashString(group.label));
@@ -155,12 +155,15 @@
 		// karena dia gak nambah tinggi kolom, cuma lebar.
 		let tallLeft = Math.max(1, Math.round(n / 4));
 		let wideLeft = Math.max(1, Math.round(n / 6));
-		return group.items.map((item) => {
-			// Icon multicolor asli (svg dengan fill hardcoded per path, kayak Figma) selalu
-			// dipaksa ghost/bg-putih — warna brand-nya sendiri udah "dibawa" logonya, jadi
-			// gak boleh ketiban solid background warna lain yang bisa clash. Svg custom yang
-			// cuma pakai currentColor (kayak Pixellab) gak kena aturan ini, tetap boleh solid.
-			const isMulticolor = !!item.icon.multicolor;
+
+		// Isi kotak diselang-seling solid (hitam) & ghost (putih) dengan jumlah yang
+		// seimbang — gak ada sisi yang numpuk hitam atau putih.
+		const solidCount = Math.round(n / 2);
+		let solidLeft = solidCount;
+		let ghostLeft = n - solidCount;
+		let prevFill: Fill = 'ghost';
+
+		return group.items.map(() => {
 			const shapeRoll = rng();
 			let shape: Shape = 'normal';
 			if (shapeRoll < 0.14 && wideLeft > 0) {
@@ -170,8 +173,15 @@
 				shape = 'tall';
 				tallLeft--;
 			}
-			const fill: Fill = isMulticolor ? 'ghost' : rng() < 0.5 ? 'solid' : 'ghost';
-			return { shape, fill };
+			let fill: Fill;
+			if (solidLeft === 0) fill = 'ghost';
+			else if (ghostLeft === 0) fill = 'solid';
+			else fill = prevFill === 'solid' ? 'ghost' : 'solid';
+			if (fill === 'solid') solidLeft--;
+			else ghostLeft--;
+			prevFill = fill;
+			const tone = fill === 'solid' ? 'var(--black)' : undefined;
+			return { shape, fill, tone };
 		});
 	}
 
@@ -447,7 +457,9 @@
 							{@const cell = layouts[gi][ii]}
 							<div
 								class="skills__box skills__box--{cell.shape} skills__box--{cell.fill}"
-								style="--skill-color: {item.icon.hex}"
+								style="--skill-color: {item.icon.hex}; {cell.tone
+									? `--skill-tone: ${cell.tone};`
+									: ''}"
 							>
 								<svg
 									class="skill-icon"
@@ -662,20 +674,22 @@
 		grid-row: span 2;
 	}
 	.skills__box--solid {
-		background: var(--skill-color);
+		/* Default: kotak solid hitam (--skill-tone). Warna brand asli (--skill-color)
+		   baru muncul pas hover. */
+		background: var(--skill-tone, var(--black));
 		color: var(--white);
 	}
 	.skills__box--solid:hover {
-		background: var(--black);
+		background: var(--skill-color);
 	}
 	.skills__box--ghost {
 		background: var(--white);
-		border: 1px solid rgba(10, 10, 10, 0.14);
-		color: var(--skill-color);
+		border: 1px solid var(--gray-light);
+		color: var(--black);
 	}
 	.skills__box--ghost:hover {
-		color: var(--black);
-		border-color: var(--black);
+		color: var(--skill-color);
+		border-color: var(--skill-color);
 	}
 	.skills__box:hover {
 		transform: translateY(-3px);
@@ -685,10 +699,18 @@
 		width: 34%;
 		height: 34%;
 		color: currentColor;
-		transition: transform 0.3s ease, color 0.3s ease;
+		transition: transform 0.3s ease, color 0.3s ease, filter 0.3s ease;
 	}
 	.skill-icon:not(.skill-icon--multicolor) path {
 		fill: currentColor;
+	}
+	.skill-icon--multicolor {
+		/* Icon custom bawa warna sendiri (Figma dkk) — default digrayscale,
+		   warna aslinya baru nongol pas hover, biar konsisten sama sistem baru. */
+		filter: grayscale(1);
+	}
+	.skills__box:hover .skill-icon--multicolor {
+		filter: grayscale(0);
 	}
 	.skills__box:hover .skill-icon {
 		transform: translateY(-9px);

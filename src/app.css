@@ -11,7 +11,7 @@
 	--ink-soft: #2a2a28;
 	--accent-ph: #3a3a38;
 	--heading-desc-gap: clamp(48px, 7vh, 88px);
-
+	--gray-light: #c9c9c4;
 	--ff-display: 'Bebas Neue', sans-serif;
 	--ff-body: 'Hanken Grotesk', system-ui, sans-serif;
 	--ff-mono: 'JetBrains Mono', 'Courier New', monospace;

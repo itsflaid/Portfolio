@@ -4,7 +4,7 @@ import Nav from "$lib/components/Nav.svelte";
 import Hero from "$lib/components/Hero.svelte";
 import About from "$lib/components/About.svelte";
 import Work from "$lib/components/Work.svelte";
-import ScrollModeToggle from "$lib/components/ScrollModeToggle.svelte";
+// import ScrollModeToggle from "$lib/components/ScrollModeToggle.svelte";
 import Manifesto from "$lib/components/Manifesto.svelte";
 import Marquee from "$lib/components/Marquee.svelte";
 import Experience from "$lib/components/Experience.svelte";
@@ -26,7 +26,8 @@ import CaseStudyModal from "$lib/components/CaseStudyModal.svelte";
 
 <Grain />
 <Nav />
-<ScrollModeToggle />
+<!-- Scroll mode toggle: nonaktif. Aktifkan lagi dengan menghapus baris komentar di bawah + hapus `//` di import ScrollModeToggle. -->
+<!-- <ScrollModeToggle /> -->
 <Hero />
 <About />
 <Experience />
