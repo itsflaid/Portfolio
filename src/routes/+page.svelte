@@ -3,7 +3,7 @@ import Grain from "$lib/components/Grain.svelte";
 import Nav from "$lib/components/Nav.svelte";
 import Hero from "$lib/components/Hero.svelte";
 import About from "$lib/components/About.svelte";
-import Work from "$lib/components/Work.svelte";
+import Projects from "$lib/components/Projects.svelte";
 // import ScrollModeToggle from "$lib/components/ScrollModeToggle.svelte";
 import Manifesto from "$lib/components/Manifesto.svelte";
 import Marquee from "$lib/components/Marquee.svelte";
@@ -36,7 +36,7 @@ import TechModal from "$lib/components/TechModal.svelte";
     <Manifesto />
 </div>
 <Marquee />
-<Work />
+<Projects />
 <Skills />
 <GithubActivity />
 

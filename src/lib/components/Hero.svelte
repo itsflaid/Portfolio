@@ -8,9 +8,9 @@
 	let heroEl: HTMLElement;
 	let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
-	function goWork(e: MouseEvent) {
+	function goProjects(e: MouseEvent) {
 		e.preventDefault();
-		scrollToTarget('#work');
+		scrollToTarget('#projects');
 	}
 
 	onMount(() => {
@@ -58,9 +58,9 @@
 				>
 			</button>
 			<span class="hero__cta-divider" aria-hidden="true"></span>
-			<a class="hero__cta-item" href="#work" onclick={goWork} data-cursor-text="SCROLL">
+			<a class="hero__cta-item" href="#projects" onclick={goProjects} data-cursor-text="SCROLL">
 				<span class="hero__cta-index">02</span>
-				<span class="hero__cta-label">THE WORK</span>
+				<span class="hero__cta-label">THE PROJECTS</span>
 				<svg class="hero__cta-icon" viewBox="0 0 24 24" aria-hidden="true"
 					><path d="M12 4v14m0 0-5-5m5 5 5-5" /></svg
 				>

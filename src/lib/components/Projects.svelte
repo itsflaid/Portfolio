@@ -6,7 +6,7 @@
   import { openCaseStudyModal, registerCaseStudyClose } from "$lib/caseStudy";
   import { openTechModal, registerTechModalClose } from "$lib/techModal";
 
-  let workEl: HTMLElement;
+  let projectsEl: HTMLElement;
   let viewportEl: HTMLElement;
   let trackEl: HTMLElement;
   let introLine1El: HTMLElement;
@@ -79,7 +79,7 @@
 	let edgeGap = 0;
 	const setSpacing = () => {
 		const card = trackEl.querySelector(
-			'.work__card:not(.work__card--intro):not(.work__card--outro)'
+			'.projects__card:not(.projects__card--intro):not(.projects__card--outro)'
 		) as HTMLElement | null;
 		if (!card) return;
 		edgeGap = Math.max(0, (viewportEl.clientWidth - card.offsetWidth) / 2);
@@ -95,7 +95,7 @@
 
 	const introTl = gsap.timeline({
 		scrollTrigger: {
-			trigger: workEl,
+			trigger: projectsEl,
 			start: 'top 90%',
 			end: 'top top',
 			scrub: 0.4
@@ -108,7 +108,7 @@
 
 	const tl = gsap.timeline({
 		scrollTrigger: {
-			trigger: workEl,
+			trigger: projectsEl,
 			start: 'top top',
 			end: () => '+=' + getScroll(),
 			pin: true,
@@ -226,7 +226,7 @@
       },
       { threshold: 0 },
     );
-    sectionObserver.observe(workEl);
+    sectionObserver.observe(projectsEl);
 
     registerCaseStudyClose(resumePreviews);
     registerTechModalClose(resumePreviews);
@@ -245,25 +245,25 @@
   });
 </script>
 
-<section class="work" id="work" bind:this={workEl}>
+<section class="projects" id="projects" bind:this={projectsEl}>
   <img
-    class="work__mark"
+    class="projects__mark"
     src="/logo/logo-mark.png"
     alt=""
     aria-hidden="true"
     draggable="false"
   />
-  <div class="work__head">
-    <span class="work__eyebrow">// WORK</span>
-    <div class="work__head-right">
-      <span class="work__count">0{activeIndex + 1} / 0{projects.length}</span>
+  <div class="projects__head">
+    <span class="projects__eyebrow">// PROJECTS</span>
+    <div class="projects__head-right">
+      <span class="projects__count">0{activeIndex + 1} / 0{projects.length}</span>
     </div>
   </div>
 
-  <div class="work__viewport" bind:this={viewportEl} data-cursor-text="DRAG">
-    <ul class="work__track" bind:this={trackEl}>
-      <li class="work__card work__card--intro">
-        <span class="work__dots" aria-hidden="true">
+  <div class="projects__viewport" bind:this={viewportEl} data-cursor-text="DRAG">
+    <ul class="projects__track" bind:this={trackEl}>
+      <li class="projects__card projects__card--intro">
+        <span class="projects__dots" aria-hidden="true">
           {#each dots as _}<i></i>{/each}
         </span>
         <div class="intro__content" bind:this={introContentEl}>
@@ -273,7 +273,7 @@
             >
             <span class="line-mask"
               ><span class="line" bind:this={introLine2El}
-                >WORK<span class="cursor" bind:this={introCursorEl}>_</span
+                >PROJECTS<span class="cursor" bind:this={introCursorEl}>_</span
                 ></span
               ></span
             >
@@ -287,7 +287,7 @@
         </div>
       </li>
       {#each projects as project, i}
-        <li class="work__card">
+        <li class="projects__card">
           <div class="card__media">
             <div class="media__pan">
               <img
@@ -434,7 +434,7 @@
         </li>
       {/each}
 
-      <li class="work__card work__card--outro">
+      <li class="projects__card projects__card--outro">
         <div class="outro__content" bind:this={outroContentEl}>
           <h2 class="outro__heading">
             <span class="line-mask"
@@ -496,7 +496,7 @@
 </section>
 
 <style>
-  .work {
+  .projects {
     position: relative;
     background: var(--white);
     color: var(--black);
@@ -507,7 +507,7 @@
     flex-direction: column;
     padding: clamp(2rem, 6vh, 4rem) 0 clamp(2rem, 6vh, 3.5rem);
   }
-  .work__mark {
+  .projects__mark {
     position: absolute;
     bottom: -6vw;
     left: -2vw;
@@ -518,7 +518,7 @@
     user-select: none;
     pointer-events: none;
   }
-  .work__dots {
+  .projects__dots {
     position: absolute;
     top: clamp(1.5rem, 4vw, 3rem);
     left: clamp(1.5rem, 4vw, 3rem);
@@ -529,42 +529,42 @@
     z-index: 1;
     pointer-events: none;
   }
-  .work__dots i {
+  .projects__dots i {
     display: block;
     width: 8px;
     height: 8px;
     background: var(--black);
     font-style: normal;
     opacity: 0.1;
-    animation: work-dot-blink 3s ease-in-out infinite;
+    animation: projects-dot-blink 3s ease-in-out infinite;
   }
-  .work__dots i:nth-child(2) {
+  .projects__dots i:nth-child(2) {
     animation-delay: 0.3s;
   }
-  .work__dots i:nth-child(3) {
+  .projects__dots i:nth-child(3) {
     animation-delay: 0.6s;
   }
-  .work__dots i:nth-child(4) {
+  .projects__dots i:nth-child(4) {
     animation-delay: 0.9s;
   }
-  .work__dots i:nth-child(5) {
+  .projects__dots i:nth-child(5) {
     animation-delay: 1.2s;
   }
-  .work__dots i:nth-child(6) {
+  .projects__dots i:nth-child(6) {
     animation-delay: 1.5s;
   }
-  .work__dots i:nth-child(7) {
+  .projects__dots i:nth-child(7) {
     animation-delay: 1.8s;
   }
-  .work__dots i:nth-child(8) {
+  .projects__dots i:nth-child(8) {
     animation-delay: 2.1s;
   }
-  .work__dots i:nth-child(9) {
+  .projects__dots i:nth-child(9) {
     animation-delay: 2.4s;
   }
 
-  .work__card.work__card--intro,
-  .work__card.work__card--outro {
+  .projects__card.projects__card--intro,
+  .projects__card.projects__card--outro {
     position: relative;
     flex: 0 0 auto;
     width: 100vw;
@@ -680,7 +680,7 @@
     font-family: var(--ff-mono);
     margin-left: 0.05em;
     opacity: 0;
-    animation: work-blink 1s step-end infinite;
+    animation: projects-blink 1s step-end infinite;
   }
   .intro__scroll {
     display: inline-flex;
@@ -710,7 +710,7 @@
       opacity: 1;
     }
   }
-  @keyframes work-blink {
+  @keyframes projects-blink {
     0%,
     100% {
       opacity: 1;
@@ -719,7 +719,7 @@
       opacity: 0;
     }
   }
-  .work__head {
+  .projects__head {
     position: relative;
     z-index: 1;
     display: flex;
@@ -729,19 +729,19 @@
     padding-bottom: clamp(1.25rem, 3vh, 2rem);
     border-bottom: 1px solid rgba(10, 10, 10, 0.14);
   }
-  .work__eyebrow,
-  .work__count {
+  .projects__eyebrow,
+  .projects__count {
     font-family: var(--ff-mono);
     font-size: 0.8rem;
     letter-spacing: 0.08em;
     color: var(--gray);
   }
-  .work__head-right {
+  .projects__head-right {
     display: flex;
     align-items: center;
     gap: clamp(1rem, 2vw, 1.5rem);
   }
-  .work__viewport {
+  .projects__viewport {
     position: relative;
     z-index: 1;
     overflow: hidden;
@@ -750,7 +750,7 @@
     align-items: center;
     padding: 0;
   }
-  .work__track {
+  .projects__track {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -760,7 +760,7 @@
     width: max-content;
     will-change: transform;
   }
-  .work__card {
+  .projects__card {
     flex: 0 0 auto;
     width: clamp(85vw, 88vw, 1200px);
     display: flex;
@@ -814,7 +814,7 @@
     opacity: 1;
   }
 
-  .work__card:hover .card__media {
+  .projects__card:hover .card__media {
     transform: scale(1.02);
   }
   .card__info {
@@ -1009,7 +1009,7 @@
     transform: translateY(-2px);
   }
 
-  @keyframes work-dot-blink {
+  @keyframes projects-dot-blink {
     0%,
     100% {
       opacity: 0.06;
@@ -1020,24 +1020,24 @@
   }
 
   @media (max-width: 900px) {
-    .work {
+    .projects {
       padding-top: clamp(2.5rem, 6vh, 4rem);
     }
 
-    .work__head {
+    .projects__head {
       margin: 0 1.25rem;
       padding-bottom: 0.85rem;
     }
 
-    .work__dots {
+    .projects__dots {
       display: none;
     }
 
-    .work__head-right {
+    .projects__head-right {
       gap: 0.5rem;
     }
 
-    .work__card {
+    .projects__card {
       flex-direction: column;
       align-items: stretch;
       width: 92vw;
@@ -1077,7 +1077,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .work__dots i {
+    .projects__dots i {
       animation: none;
     }
     .card__media {
@@ -1093,30 +1093,30 @@
       animation: none;
     }
 
-    .work__viewport {
+    .projects__viewport {
       overflow: visible;
       align-items: flex-start;
     }
-    .work__track {
+    .projects__track {
       flex-direction: column;
       width: auto;
       padding: 0;
       gap: clamp(1.5rem, 4vh, 3rem);
     }
-    .work__card,
-    .work__card.work__card--intro,
-    .work__card.work__card--outro {
+    .projects__card,
+    .projects__card.projects__card--intro,
+    .projects__card.projects__card--outro {
       width: 92vw;
       max-width: 92vw;
       margin: 0 auto;
     }
-    .work__card:not(.work__card--intro):not(.work__card--outro) {
+    .projects__card:not(.projects__card--intro):not(.projects__card--outro) {
       flex-direction: column;
       align-items: stretch;
       gap: clamp(1.25rem, 3vh, 2rem);
     }
-    .work__card--intro,
-    .work__card--outro {
+    .projects__card--intro,
+    .projects__card--outro {
       padding: clamp(3rem, 8vh, 5rem) 1.5rem;
     }
     .card__media {

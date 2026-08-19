@@ -10,7 +10,7 @@
 
 	const menuLinks: MenuLink[] = [
 		{ label: 'ABOUT', href: '#about' },
-		{ label: 'WORK', href: '#work' },
+		{ label: 'PROJECTS', href: '#projects' },
 		{ label: 'SKILLS', href: '#skills' },
 		{ label: 'CONTACT', href: '#contact' }
 	];
@@ -115,7 +115,7 @@
 	</a>
 	<div class="nav__links">
 		<a href="#about" onclick={(e) => go(e, '#about')}>About</a>
-		<a href="#work" onclick={(e) => go(e, '#work')}>Work</a>
+		<a href="#projects" onclick={(e) => go(e, '#projects')}>Projects</a>
 		<a href="#skills" onclick={(e) => go(e, '#skills')}>Skills</a>
 		<a href="#contact" onclick={(e) => go(e, '#contact')}>Contact</a>
 	</div>
