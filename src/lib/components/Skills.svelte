@@ -34,7 +34,10 @@
 		siGsap,
 		siFramer,
 		siDocker,
-		siBootstrap
+		siBootstrap,
+		siLivewire,
+    siAstro
+
 	} from 'simple-icons';
 	import type { SimpleIcon } from 'simple-icons';
 	import {
@@ -68,7 +71,9 @@
 				{ name: 'Bootstrap', icon: si(siBootstrap) },
 				{ name: 'SvelteKit', icon: si(siSvelte) },
 				{ name: 'Vue', icon: si(siVuedotjs) },
-				{ name: 'TanStack Query', icon: { ...si(siTanstack), hex: '#FF4154' } }
+				{ name: 'TanStack Query', icon: { ...si(siTanstack), hex: '#FF4154' } },
+				{ name: 'Astro', icon: si(siAstro) },
+				{ name: 'Livewire', icon: si(siLivewire) }
 			]
 		},
 		{
