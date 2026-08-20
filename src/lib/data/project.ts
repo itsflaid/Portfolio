@@ -20,7 +20,9 @@ import {
 	siFramer,
 	siJsonwebtokens,
 	siTailwindcss,
-	siGreensock
+	siGreensock,
+	siLivewire,
+	siBootstrap
 } from 'simple-icons';
 import type { SimpleIcon } from 'simple-icons';
 import { groqIcon, inertiaIcon, nextAuthIcon } from '../components/icons';
@@ -424,23 +426,22 @@ export const projects: Project[] = [
 		video: '',
 		desc: 'Multi-user debt tracking for a family store, so every transaction anyone logs is visible to the whole family in real time.',
 		tech: [
-			{ name: 'Vue', icon: si(siVuedotjs) },
+			{ name: 'Livewire', icon: si(siLivewire) },
 			{ name: 'Laravel', icon: si(siLaravel) },
-			{ name: 'Inertia', icon: inertiaIcon },
 			{ name: 'MySQL', icon: si(siMysql) }
 		],
 		techPreview: [
-			{ name: 'Vue', icon: si(siVuedotjs) },
+			{ name: 'Livewire', icon: si(siLivewire) },
 			{ name: 'Laravel', icon: si(siLaravel) },
 			{ name: 'MySQL', icon: si(siMysql) }
 		],
 		techGroups: [
 			{
-				label: 'FRAMEWORK & LANG',
+				label: 'FRAMEWORK',
 				items: [
-					{ name: 'Vue', icon: si(siVuedotjs) },
+					{ name: 'Livewire', icon: si(siLivewire) },
 					{ name: 'Laravel', icon: si(siLaravel) },
-					{ name: 'Inertia', icon: inertiaIcon }
+					{ name: 'Bootstrap', icon: si(siBootstrap) }
 				]
 			},
 			{

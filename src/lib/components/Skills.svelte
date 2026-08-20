@@ -33,7 +33,8 @@
 		siVercel,
 		siGsap,
 		siFramer,
-		siDocker
+		siDocker,
+		siBootstrap
 	} from 'simple-icons';
 	import type { SimpleIcon } from 'simple-icons';
 	import {
@@ -64,6 +65,7 @@
 				{ name: 'TypeScript', icon: si(siTypescript) },
 				{ name: 'JavaScript', icon: si(siJavascript) },
 				{ name: 'Tailwind', icon: si(siTailwindcss) },
+				{ name: 'Bootstrap', icon: si(siBootstrap) },
 				{ name: 'SvelteKit', icon: si(siSvelte) },
 				{ name: 'Vue', icon: si(siVuedotjs) },
 				{ name: 'TanStack Query', icon: { ...si(siTanstack), hex: '#FF4154' } }
