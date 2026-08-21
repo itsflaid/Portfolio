@@ -56,6 +56,7 @@
 	let legendEl: HTMLElement;
 	let monthlyEl: HTMLElement;
 	let insightEl: HTMLElement;
+	let rightEl: HTMLElement;
 	let totalNumEl: HTMLElement;
 	let streakNumEl: HTMLElement;
 	let commitsNumEl: HTMLElement;
@@ -184,6 +185,8 @@
 				gsap.set([metaEl, yearsEl], { opacity: 0, y: 10 });
 				gsap.set(bars, { scaleY: 0 });
 				gsap.set(legendEl, { opacity: 0, y: 10 });
+				gsap.set([line1El, line2El], { y: '105%' });
+				gsap.set(cursorEl, { opacity: 0 });
 				totalNumEl.textContent = '0';
 				streakNumEl.textContent = '0';
 				commitsNumEl.textContent = '0';
@@ -192,62 +195,80 @@
 				followersNumEl.textContent = '0';
 				insightEl.textContent = '';
 
-				const mTl = gsap.timeline({
-					scrollTrigger: { trigger: sectionEl, start: 'top 78%', toggleActions: 'play none none none' }
+				const leftTl = gsap.timeline({
+					scrollTrigger: { trigger: sectionEl, start: 'top 80%', toggleActions: 'play none none none' }
 				});
-				mTl.fromTo(line1El, { y: '105%', x: '-1rem' }, { y: '0%', x: '0rem', duration: 0.6, ease: 'power3.out' }, 0);
-				mTl.fromTo(line2El, { y: '105%', x: '1rem' }, { y: '0%', x: '0rem', duration: 0.6, ease: 'power3.out' }, 0.12);
-				mTl.to(cursorEl, { opacity: 1, duration: 0.2 }, 0.5);
-				mTl.to(rows, { opacity: 1, y: 0, stagger: 0.08, ease: 'power2.out' }, 0.2);
-				mTl.to(metaEl, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0.15);
-				mTl.to(yearsEl, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0.25);
+				leftTl.fromTo(line1El, { y: '105%', x: '-1rem' }, { y: '0%', x: '0rem', duration: 0.6, ease: 'power3.out' }, 0);
+				leftTl.fromTo(line2El, { y: '105%', x: '1rem' }, { y: '0%', x: '0rem', duration: 0.6, ease: 'power3.out' }, 0.12);
+				leftTl.to(cursorEl, { opacity: 1, duration: 0.2 }, 0.5);
+				leftTl.to(rows, { opacity: 1, y: 0, stagger: 0.08, ease: 'power2.out' }, 0.2);
 
-				const mCounters = { total: 0, streak: 0, commits: 0, repos: 0, stars: 0, followers: 0 };
-				mTl.to(
-					mCounters,
+				const leftCounters = { total: 0, streak: 0, commits: 0, repos: 0 };
+				leftTl.to(
+					leftCounters,
 					{
 						total: stats.total,
 						streak: stats.currentStreak,
 						commits: stats.commits,
 						repos: stats.repos,
+						duration: 0.5,
+						ease: 'power1.out',
+						onUpdate: () => {
+							totalNumEl.textContent = String(Math.floor(leftCounters.total));
+							streakNumEl.textContent = String(Math.floor(leftCounters.streak));
+							commitsNumEl.textContent = String(Math.floor(leftCounters.commits));
+							reposNumEl.textContent = String(Math.floor(leftCounters.repos));
+						}
+					},
+					0.2
+				);
+				leftTl.call(
+					() => {
+						insightEl.textContent = insightText();
+					},
+					undefined,
+					0.7
+				);
+
+				const rightTl = gsap.timeline({
+					scrollTrigger: { trigger: rightEl, start: 'top 85%', toggleActions: 'play none none none' }
+				});
+				rightTl.to(metaEl, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0);
+				rightTl.to(yearsEl, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0.05);
+
+				const rightCounters = { stars: 0, followers: 0 };
+				rightTl.to(
+					rightCounters,
+					{
 						stars: stats.stars,
 						followers: stats.followers,
 						duration: 0.5,
 						ease: 'power1.out',
 						onUpdate: () => {
-							totalNumEl.textContent = String(Math.floor(mCounters.total));
-							streakNumEl.textContent = String(Math.floor(mCounters.streak));
-							commitsNumEl.textContent = String(Math.floor(mCounters.commits));
-							reposNumEl.textContent = String(Math.floor(mCounters.repos));
-							starsNumEl.textContent = formatCompact(Math.floor(mCounters.stars));
-							followersNumEl.textContent = formatCompact(Math.floor(mCounters.followers));
+							starsNumEl.textContent = formatCompact(Math.floor(rightCounters.stars));
+							followersNumEl.textContent = formatCompact(Math.floor(rightCounters.followers));
 						}
 					},
-					0.2
+					0
 				);
 
-				mTl.to(
+				rightTl.to(bars, { scaleY: 1, stagger: 0.03, duration: 0.35, ease: 'power2.out' }, 0.15);
+				rightTl.to(
 					cells,
 					{
 						opacity: (i, t) => parseFloat((t as HTMLElement).dataset.opacity ?? '0.06'),
 						stagger: { amount: 0.5, from: 'start' },
 						ease: 'none'
 					},
-					0.3
+					0.25
 				);
-				mTl.to(bars, { scaleY: 1, stagger: 0.03, duration: 0.35, ease: 'power2.out' }, 0.75);
-				mTl.to(legendEl, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0.95);
-				mTl.call(
-					() => {
-						insightEl.textContent = insightText();
-					},
-					undefined,
-					0.95
-				);
+				rightTl.to(legendEl, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0.55);
 
 				cleanup = () => {
-					mTl.scrollTrigger?.kill();
-					mTl.kill();
+					leftTl.scrollTrigger?.kill();
+					leftTl.kill();
+					rightTl.scrollTrigger?.kill();
+					rightTl.kill();
 				};
 				return;
 			}
@@ -414,7 +435,7 @@
 			</div>
 
 			{#if !loadError}
-				<div class="ghactivity__right">
+				<div class="ghactivity__right" bind:this={rightEl}>
 					<div class="ghactivity__meta" bind:this={metaEl}>
 						<span class="ghactivity__meta-item" data-cursor-text="{stats.stars} bintang">
 						<span class="ghactivity__meta-icon" aria-hidden="true">★</span>

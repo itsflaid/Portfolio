@@ -36,7 +36,8 @@
 		siDocker,
 		siBootstrap,
 		siLivewire,
-    siAstro
+    siAstro,
+    siLaragon
 
 	} from 'simple-icons';
 	import type { SimpleIcon } from 'simple-icons';
@@ -56,80 +57,81 @@
 		return { hex: `#${icon.hex}`, path: icon.path };
 	}
 
-	type SkillItem = { name: string; icon: SkillIcon };
+	type SkillTier = 'sering' | 'jarang';
+	type SkillItem = { name: string; icon: SkillIcon; tier: SkillTier };
 	type SkillGroup = { label: string; items: SkillItem[] };
 
 	const groups: SkillGroup[] = [
 		{
 			label: 'FRONTEND',
 			items: [
-				{ name: 'Next.js', icon: si(siNextdotjs) },
-				{ name: 'React', icon: si(siReact) },
-				{ name: 'TypeScript', icon: si(siTypescript) },
-				{ name: 'JavaScript', icon: si(siJavascript) },
-				{ name: 'Tailwind', icon: si(siTailwindcss) },
-				{ name: 'Bootstrap', icon: si(siBootstrap) },
-				{ name: 'SvelteKit', icon: si(siSvelte) },
-				{ name: 'Vue', icon: si(siVuedotjs) },
-				{ name: 'TanStack Query', icon: { ...si(siTanstack), hex: '#FF4154' } },
-				{ name: 'Astro', icon: si(siAstro) },
-				{ name: 'Livewire', icon: si(siLivewire) }
+				{ name: 'Next.js', icon: si(siNextdotjs), tier: 'sering' },
+				{ name: 'Bootstrap', icon: si(siBootstrap), tier: 'jarang' },
+				{ name: 'React', icon: si(siReact), tier: 'sering' },
+				{ name: 'SvelteKit', icon: si(siSvelte), tier: 'jarang' },
+				{ name: 'TypeScript', icon: si(siTypescript), tier: 'sering' },
+				{ name: 'Vue', icon: si(siVuedotjs), tier: 'jarang' },
+				{ name: 'JavaScript', icon: si(siJavascript), tier: 'sering' },
+				{ name: 'TanStack Query', icon: { ...si(siTanstack), hex: '#FF4154' }, tier: 'jarang' },
+				{ name: 'Tailwind', icon: si(siTailwindcss), tier: 'sering' },
+				{ name: 'Astro', icon: si(siAstro), tier: 'jarang' },
+				{ name: 'Livewire', icon: si(siLivewire), tier: 'jarang' }
 			]
 		},
 		{
 			label: 'BACKEND',
 			items: [
-				{ name: 'Node.js', icon: si(siNodedotjs) },
-				{ name: 'Express', icon: si(siExpress) },
-				{ name: 'Prisma', icon: si(siPrisma) },
-				{ name: 'REST API', icon: restApiIcon },
-				{ name: 'PHP', icon: si(siPhp) },
-				{ name: 'Laravel', icon: si(siLaravel) },
-				{ name: 'NextAuth', icon: nextAuthIcon },
-				{ name: 'Google OAuth', icon: si(siGoogle) },
-				{ name: 'BetterAuth', icon: { ...si(siBetterauth), hex: '#000000' } }
+				{ name: 'Node.js', icon: si(siNodedotjs), tier: 'sering' },
+				{ name: 'Laravel', icon: si(siLaravel), tier: 'jarang' },
+				{ name: 'Express', icon: si(siExpress), tier: 'sering' },
+				{ name: 'PHP', icon: si(siPhp), tier: 'jarang' },
+				{ name: 'Prisma', icon: si(siPrisma), tier: 'sering' },
+				{ name: 'NextAuth', icon: nextAuthIcon, tier: 'sering' },
+				{ name: 'REST API', icon: restApiIcon, tier: 'sering' },
+				{ name: 'BetterAuth', icon: { ...si(siBetterauth), hex: '#000000' }, tier: 'jarang' }
 			]
 		},
 		{
 			label: 'DATABASE',
 			items: [
-				{ name: 'PostgreSQL', icon: si(siPostgresql) },
-				{ name: 'MySQL', icon: si(siMysql) },
-				{ name: 'Supabase', icon: si(siSupabase) },
-				{ name: 'Neon', icon: si(siNeon) }
+				{ name: 'PostgreSQL', icon: si(siPostgresql), tier: 'sering' },
+				{ name: 'Supabase', icon: si(siSupabase), tier: 'jarang' },
+				{ name: 'MySQL', icon: si(siMysql), tier: 'sering' },
+				{ name: 'Neon', icon: si(siNeon), tier: 'sering' }
 			]
 		},
 		{
 			label: 'DESIGN & MOTION',
 			items: [
-				{ name: 'Figma', icon: figmaIcon },
-				{ name: 'Canva', icon: canvaIcon },
-				{ name: 'Pixellab', icon: pixellabIcon },
-				{ name: 'GSAP', icon: si(siGsap) },
-				{ name: 'Framer Motion', icon: si(siFramer) }
+				{ name: 'Figma', icon: figmaIcon, tier: 'sering' },
+				{ name: 'GSAP', icon: si(siGsap), tier: 'jarang' },
+				{ name: 'Canva', icon: canvaIcon, tier: 'sering' },
+				{ name: 'Pixellab', icon: pixellabIcon, tier: 'sering' },
+				{ name: 'Framer Motion', icon: si(siFramer), tier: 'sering' }
 			]
 		},
 		{
 			label: 'AI & LLM',
 			items: [
-				{ name: 'Claude', icon: si(siClaude) },
-				{ name: 'GPT', icon: gptIcon },
-				{ name: 'Codex', icon: codexIcon },
-				{ name: 'Groq', icon: groqIcon },
-				{ name: 'OpenRouter', icon: si(siOpenrouter) },
-				{ name: 'OpenCode', icon: si(siOpencode) }
+				{ name: 'Claude', icon: si(siClaude), tier: 'sering' },
+				{ name: 'GPT', icon: gptIcon, tier: 'jarang' },
+				{ name: 'OpenRouter', icon: si(siOpenrouter), tier: 'sering' },
+				{ name: 'Groq', icon: groqIcon, tier: 'jarang' },
+				{ name: 'Codex', icon: codexIcon, tier: 'jarang' },
+				{ name: 'OpenCode', icon: si(siOpencode), tier: 'sering' },
 			]
 		},
 		{
 			label: 'TOOLS & INFRA',
 			items: [
-				{ name: 'GitHub', icon: si(siGithub) },
-				{ name: 'Git', icon: si(siGit) },
-				{ name: 'Vercel', icon: si(siVercel) },
-				{ name: 'Vite', icon: si(siVite) },
-				{ name: 'npm', icon: si(siNpm) },
-				{ name: 'Upstash', icon: si(siUpstash) },
-				{ name: 'Docker', icon: si(siDocker) }
+				{ name: 'Git', icon: si(siGit), tier: 'sering' },
+				{ name: 'Vite', icon: si(siVite), tier: 'jarang' },
+				{ name: 'npm', icon: si(siNpm), tier: 'sering' },
+				{ name: 'GitHub', icon: si(siGithub), tier: 'sering' },
+				{ name: 'Vercel', icon: si(siVercel), tier: 'sering' },
+				{ name: 'Docker', icon: si(siDocker), tier: 'jarang' },
+				{ name: 'Upstash', icon: si(siUpstash), tier: 'jarang' },
+				{ name: 'Laragon', icon: si(siLaragon), tier: 'sering' }
 			]
 		}
 	];
@@ -159,18 +161,12 @@
 		const n = group.items.length;
 		// Kuota kotak besar per grup, proporsional ke jumlah item — biar kolom gak
 		// jomplang. ~1 "tall" per kolom (grid 4 kolom), "wide" dijatah lebih longgar
-		// karena dia gak nambah tinggi kolom, cuma lebar.
+		// karena dia gak nambah tinggi kolom, cuma lebar. Ini tetap random murni,
+		// cuma buat variasi bentuk visual.
 		let tallLeft = Math.max(1, Math.round(n / 4));
 		let wideLeft = Math.max(1, Math.round(n / 6));
 
-		// Isi kotak diselang-seling solid (hitam) & ghost (putih) dengan jumlah yang
-		// seimbang — gak ada sisi yang numpuk hitam atau putih.
-		const solidCount = Math.round(n / 2);
-		let solidLeft = solidCount;
-		let ghostLeft = n - solidCount;
-		let prevFill: Fill = 'ghost';
-
-		return group.items.map(() => {
+		return group.items.map((item) => {
 			const shapeRoll = rng();
 			let shape: Shape = 'normal';
 			if (shapeRoll < 0.14 && wideLeft > 0) {
@@ -180,13 +176,10 @@
 				shape = 'tall';
 				tallLeft--;
 			}
-			let fill: Fill;
-			if (solidLeft === 0) fill = 'ghost';
-			else if (ghostLeft === 0) fill = 'solid';
-			else fill = prevFill === 'solid' ? 'ghost' : 'solid';
-			if (fill === 'solid') solidLeft--;
-			else ghostLeft--;
-			prevFill = fill;
+			// Fill BUKAN random: solid = tech yang sering dipakai, ghost = pernah
+			// dipakai. Ini yang bikin grid jadi "peta" keahlian asli, bukan
+			// dekorasi selang-seling.
+			const fill: Fill = item.tier === 'sering' ? 'solid' : 'ghost';
 			const tone = fill === 'solid' ? 'var(--black)' : undefined;
 			return { shape, fill, tone };
 		});
@@ -451,6 +444,15 @@
 	<div class="skills__light" bind:this={lightEl}>
 		<span class="skills__mark" aria-hidden="true" bind:this={markLightEl}>SKILLS</span>
 
+		<div class="skills__legend" aria-hidden="true">
+			<span class="skills__legend-item">
+				<i class="skills__legend-swatch skills__legend-swatch--solid"></i>sering dipakai
+			</span>
+			<span class="skills__legend-item">
+				<i class="skills__legend-swatch skills__legend-swatch--ghost"></i>jarang/pernah dipakai
+			</span>
+		</div>
+
 		<div class="skills__col" bind:this={stackEl}>
 			{#each groups as group, gi}
 				<div class="skills__group">
@@ -618,6 +620,36 @@
 		right: auto;
 		left: -0.5vw;
 		color: var(--fg-dark);
+	}
+
+	.skills__legend {
+		position: relative;
+		z-index: 1;
+		display: flex;
+		gap: clamp(1rem, 2.5vw, 1.5rem);
+		margin-bottom: clamp(1.5rem, 3.5vh, 2.25rem);
+	}
+	.skills__legend-item {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-family: var(--ff-mono);
+		font-size: 0.68rem;
+		letter-spacing: 0.06em;
+		color: var(--gray, rgba(10, 10, 10, 0.55));
+	}
+	.skills__legend-swatch {
+		display: block;
+		width: 8px;
+		height: 8px;
+		flex: 0 0 auto;
+	}
+	.skills__legend-swatch--solid {
+		background: var(--black);
+	}
+	.skills__legend-swatch--ghost {
+		background: var(--white);
+		border: 1px solid var(--gray-light, rgba(10, 10, 10, 0.3));
 	}
 
 	.skills__col {
