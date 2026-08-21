@@ -42,6 +42,7 @@
 	} from 'simple-icons';
 	import type { SimpleIcon } from 'simple-icons';
 	import {
+		si,
 		groqIcon,
 		gptIcon,
 		codexIcon,
@@ -50,12 +51,8 @@
 		figmaIcon,
 		canvaIcon,
 		pixellabIcon
-	} from './icons';
-	import type { SkillIcon } from './icons';
-
-	function si(icon: SimpleIcon): SkillIcon {
-		return { hex: `#${icon.hex}`, path: icon.path };
-	}
+	} from '$lib/data/icons';
+	import type { SkillIcon } from '$lib/data/icons';
 
 	type SkillTier = 'sering' | 'jarang';
 	type SkillItem = { name: string; icon: SkillIcon; tier: SkillTier };
@@ -114,8 +111,8 @@
 			label: 'AI & LLM',
 			items: [
 				{ name: 'Claude', icon: si(siClaude), tier: 'sering' },
-				{ name: 'GPT', icon: gptIcon, tier: 'jarang' },
-				{ name: 'OpenRouter', icon: si(siOpenrouter), tier: 'sering' },
+				{ name: 'OpenRouter', icon: si(siOpenrouter), tier: 'jarang' },
+				{ name: 'GPT', icon: gptIcon, tier: 'sering' },
 				{ name: 'Groq', icon: groqIcon, tier: 'jarang' },
 				{ name: 'Codex', icon: codexIcon, tier: 'jarang' },
 				{ name: 'OpenCode', icon: si(siOpencode), tier: 'sering' },
@@ -294,102 +291,33 @@
 			exitTl.to([...darkContent, headingEl], { opacity: 0, y: -20, duration: 0.5, ease: 'power1.in' }, 0);
 			exitTl.to(darkEl, { width: '100%', duration: 0.9, ease: 'power1.inOut' }, 0.15);
 		} else {
-			const n = groups.length;
-
-			const heights = groupEls.map((g) => g.offsetHeight);
-			const maxHeight = Math.max(...heights, 0);
-			if (stackEl) stackEl.style.height = `${maxHeight}px`;
-			groupEls.forEach((g) => {
-				g.style.position = 'absolute';
-				g.style.top = '0';
-				g.style.left = '0';
-				g.style.right = '0';
-			});
-
-			groupEls.forEach((group, i) => {
+			groupEls.forEach((group) => {
+				const { rule } = headPartsOf(group);
 				const boxes = boxesOf(group);
-				const { rule, labelText } = headPartsOf(group);
+
 				gsap.set(boxes, { opacity: 0, scale: 0.5, y: 14 });
-				gsap.set(labelText, { opacity: i === 0 ? 1 : 0 });
-				if (rule) gsap.set(rule, { scaleX: i === 0 ? 1 : 0 });
-				group.style.pointerEvents = i === 0 ? 'auto' : 'none';
-			});
-			const firstHead = headPartsOf(groupEls[0]);
-			if (firstHead.rule) gsap.set(firstHead.rule, { scaleX: 0 });
-			gsap.set(firstHead.labelText, { opacity: 0 });
+				if (rule) gsap.set(rule, { scaleX: 0 });
 
-			function playIn(group: HTMLElement) {
-				const boxes = boxesOf(group);
-				const { rule, labelText } = headPartsOf(group);
-				if (rule) gsap.to(rule, { scaleX: 1, duration: 0.4, ease: 'power2.out' });
-				gsap.to(labelText, { opacity: 1, duration: 0.3, ease: 'power2.out' });
-				gsap.to(boxes, {
-					opacity: 1,
-					scale: 1,
-					y: 0,
-					duration: 0.4,
-					stagger: 0.035,
-					ease: 'back.out(1.7)'
-				});
-			}
-
-			const firstReveal = ScrollTrigger.create({
-				trigger: lightEl,
-				start: 'top 85%',
-				once: true,
-				onEnter: () => playIn(groupEls[0])
-			});
-			groupTriggers.push(firstReveal);
-
-			let stepPx = 0;
-			function computeStep() {
-				stepPx = window.innerHeight * 0.85;
-			}
-			computeStep();
-			ScrollTrigger.addEventListener('refreshInit', computeStep);
-			const getTotalScroll = () => stepPx * (n - 1);
-
-			pinTl = gsap.timeline({
-				scrollTrigger: {
-					trigger: lightEl,
-					start: 'top top',
-					end: () => '+=' + Math.max(getTotalScroll(), 1),
-					pin: true,
-					scrub: 1,
-					invalidateOnRefresh: true,
-					anticipatePin: 1,
-					snap: {
-						snapTo: 1 / (n - 1),
-						duration: 0.35,
-						ease: 'power1.inOut'
+				const groupTl = gsap.timeline({
+					scrollTrigger: {
+						trigger: group,
+						start: 'top 85%',
+						end: 'bottom 25%',
+						toggleActions: 'restart reverse restart reverse'
 					}
-				}
+				});
+				if (rule) groupTl.to(rule, { scaleX: 1, duration: 0.4, ease: 'power2.out' }, 0);
+				boxes.forEach((box, i) => {
+					const kick = (i % 2 === 0 ? 1 : -1) * gsap.utils.random(3, 8);
+					groupTl.fromTo(
+						box,
+						{ opacity: 0, scale: 0.5, y: 14, rotate: kick },
+						{ opacity: 1, scale: 1, y: 0, rotate: 0, duration: 0.45, ease: 'back.out(1.7)' },
+						0.1 + i * 0.045
+					);
+				});
+				if (groupTl.scrollTrigger) groupTriggers.push(groupTl.scrollTrigger);
 			});
-
-			for (let i = 0; i < n - 1; i++) {
-				const outGroup = groupEls[i];
-				const inGroup = groupEls[i + 1];
-				const outBoxes = boxesOf(outGroup);
-				const { rule: outRule, labelText: outLabel } = headPartsOf(outGroup);
-				const inBoxes = boxesOf(inGroup);
-				const { rule: inRule, labelText: inLabel } = headPartsOf(inGroup);
-
-				pinTl.to(outBoxes, { opacity: 0, scale: 0.9, y: -10, duration: 0.3, stagger: 0.015, ease: 'power1.in' }, i);
-				if (outRule) pinTl.to(outRule, { scaleX: 0, duration: 0.25, ease: 'power1.in' }, i);
-				pinTl.to(outLabel, { opacity: 0, duration: 0.2, ease: 'power1.in' }, i);
-				pinTl.set(outGroup, { pointerEvents: 'none' }, i + 0.32);
-				pinTl.set(inGroup, { pointerEvents: 'auto' }, i + 0.32);
-				pinTl.to(inLabel, { opacity: 1, duration: 0.3, ease: 'power2.out' }, i + 0.32);
-				if (inRule) pinTl.fromTo(inRule, { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: 'power2.out' }, i + 0.32);
-				pinTl.fromTo(
-					inBoxes,
-					{ opacity: 0, scale: 0.5, y: 14 },
-					{ opacity: 1, scale: 1, y: 0, duration: 0.4, stagger: 0.03, ease: 'back.out(1.7)' },
-					i + 0.35
-				);
-			}
-
-			if (pinTl.scrollTrigger) groupTriggers.push(pinTl.scrollTrigger);
 
 			exitTl = gsap.timeline({
 				scrollTrigger: { trigger: skillsEl, start: 'bottom 65%', end: 'bottom top', scrub: 1 }
@@ -398,13 +326,10 @@
 			exitTl.to(darkEl, { width: '100%', duration: 0.9, ease: 'power1.inOut' }, 0.15);
 
 			return () => {
-				ScrollTrigger.removeEventListener('refreshInit', computeStep);
 				entryTl.scrollTrigger?.kill();
 				entryTl.kill();
 				exitTl?.scrollTrigger?.kill();
 				exitTl?.kill();
-				pinTl?.scrollTrigger?.kill();
-				pinTl?.kill();
 				groupTriggers.forEach((st) => st.kill());
 			};
 		}

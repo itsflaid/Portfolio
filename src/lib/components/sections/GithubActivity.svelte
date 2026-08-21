@@ -3,6 +3,7 @@
 	import { gsap } from 'gsap';
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
 	import { renderScramble } from '$lib/scramble';
+	import { SITE } from '$lib/data/site';
 
 	type Day = { count: number; date: string };
 	type Stats = {
@@ -17,7 +18,6 @@
 	};
 	type MonthBucket = { label: string; sortKey: string; count: number; pct: number };
 
-	const GITHUB_URL = 'https://github.com/itsflaid';
 	const year = new Date().getFullYear();
 
 	const MONTH_ID = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGU', 'SEP', 'OKT', 'NOV', 'DES'];
@@ -394,7 +394,7 @@
 				{#if loadError}
 					<p class="ghactivity__fallback">
 						Data aktivitas GitHub lagi gak bisa dimuat. Cek langsung di
-						<a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">github.com/itsflaid ↗</a>
+						<a href={SITE.github} target="_blank" rel="noopener noreferrer">github.com/itsflaid ↗</a>
 					</p>
 				{:else}
 					<dl class="stats" bind:this={statsEl}>
@@ -424,7 +424,7 @@
 
 					<a 
 						class="ghactivity__link"
-						href={GITHUB_URL}
+						href={SITE.github}
 						target="_blank"
 						rel="noopener noreferrer"
 						data-cursor-text="OPEN"

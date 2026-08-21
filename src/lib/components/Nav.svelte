@@ -3,17 +3,7 @@
 	import { gsap } from 'gsap';
 	import { scrollToTarget, stopLenis, startLenis } from '$lib/scroll';
 
-	type MenuLink = {
-		label: string;
-		href: string;
-	};
-
-	const menuLinks: MenuLink[] = [
-		{ label: 'ABOUT', href: '#about' },
-		{ label: 'PROJECTS', href: '#projects' },
-		{ label: 'SKILLS', href: '#skills' },
-		{ label: 'CONTACT', href: '#contact' }
-	];
+	import { navLinks as menuLinks } from '$lib/data/site';
 
 	let open = false;
 	let mounted = false;

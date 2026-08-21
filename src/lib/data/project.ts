@@ -25,12 +25,8 @@ import {
 	siBootstrap
 } from 'simple-icons';
 import type { SimpleIcon } from 'simple-icons';
-import { groqIcon, inertiaIcon, nextAuthIcon } from '../components/icons';
-import type { SkillIcon } from '../components/icons';
-
-function si(icon: SimpleIcon): SkillIcon {
-	return { hex: `#${icon.hex}`, path: icon.path };
-}
+import { groqIcon, inertiaIcon, nextAuthIcon, si } from './icons';
+import type { SkillIcon } from './icons';
 
 export type TechItem = {
 	name: string;

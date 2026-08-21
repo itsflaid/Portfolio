@@ -1,19 +1,19 @@
 <script lang="ts">
-import Grain from "$lib/components/Grain.svelte";
+import Grain from "$lib/components/layout/Grain.svelte";
 import Nav from "$lib/components/Nav.svelte";
-import Hero from "$lib/components/Hero.svelte";
-import About from "$lib/components/About.svelte";
-import Projects from "$lib/components/Projects.svelte";
+import Hero from "$lib/components/sections/Hero.svelte";
+import About from "$lib/components/sections/About.svelte";
+import Projects from "$lib/components/sections/Projects.svelte";
 // import ScrollModeToggle from "$lib/components/ScrollModeToggle.svelte";
-import Manifesto from "$lib/components/Manifesto.svelte";
-import Marquee from "$lib/components/Marquee.svelte";
-import Experience from "$lib/components/Experience.svelte";
-import Skills from "$lib/components/Skills.svelte";
-import GithubActivity from "$lib/components/GithubActivity.svelte";
-import Contact from "$lib/components/Contact.svelte";
-import ResumeModal from "$lib/components/ResumeModal.svelte";
-import CaseStudyModal from "$lib/components/CaseStudyModal.svelte";
-import TechModal from "$lib/components/TechModal.svelte";
+import Manifesto from "$lib/components/sections/Manifesto.svelte";
+import Marquee from "$lib/components/sections/Marquee.svelte";
+import Experience from "$lib/components/sections/Experience.svelte";
+import Skills from "$lib/components/sections/Skills.svelte";
+import GithubActivity from "$lib/components/sections/GithubActivity.svelte";
+import Contact from "$lib/components/sections/Contact.svelte";
+import ResumeModal from "$lib/components/modals/ResumeModal.svelte";
+import CaseStudyModal from "$lib/components/modals/CaseStudyModal.svelte";
+import TechModal from "$lib/components/modals/TechModal.svelte";
 
 </script>
 

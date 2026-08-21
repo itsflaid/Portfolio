@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '../app.css';
-	import SmoothScroll from '$lib/components/SmoothScroll.svelte';
+	import SmoothScroll from '$lib/components/layout/SmoothScroll.svelte';
 </script>
 
 <SmoothScroll>

@@ -4,20 +4,7 @@
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
 	import { scrollToTarget, jumpToTop } from '$lib/scroll';
 
-	type ContactLink = { label: string; href: string };
-
-	const quickLinks: ContactLink[] = [
-		{ label: 'ABOUT', href: '#about' },
-		{ label: 'PROJECTS', href: '#projects' },
-		{ label: 'SKILLS', href: '#skills' },
-		{ label: 'CONTACT', href: '#contact' }
-	];
-
-	const socials: ContactLink[] = [
-		{ label: 'GITHUB', href: 'https://github.com/itsflaid' },
-		{ label: 'LINKEDIN', href: 'https://www.linkedin.com/in/muhammad-fadil-1264b82a9' },
-		{ label: 'INSTAGRAM', href: 'https://www.instagram.com/sebutsajamf?igsh=N2xjdnVobmthdGU0' }
-	];
+	import { navLinks as quickLinks, socials, SITE } from '$lib/data/site';
 
 	type ContactFact = { label: string; value: string };
 	const facts: ContactFact[] = [
@@ -338,8 +325,8 @@
 						></span
 					>
 				</h2>
-				<a class="contact__cta" href="mailto:mfadil.coder@gmail.com" data-reveal
-					>mfadil.coder@gmail.com →</a
+				<a class="contact__cta" href="mailto:{SITE.email}" data-reveal
+					>{SITE.email} →</a
 				>
 			</div>
 
