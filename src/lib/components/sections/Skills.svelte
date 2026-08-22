@@ -740,7 +740,7 @@
 		.skills__col {
 			position: relative;
 			max-width: none;
-			gap: 0;
+			gap: 2rem;
 		}
 		.skills__group {
 			width: 100%;

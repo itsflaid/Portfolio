@@ -366,20 +366,6 @@
                       <span>+{techTotalCount(project) - project.techPreview.length} MORE</span>
                     </li>
                   {/if}
-                {:else}
-                  {#each project.tech as tech}
-                    <li style={tech.icon ? `--tech-color: ${tech.icon.hex}` : ""}>
-                      {#if tech.icon}
-                        <svg
-                          class="tech-icon"
-                          viewBox="0 0 24 24"
-                          aria-hidden="true"
-                          ><path d={tech.icon.path} fill-rule="evenodd" /></svg
-                        >
-                      {/if}
-                      <span>{tech.name}</span>
-                    </li>
-                  {/each}
                 {/if}
               </ul>
             </div>

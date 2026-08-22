@@ -22,7 +22,8 @@ import {
 	siTailwindcss,
 	siGreensock,
 	siLivewire,
-	siBootstrap
+	siBootstrap,
+	siNeon
 } from 'simple-icons';
 import type { SimpleIcon } from 'simple-icons';
 import { groqIcon, inertiaIcon, nextAuthIcon, si } from './icons';
@@ -50,7 +51,6 @@ export type Project = {
 	thumb: string;
 	video: string;
 	desc: string;
-	tech: TechItem[];
 	techPreview?: TechItem[];
 	techGroups?: TechGroup[];
 	metrics?: string[];
@@ -67,13 +67,6 @@ export const projects: Project[] = [
 		thumb: '/preview/image/devmap.webp',
 		video: '/preview/video/devmap',
 		desc: 'Maps your codebase through static analysis to give AI agents structured context and a clearer understanding of your project.',
-		tech: [
-			{ name: 'TypeScript', icon: si(siTypescript) },
-			{ name: 'Node.js', icon: si(siNodedotjs) },
-			{ name: 'ts-morph' },
-			{ name: 'Commander' },
-			{ name: 'Astro', icon: si(siAstro) }
-		],
 		techPreview: [
 			{ name: 'ts-morph' },
 			{ name: 'Commander' },
@@ -119,12 +112,6 @@ export const projects: Project[] = [
 		thumb: '/preview/image/devnote.webp',
 		video: '/preview/video/devnote2',
 		desc: 'Keep your technical knowledge organized in one place, from reusable snippets and resources to notes and collections.',
-		tech: [
-			{ name: 'Next.js', icon: si(siNextdotjs) },
-			{ name: 'TypeScript', icon: si(siTypescript) },
-			{ name: 'PostgreSQL', icon: si(siPostgresql) },
-			{ name: 'Codemirror', icon: si(siCodemirror) }
-		],
 		techPreview: [
 			{ name: 'Next.js', icon: si(siNextdotjs) },
 			{ name: 'TypeScript', icon: si(siTypescript) },
@@ -149,7 +136,8 @@ export const projects: Project[] = [
 				label: 'DATABASE',
 				items: [
 					{ name: 'PostgreSQL', icon: si(siPostgresql) },
-					{ name: 'Prisma', icon: si(siPrisma) }
+					{ name: 'Prisma', icon: si(siPrisma) },
+					{ name: 'Supabase', icon: si(siSupabase) }
 				]
 			},
 			{
@@ -183,12 +171,6 @@ export const projects: Project[] = [
 		thumb: '/preview/image/chatme.webp',
 		video: '/preview/video/chatme2',
 		desc: 'A simple way to capture thoughts, save notes, and manage reminders through a familiar chat-based interface.',
-		tech: [
-			{ name: 'Next.js', icon: si(siNextdotjs) },
-			{ name: 'TypeScript', icon: si(siTypescript) },
-			{ name: 'PostgreSQL', icon: si(siPostgresql) },
-			{ name: 'Upstash', icon: si(siUpstash) }
-		],
 		techPreview: [
 			{ name: 'Next.js', icon: si(siNextdotjs) },
 			{ name: 'TypeScript', icon: si(siTypescript) },
@@ -216,7 +198,8 @@ export const projects: Project[] = [
 				items: [
 					{ name: 'PostgreSQL', icon: si(siPostgresql) },
 					{ name: 'Prisma', icon: si(siPrisma) },
-					{ name: 'Upstash Redis', icon: si(siUpstash) }
+					{ name: 'Upstash Redis', icon: si(siUpstash) },
+					{ name: 'Neon', icon: si(siNeon) }
 				]
 			},
 			{
@@ -245,12 +228,6 @@ export const projects: Project[] = [
 		thumb: '/preview/image/dailyfit.webp',
 		video: '/preview/video/dailyfit',
 		desc: 'Follow daily workouts, track completed activities, and keep an eye on your progress through a simple fitness experience.',
-		tech: [
-			{ name: 'Next.js', icon: si(siNextdotjs) },
-			{ name: 'TypeScript', icon: si(siTypescript) },
-			{ name: 'PostgreSQL', icon: si(siPostgresql) },
-			{ name: 'Prisma', icon: si(siPrisma) }
-		],
 		techPreview: [
 			{ name: 'Next.js', icon: si(siNextdotjs) },
 			{ name: 'TypeScript', icon: si(siTypescript) },
@@ -272,7 +249,8 @@ export const projects: Project[] = [
 				label: 'DATABASE',
 				items: [
 					{ name: 'PostgreSQL', icon: si(siPostgresql) },
-					{ name: 'Prisma', icon: si(siPrisma) }
+					{ name: 'Prisma', icon: si(siPrisma) },
+					{ name: 'Neon', icon: si(siNeon) }
 				]
 			},
 			{
@@ -305,12 +283,6 @@ export const projects: Project[] = [
 		thumb: '/preview/image/mufadz.webp',
 		video: '/preview/video/mufadz',
 		desc: 'Brings Islamic services together in one platform — Quran reader and prayer schedule anchor daily use, alongside dzikir, zakat calculator, and an AI chatbot.',
-		tech: [
-			{ name: 'React', icon: si(siReact) },
-			{ name: 'TypeScript', icon: si(siTypescript) },
-			{ name: 'Express', icon: si(siExpress) },
-			{ name: 'MySQL', icon: si(siMysql) }
-		],
 		techPreview: [
 			{ name: 'React', icon: si(siReact) },
 			{ name: 'Express', icon: si(siExpress) },
@@ -366,12 +338,6 @@ export const projects: Project[] = [
 		thumb: '/preview/image/de-home-spa.webp',
 		video: '/preview/video/dehomespa',
 		desc: 'Get personalized home spa recommendations based on your needs through guided selections or direct conversations with AI.',
-		tech: [
-			{ name: 'Next.js', icon: si(siNextdotjs) },
-			{ name: 'TypeScript', icon: si(siTypescript) },
-			{ name: 'Groq', icon: groqIcon },
-			{ name: 'Fonnte' }
-		],
 		techPreview: [
 			{ name: 'Next.js', icon: si(siNextdotjs) },
 			{ name: 'TypeScript', icon: si(siTypescript) },
@@ -421,11 +387,6 @@ export const projects: Project[] = [
 		thumb: '/preview/image/kasbonin.webp',
 		video: '',
 		desc: 'Multi-user debt tracking for a family store, so every transaction anyone logs is visible to the whole family in real time.',
-		tech: [
-			{ name: 'Livewire', icon: si(siLivewire) },
-			{ name: 'Laravel', icon: si(siLaravel) },
-			{ name: 'MySQL', icon: si(siMysql) }
-		],
 		techPreview: [
 			{ name: 'Livewire', icon: si(siLivewire) },
 			{ name: 'Laravel', icon: si(siLaravel) },
@@ -433,11 +394,16 @@ export const projects: Project[] = [
 		],
 		techGroups: [
 			{
-				label: 'FRAMEWORK',
+				label: 'FRONTEND',
 				items: [
 					{ name: 'Livewire', icon: si(siLivewire) },
-					{ name: 'Laravel', icon: si(siLaravel) },
 					{ name: 'Bootstrap', icon: si(siBootstrap) }
+				]
+			},
+			{
+				label: 'BACKEND',
+				items: [
+					{ name: 'Laravel', icon: si(siLaravel) }
 				]
 			},
 			{
