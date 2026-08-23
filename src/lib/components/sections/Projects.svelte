@@ -393,12 +393,26 @@
                   href={project.demo}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Live Demo"
+                  aria-label={project.demoLabel ?? 'Live Demo'}
                 >
-                  <span>Live Demo</span>
+                  <span>{project.demoLabel ?? 'Live Demo'}</span>
                   <svg viewBox="0 0 24 24" aria-hidden="true"
                     ><path d="M7 17 17 7M8 7h9v9" /></svg
                   >
+                </a>
+              {/if}
+              {#if project.npm}
+                <a
+                  class="card__btn card__btn--npm"
+                  href={project.npm}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="NPM Package"
+                >
+                  <svg class="card__btn-npm" viewBox="0 0 24 24" aria-hidden="true"
+                    ><path d="M1.763 0C.786 0 0 .786 0 1.763v20.474C0 23.214.786 24 1.763 24h20.474c.977 0 1.763-.786 1.763-1.763V1.763C24 .786 23.214 0 22.237 0zM5.13 5.323l13.837.019-.009 13.836h-3.464l.01-10.382h-3.456L12.04 19.17H5.113z" /></svg
+                  >
+                  <span>NPM</span>
                 </a>
               {/if}
               <a
@@ -974,6 +988,20 @@
     color: var(--white);
     border-color: var(--black);
   }
+  .card__btn--npm {
+    background: transparent;
+    color: var(--black);
+    border: 1px solid rgba(10, 10, 10, 0.3);
+  }
+  .card__btn--npm .card__btn-npm {
+    fill: currentColor;
+    stroke: none;
+  }
+  .card__btn--npm:hover {
+    background: var(--black);
+    color: var(--white);
+    border-color: var(--black);
+  }
   .card__btn--repo {
     background: transparent;
     color: var(--black);
@@ -1051,6 +1079,7 @@
       padding: 0.6rem 0.9rem;
     }
     .card__btn--demo span,
+    .card__btn--npm span,
     .card__btn--repo span {
       display: none;
     }
