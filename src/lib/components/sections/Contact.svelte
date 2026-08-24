@@ -6,13 +6,6 @@
 
 	import { navLinks as quickLinks, socials, SITE } from '$lib/data/site';
 
-	type ContactFact = { label: string; value: string };
-	const facts: ContactFact[] = [
-		{ label: 'STATUS', value: 'Open for freelance & collab' },
-		{ label: 'BASED IN', value: 'Kutai Kartanegara, ID' },
-		{ label: 'REPLY TIME', value: 'Usually within 24 hours' }
-	];
-
 	const year = new Date().getFullYear();
 
 	let contactEl: HTMLElement;
@@ -69,16 +62,12 @@
 		const lightContent = gsap.utils.toArray<HTMLElement>(
 			contactEl.querySelectorAll('[data-reveal-light]')
 		);
-		const factsRows = gsap.utils.toArray<HTMLElement>(contactEl.querySelectorAll('.contact__facts-row'));
-		const factsRules = gsap.utils.toArray<HTMLElement>(contactEl.querySelectorAll('.contact__rule'));
 
 		if (reduceMotion) {
 			gsap.set(darkEl, { xPercent: 0, width: '100%' });
 			gsap.set([headingLine1El, headingLine2El], { y: '0%', x: '0rem' });
 			gsap.set(cursorEl, { opacity: 1 });
 			gsap.set(lightContent, { opacity: 1, y: 0 });
-			gsap.set(factsRows, { opacity: 1, y: 0 });
-			gsap.set(factsRules, { scaleX: 1 });
 			gsap.set(darkContent, { opacity: isMobile ? 1 : 0 });
 			if (!isMobile) {
 				gsap.set(endingCursorEl, { opacity: 1 });
@@ -108,24 +97,33 @@
 
 		tl.fromTo(darkEl, { xPercent: 100 }, { xPercent: 0, ease: 'none' }, 0);
 
-		tl.fromTo(
-			lightContent,
-			{ opacity: 0, y: 20 },
-			{ opacity: 1, y: 0, stagger: 0.08, ease: 'power2.out' },
-			0.1
-		);
-		tl.fromTo(
-			factsRows,
-			{ opacity: 0, y: 16 },
-			{ opacity: 1, y: 0, stagger: 0.08, ease: 'power2.out' },
-			0.14
-		);
-		tl.fromTo(
-			factsRules,
-			{ scaleX: 0 },
-			{ scaleX: 1, duration: 0.4, stagger: 0.08, ease: 'power2.out' },
-			0.14
-		);
+		const mobileLightTriggers: ScrollTrigger[] = [];
+		if (!isMobile) {
+			tl.fromTo(
+				lightContent,
+				{ opacity: 0, y: 20 },
+				{ opacity: 1, y: 0, stagger: 0.08, ease: 'power2.out' },
+				0.1
+			);
+		} else {
+			// Mobile: tiap blok konten bg putih baru animate pas masuk layar,
+			// dan mundur lagi tiap keluar layar — bisa diulang tanpa batas.
+			lightContent.forEach((el) => {
+				const t = gsap.timeline({
+					scrollTrigger: {
+						trigger: el,
+						start: 'top 92%',
+						toggleActions: 'restart reverse restart reverse'
+					}
+				});
+				t.fromTo(
+					el,
+					{ opacity: 0, y: 24 },
+					{ opacity: 1, y: 0, duration: 0.55, ease: 'power2.out' }
+				);
+				if (t.scrollTrigger) mobileLightTriggers.push(t.scrollTrigger);
+			});
+		}
 
 		tl.fromTo(
 			darkContent,
@@ -161,7 +159,6 @@
 		if (!isMobile) {
 			curtain.fromTo(darkEl, { width: '50%' }, { width: '100%', ease: 'none' }, 0);
 			curtain.to(lightContent, { opacity: 0, duration: 0.4, ease: 'power1.in' }, 0.2);
-			curtain.to(factsRows, { opacity: 0, duration: 0.3, ease: 'power1.in' }, 0.2);
 
 			const revealOut = [...darkContent, headingLine1El, headingLine2El];
 			curtain.to(revealOut, { opacity: 0, y: -16, duration: 0.35, ease: 'power2.in' }, 0.4);
@@ -200,11 +197,13 @@
 
 		const mobileEndingTriggers: ScrollTrigger[] = [];
 		if (isMobile) {
+			// Ending full layar in-flow: bg dark natural kegeser keatas mengikuti
+			// scroll. Teks reveal tiap masuk layar & mundur tiap keluar (infinite).
 			const mobileEndingTl = gsap.timeline({
 				scrollTrigger: {
 					trigger: mobileEndingEl,
-					start: 'top 78%',
-					toggleActions: 'play none none none'
+					start: 'top 60%',
+					toggleActions: 'restart reverse restart reverse'
 				}
 			});
 			mobileEndingTl.fromTo(
@@ -247,6 +246,7 @@
 			curtain.scrollTrigger?.kill();
 			curtain.kill();
 			mobileEndingTriggers.forEach((st) => st.kill());
+			mobileLightTriggers.forEach((st) => st.kill());
 		};
 	});
 </script>
@@ -263,16 +263,6 @@
 					If you have a problem worth solving? let's talk.
 				</p>
 			</div>
-
-			<dl class="contact__facts">
-				{#each facts as fact}
-					<div class="contact__facts-row">
-						<span class="contact__rule" aria-hidden="true"></span>
-						<dt>{fact.label}</dt>
-						<dd>{fact.value}</dd>
-					</div>
-				{/each}
-			</dl>
 
 			<div class="contact__groups">
 				<nav class="contact__group" data-reveal-light aria-label="Menu">
@@ -407,7 +397,6 @@
 		color: var(--black);
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
 		gap: clamp(1.75rem, 4vh, 2.5rem);
 		padding: clamp(1.5rem, 4vh, 2.5rem) clamp(2rem, 6vw, 4rem);
 		overflow: hidden;
@@ -418,6 +407,7 @@
 		gap: 0.6rem;
 		max-width: 26rem;
 		opacity: 0;
+		margin-top: auto;
 	}
 	.contact__eyebrow-light {
 		font-family: var(--ff-mono);
@@ -432,49 +422,10 @@
 		color: var(--ink-soft);
 	}
 
-	.contact__facts {
-		margin: 0;
-		display: flex;
-		flex-direction: column;
-	}
-	.contact__facts-row {
-		position: relative;
-		display: flex;
-		align-items: baseline;
-		gap: 1.25rem;
-		padding: 0.6rem 0;
-		opacity: 0;
-	}
-	.contact__rule {
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		height: 1px;
-		background: rgba(10, 10, 10, 0.14);
-		transform: scaleX(0);
-		transform-origin: left;
-	}
-	.contact__facts-row dt {
-		flex: 0 0 auto;
-		width: clamp(6rem, 10vw, 7.5rem);
-		margin: 0;
-		font-family: var(--ff-mono);
-		font-size: 0.68rem;
-		letter-spacing: 0.08em;
-		color: var(--gray);
-	}
-	.contact__facts-row dd {
-		margin: 0;
-		font-family: var(--ff-body);
-		font-size: 0.88rem;
-		color: var(--black);
-		opacity: 0.85;
-	}
-
 	.contact__groups {
 		display: flex;
 		gap: clamp(2rem, 6vw, 3.5rem);
+		margin-bottom: auto;
 	}
 	.contact__group {
 		flex: 1 1 0%;
@@ -802,9 +753,13 @@
 			display: none;
 		}
 		.contact__ending-mobile {
+			position: relative;
+			min-height: 100vh;
+			min-height: 100svh;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
+			justify-content: center;
 			text-align: center;
 			gap: clamp(0.9rem, 3vh, 1.4rem);
 			background: var(--black);

@@ -51,6 +51,7 @@
     figmaIcon,
     canvaIcon,
     pixellabIcon,
+    vsCodeIcon,
   } from "$lib/data/icons";
   import type { SkillIcon } from "$lib/data/icons";
 
@@ -116,7 +117,7 @@
       ],
     },
     {
-      label: "AI & LLM",
+      label: "AI TOOLS & LLM",
       items: [
         { name: "Claude", icon: si(siClaude), tier: "sering" },
         { name: "OpenRouter", icon: si(siOpenrouter), tier: "jarang" },
@@ -138,6 +139,7 @@
         { name: "Docker", icon: si(siDocker), tier: "jarang" },
         { name: "Upstash", icon: si(siUpstash), tier: "jarang" },
         { name: "Laragon", icon: si(siLaragon), tier: "sering" },
+        { name: "VS Code", icon: vsCodeIcon, tier: "sering" },
       ],
     },
   ];

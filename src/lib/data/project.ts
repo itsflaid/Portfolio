@@ -93,7 +93,7 @@ export const projects: Project[] = [
 				]
 			}
 		],
-		metrics: ['282/282 tests passing', '11 framework supported'],
+		metrics: ['236/236 tests passing', '11 framework supported'],
 		demo: 'https://devmap-web.vercel.app',
 		demoLabel: 'Landing',
 		npm: 'https://www.npmjs.com/package/@flaid/devmap',
