@@ -32,12 +32,12 @@
 </script>
 
 <section class="hero" id="top" bind:this={heroEl}>
-	<span class="hero__mark hero__mark--1" aria-hidden="true"><i>F</i><i>L</i><i>A</i><i>I</i><i>D</i></span>
+	<!-- <span class="hero__mark hero__mark--1" aria-hidden="true"><i>F</i><i>L</i><i>A</i><i>I</i><i>D</i></span> -->
 	<span class="hero__mark hero__mark--2" aria-hidden="true"><i>F</i><i>L</i><i>A</i><i>I</i><i>D</i></span>
 	<span class="hero__dots hero__dots--bl" aria-hidden="true">
 		{#each dots as _}<i></i>{/each}
 	</span>
-	<span class="hero__spin" aria-hidden="true"></span>
+	<!-- <span class="hero__spin" aria-hidden="true"></span> -->
 	<div class="hero__content">
 		<span class="hero__eyebrow">FULLSTACK DEVELOPER — KUTAI KARTANEGARA, ID</span>
 		<h1><span class="hero__name">MUHAMMAD</span><span class="hero__name">FADIL</span></h1>
@@ -101,10 +101,10 @@
 		display: inline-block;
 		opacity: 0.065;
 	}
-	.hero__mark--1 {
+	/* .hero__mark--1 {
 		top: -3vw;
 		left: -2vw;
-	}
+	} */
 	.hero__mark--2 {
 		bottom: -3vw;
 		right: -2vw;
@@ -265,7 +265,7 @@
 	.hero__dots i:nth-child(8) { animation-delay: 2.1s; }
 	.hero__dots i:nth-child(9) { animation-delay: 2.4s; }
 
-	.hero__spin {
+	/* .hero__spin {
 		position: absolute;
 		right: clamp(2rem, 5vw, 4rem);
 		top: 50%;
@@ -296,7 +296,7 @@
 		right: 0;
 		height: 1px;
 		transform: translateY(-50%);
-	}
+	} */
 
 	@keyframes rise {
 		from {
@@ -337,8 +337,8 @@
 			animation: none;
 			opacity: 0.2;
 		}
-		.hero__spin {
+		/* .hero__spin {
 			animation: none;
-		}
+		} */
 	}
 </style>

@@ -371,57 +371,60 @@
             </div>
             <div class="card__actions">
               {#if project.caseStudy}
-                <button
-                  type="button"
-                  class="card__btn card__btn--case"
-                  onclick={() => {
-                      pausePreviews();
-                      openCaseStudyModal(project);
-                    }}
-                  data-cursor-text="READ"
-                >
-                  <span>Case Study</span>
-                  <svg viewBox="0 0 24 24" aria-hidden="true"
-                    ><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path
-                      d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg
+                <div class="card__actions-left">
+                  <button
+                    type="button"
+                    class="card__btn card__btn--case"
+                    onclick={() => {
+                        pausePreviews();
+                        openCaseStudyModal(project);
+                      }}
+                    data-cursor-text="READ"
                   >
-                </button>
+                    <span>Case Study</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"
+                      ><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path
+                        d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg
+                    >
+                  </button>
+                </div>
               {/if}
-              {#if project.demo}
+              <div class="card__actions-right">
+                {#if project.demo}
+                  <a
+                    class="card__btn card__btn--demo"
+                    href={project.demo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={project.demoLabel ?? 'Live Demo'}
+                  >
+                    <span>{project.demoLabel ?? 'Live Demo'}</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"
+                      ><path d="M7 17 17 7M8 7h9v9" /></svg
+                    >
+                  </a>
+                {/if}
+                {#if project.npm}
+                  <a
+                    class="card__btn card__btn--npm"
+                    href={project.npm}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="NPM Package"
+                  >
+                    <svg class="card__btn-npm" viewBox="0 0 24 24" aria-hidden="true"
+                      ><path d="M1.763 0C.786 0 0 .786 0 1.763v20.474C0 23.214.786 24 1.763 24h20.474c.977 0 1.763-.786 1.763-1.763V1.763C24 .786 23.214 0 22.237 0zM5.13 5.323l13.837.019-.009 13.836h-3.464l.01-10.382h-3.456L12.04 19.17H5.113z" /></svg
+                    >
+                    <span>NPM</span>
+                  </a>
+                {/if}
                 <a
-                  class="card__btn card__btn--demo"
-                  href={project.demo}
+                  class="card__btn card__btn--repo"
+                  href={project.repo}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={project.demoLabel ?? 'Live Demo'}
+                  aria-label="Repository"
                 >
-                  <span>{project.demoLabel ?? 'Live Demo'}</span>
-                  <svg viewBox="0 0 24 24" aria-hidden="true"
-                    ><path d="M7 17 17 7M8 7h9v9" /></svg
-                  >
-                </a>
-              {/if}
-              {#if project.npm}
-                <a
-                  class="card__btn card__btn--npm"
-                  href={project.npm}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="NPM Package"
-                >
-                  <svg class="card__btn-npm" viewBox="0 0 24 24" aria-hidden="true"
-                    ><path d="M1.763 0C.786 0 0 .786 0 1.763v20.474C0 23.214.786 24 1.763 24h20.474c.977 0 1.763-.786 1.763-1.763V1.763C24 .786 23.214 0 22.237 0zM5.13 5.323l13.837.019-.009 13.836h-3.464l.01-10.382h-3.456L12.04 19.17H5.113z" /></svg
-                  >
-                  <span>NPM</span>
-                </a>
-              {/if}
-              <a
-                class="card__btn card__btn--repo"
-                href={project.repo}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Repository"
-              >
                 <svg class="card__btn-gh" viewBox="0 0 24 24" aria-hidden="true"
                   ><path
                     d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.63.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.36 1.12 2.94.85.09-.67.35-1.12.63-1.38-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.28 2.75 1.05a9.36 9.36 0 0 1 5.01 0c1.9-1.33 2.74-1.05 2.74-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.6.69.49A10.26 10.26 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z"
@@ -429,6 +432,7 @@
                 >
                 <span>Repository</span>
               </a>
+              </div>
             </div>
           </div>
         </li>
@@ -945,6 +949,13 @@
     gap: clamp(0.6rem, 1.2vw, 0.9rem);
     margin-top: clamp(0.9rem, 2vh, 1.25rem);
   }
+  .card__actions-left,
+  .card__actions-right {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: clamp(0.6rem, 1.2vw, 0.9rem);
+  }
   .card__btn {
     display: inline-flex;
     align-items: center;
@@ -1069,13 +1080,18 @@
       flex-wrap: nowrap;
       gap: 0.5rem;
     }
+    .card__actions-left,
+    .card__actions-right {
+      flex: 1 1 0%;
+      gap: 0.5rem;
+    }
     .card__btn {
       flex: 1 1 0%;
       justify-content: center;
       padding: 0.6rem;
     }
     .card__btn--case {
-      flex: 2 1 0%;
+      width: 100%;
       padding: 0.6rem 0.9rem;
     }
     .card__btn--demo span,
