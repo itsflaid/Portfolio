@@ -1,4 +1,5 @@
 <script lang="ts">
+import { SITE, sameAs } from "$lib/data/site";
 import Grain from "$lib/components/layout/Grain.svelte";
 import Nav from "$lib/components/Nav.svelte";
 import Hero from "$lib/components/sections/Hero.svelte";
@@ -15,19 +16,39 @@ import ResumeModal from "$lib/components/modals/ResumeModal.svelte";
 import CaseStudyModal from "$lib/components/modals/CaseStudyModal.svelte";
 import TechModal from "$lib/components/modals/TechModal.svelte";
 
+const pageTitle = "Muhammad Fadil (Flaid) — Fullstack Developer";
+const pageDescription =
+	"Portfolio Muhammad Fadil / Flaid — fullstack developer membangun DevMap, DevNote, ChatMe, dan tools / aplikasi lain.";
+
+const personLd = {
+	"@context": "https://schema.org",
+	"@type": "Person",
+	name: SITE.name,
+	alternateName: ["Flaid", "itsflaid", "mufacoderz"],
+	jobTitle: "Fullstack Developer",
+	url: SITE.url,
+	email: `mailto:${SITE.email}`,
+	sameAs
+};
 </script>
 
 <svelte:head>
-<title>Muhammad Fadil — Fullstack Developer</title>
-	<meta
-    name="description"
-    content="Portfolio of Muhammad Fadil, fullstack developer building DevMap, ChatMe and other tools under Flaid / Devecos."
-/>
+	<title>{pageTitle}</title>
+	<meta name="description" content={pageDescription} />
+	<link rel="canonical" href={SITE.url} />
+
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={pageTitle} />
+	<meta property="og:description" content={pageDescription} />
+	<meta property="og:url" content={SITE.url} />
+	<meta property="og:image" content="{SITE.url}/og-image.png" />
+	<meta name="twitter:card" content="summary_large_image" />
+
+	{@html `<script type="application/ld+json">${JSON.stringify(personLd)}</script>`}
 </svelte:head>
 
 <Grain />
 <Nav />
-<!-- Scroll mode toggle: nonaktif. Aktifkan lagi dengan menghapus baris komentar di bawah + hapus `//` di import ScrollModeToggle. -->
 <!-- <ScrollModeToggle /> -->
 <Hero />
 <About />
