@@ -8,7 +8,7 @@ export const SITE = {
 	npm: 'https://www.npmjs.com/~fadilz',
 	tiktok: 'https://www.tiktok.com/@itsflaid',
 	location: 'Kutai Kartanegara, ID',
-	url: 'https://itsflaid.my.id'
+	url: 'https://www.flaid.my.id/'
 } as const;
 
 export type NavLink = { label: string; href: string };
