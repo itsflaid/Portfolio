@@ -97,34 +97,6 @@
 
 		tl.fromTo(darkEl, { xPercent: 100 }, { xPercent: 0, ease: 'none' }, 0);
 
-		const mobileLightTriggers: ScrollTrigger[] = [];
-		if (!isMobile) {
-			tl.fromTo(
-				lightContent,
-				{ opacity: 0, y: 20 },
-				{ opacity: 1, y: 0, stagger: 0.08, ease: 'power2.out' },
-				0.1
-			);
-		} else {
-			// Mobile: tiap blok konten bg putih baru animate pas masuk layar,
-			// dan mundur lagi tiap keluar layar — bisa diulang tanpa batas.
-			lightContent.forEach((el) => {
-				const t = gsap.timeline({
-					scrollTrigger: {
-						trigger: el,
-						start: 'top 92%',
-						toggleActions: 'restart reverse restart reverse'
-					}
-				});
-				t.fromTo(
-					el,
-					{ opacity: 0, y: 24 },
-					{ opacity: 1, y: 0, duration: 0.55, ease: 'power2.out' }
-				);
-				if (t.scrollTrigger) mobileLightTriggers.push(t.scrollTrigger);
-			});
-		}
-
 		tl.fromTo(
 			darkContent,
 			{ opacity: 0, y: 24 },
@@ -146,17 +118,26 @@
 		);
 		tl.to(cursorEl, { opacity: 1, duration: 0.2 }, 0.95);
 
-		const curtain = gsap.timeline({
-			scrollTrigger: {
-				trigger: contactEl,
-				start: 'top top',
-				end: 'bottom bottom',
-				scrub: 1,
-				invalidateOnRefresh: true
-			}
-		});
+		const mm = gsap.matchMedia();
 
-		if (!isMobile) {
+		mm.add('(min-width: 861px)', () => {
+			tl.fromTo(
+				lightContent,
+				{ opacity: 0, y: 20 },
+				{ opacity: 1, y: 0, stagger: 0.08, ease: 'power2.out' },
+				0.1
+			);
+
+			const curtain = gsap.timeline({
+				scrollTrigger: {
+					trigger: contactEl,
+					start: 'top top',
+					end: 'bottom bottom',
+					scrub: 1,
+					invalidateOnRefresh: true
+				}
+			});
+
 			curtain.fromTo(darkEl, { width: '50%' }, { width: '100%', ease: 'none' }, 0);
 			curtain.to(lightContent, { opacity: 0, duration: 0.4, ease: 'power1.in' }, 0.2);
 
@@ -193,12 +174,29 @@
 				{ opacity: 1, y: 0, duration: 0.4 },
 				1.02
 			);
-		}
 
-		const mobileEndingTriggers: ScrollTrigger[] = [];
-		if (isMobile) {
-			// Ending full layar in-flow: bg dark natural kegeser keatas mengikuti
-			// scroll. Teks reveal tiap masuk layar & mundur tiap keluar (infinite).
+			return () => {
+				curtain.scrollTrigger?.kill();
+				curtain.kill();
+			};
+		});
+
+		mm.add('(max-width: 860px)', () => {
+			lightContent.forEach((el) => {
+				const t = gsap.timeline({
+					scrollTrigger: {
+						trigger: el,
+						start: 'top 92%',
+						toggleActions: 'restart reverse restart reverse'
+					}
+				});
+				t.fromTo(
+					el,
+					{ opacity: 0, y: 24 },
+					{ opacity: 1, y: 0, duration: 0.55, ease: 'power2.out' }
+				);
+			});
+
 			const mobileEndingTl = gsap.timeline({
 				scrollTrigger: {
 					trigger: mobileEndingEl,
@@ -237,16 +235,17 @@
 				{ opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' },
 				0.68
 			);
-			if (mobileEndingTl.scrollTrigger) mobileEndingTriggers.push(mobileEndingTl.scrollTrigger);
-		}
+
+			return () => {
+				mobileEndingTl.scrollTrigger?.kill();
+				mobileEndingTl.kill();
+			};
+		});
 
 		return () => {
 			tl.scrollTrigger?.kill();
 			tl.kill();
-			curtain.scrollTrigger?.kill();
-			curtain.kill();
-			mobileEndingTriggers.forEach((st) => st.kill());
-			mobileLightTriggers.forEach((st) => st.kill());
+			mm.revert();
 		};
 	});
 </script>

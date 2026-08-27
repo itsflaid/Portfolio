@@ -148,8 +148,8 @@
 					</div>
 					<div class="facts__row">
 						<span class="facts__rule" aria-hidden="true"></span>
-						<dt>FOCUS</dt>
-						<dd>Fullstack Dev · AI-Assisted Tooling</dd>
+						<dt>MAIN STACK</dt>
+						<dd>TypeScript · Next.js · PostgreSQL</dd>
 					</div>
 					<div class="facts__row">
 						<span class="facts__rule" aria-hidden="true"></span>

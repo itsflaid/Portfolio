@@ -1,37 +1,17 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { gsap } from 'gsap';
-	import { ScrollTrigger } from 'gsap/ScrollTrigger';
 	import { scrollToTarget } from '$lib/scroll';
 	import { openResumeModal } from '$lib/resume';
 
-	let heroEl: HTMLElement;
 	let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
 	function goProjects(e: MouseEvent) {
 		e.preventDefault();
 		scrollToTarget('#projects');
 	}
-
-	onMount(() => {
-		gsap.registerPlugin(ScrollTrigger);
-		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-		if (reduceMotion) return;
-
-		const trigger = ScrollTrigger.create({
-			trigger: heroEl,
-			start: 'top top',
-			end: 'bottom top',
-			pin: true,
-			pinSpacing: false
-		});
-
-		return () => trigger.kill();
-	});
 </script>
 
-<section class="hero" id="top" bind:this={heroEl}>
+<div class="hero-frame">
+<section class="hero" id="top">
 	<!-- <span class="hero__mark hero__mark--1" aria-hidden="true"><i>F</i><i>L</i><i>A</i><i>I</i><i>D</i></span> -->
 	<span class="hero__mark hero__mark--2" aria-hidden="true"><i>F</i><i>L</i><i>A</i><i>I</i><i>D</i></span>
 	<span class="hero__dots hero__dots--bl" aria-hidden="true">
@@ -68,10 +48,16 @@
 		</nav>
 	</div>
 </section>
+</div>
 
 <style>
-	.hero {
+	.hero-frame {
 		position: relative;
+		height: 200vh;
+	}
+	.hero {
+		position: sticky;
+		top: 0;
 		height: 100vh;
 		z-index: 1;
 		overflow: hidden;

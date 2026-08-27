@@ -129,7 +129,6 @@
 	onMount(() => {
 		gsap.registerPlugin(ScrollTrigger);
 		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-		const isMobile = window.matchMedia('(max-width: 860px)').matches;
 
 		let cleanup: (() => void) | null = null;
 
@@ -179,7 +178,9 @@
 				return;
 			}
 
-			if (isMobile) {
+			const mm = gsap.matchMedia();
+
+			mm.add('(max-width: 860px)', () => {
 				gsap.set(cells, { opacity: 0 });
 				gsap.set(rows, { opacity: 0, y: 16 });
 				gsap.set([metaEl, yearsEl], { opacity: 0, y: 10 });
@@ -196,7 +197,13 @@
 				insightEl.textContent = '';
 
 				const leftTl = gsap.timeline({
-					scrollTrigger: { trigger: sectionEl, start: 'top 80%', toggleActions: 'play none none none' }
+					scrollTrigger: {
+						trigger: sectionEl,
+						start: 'top 90%',
+						end: 'top 40%',
+						scrub: 0.5,
+						invalidateOnRefresh: true
+					}
 				});
 				leftTl.fromTo(line1El, { y: '105%', x: '-1rem' }, { y: '0%', x: '0rem', duration: 0.6, ease: 'power3.out' }, 0);
 				leftTl.fromTo(line2El, { y: '105%', x: '1rem' }, { y: '0%', x: '0rem', duration: 0.6, ease: 'power3.out' }, 0.12);
@@ -231,7 +238,13 @@
 				);
 
 				const rightTl = gsap.timeline({
-					scrollTrigger: { trigger: rightEl, start: 'top 85%', toggleActions: 'play none none none' }
+					scrollTrigger: {
+						trigger: rightEl,
+						start: 'top 90%',
+						end: 'top 40%',
+						scrub: 0.5,
+						invalidateOnRefresh: true
+					}
 				});
 				rightTl.to(metaEl, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0);
 				rightTl.to(yearsEl, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0.05);
@@ -264,102 +277,105 @@
 				);
 				rightTl.to(legendEl, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0.55);
 
-				cleanup = () => {
+				return () => {
 					leftTl.scrollTrigger?.kill();
 					leftTl.kill();
 					rightTl.scrollTrigger?.kill();
 					rightTl.kill();
 				};
-				return;
-			}
-
-			gsap.set(cells, { opacity: 0 });
-			gsap.set(rows, { opacity: 0, y: 16 });
-			gsap.set([metaEl, yearsEl], { opacity: 0, y: 10 });
-			gsap.set(bars, { scaleY: 0 });
-			gsap.set(legendEl, { opacity: 0, y: 10 });
-			gsap.set([line1El, line2El], { y: '105%' });
-
-			let progress = 0;
-			const counters = { total: 0, streak: 0, commits: 0, repos: 0, stars: 0, followers: 0 };
-
-			const tl = gsap.timeline({
-				scrollTrigger: {
-					trigger: sectionEl,
-					start: 'top top',
-					end: 'bottom bottom',
-					scrub: 1.2,
-					invalidateOnRefresh: true,
-					onUpdate: (self) => {
-						progress = self.progress;
-					}
-				}
 			});
 
-			tl.fromTo(line1El, { y: '105%', x: '-1.4rem' }, { y: '0%', x: '0rem', duration: 0.35, ease: 'power3.out' }, 0);
-			tl.fromTo(line2El, { y: '105%', x: '1.4rem' }, { y: '0%', x: '0rem', duration: 0.35, ease: 'power3.out' }, 0.05);
-			tl.to(cursorEl, { opacity: 1, duration: 0.05 }, 0.12);
+			mm.add('(min-width: 861px)', () => {
+				gsap.set(cells, { opacity: 0 });
+				gsap.set(rows, { opacity: 0, y: 16 });
+				gsap.set([metaEl, yearsEl], { opacity: 0, y: 10 });
+				gsap.set(bars, { scaleY: 0 });
+				gsap.set(legendEl, { opacity: 0, y: 10 });
+				gsap.set([line1El, line2El], { y: '105%' });
 
-			tl.to(rows, { opacity: 1, y: 0, stagger: 0.05, ease: 'power2.out' }, 0.15);
-			tl.to([metaEl, yearsEl], { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' }, 0.1);
+				let progress = 0;
+				const counters = { total: 0, streak: 0, commits: 0, repos: 0, stars: 0, followers: 0 };
 
-			tl.to(
-				cells,
-				{
-					opacity: (i, target) => parseFloat((target as HTMLElement).dataset.opacity ?? '0.06'),
-					stagger: { amount: 0.5, from: 'start' },
-					ease: 'none'
-				},
-				0.15
-			);
-
-			tl.to(
-				counters,
-				{
-					total: stats.total,
-					streak: stats.currentStreak,
-					commits: stats.commits,
-					repos: stats.repos,
-					stars: stats.stars,
-					followers: stats.followers,
-					duration: 0.55,
-					ease: 'power1.out',
-					onUpdate: () => {
-						totalNumEl.textContent = String(Math.floor(counters.total));
-						streakNumEl.textContent = String(Math.floor(counters.streak));
-						commitsNumEl.textContent = String(Math.floor(counters.commits));
-						reposNumEl.textContent = String(Math.floor(counters.repos));
-						starsNumEl.textContent = formatCompact(Math.floor(counters.stars));
-						followersNumEl.textContent = formatCompact(Math.floor(counters.followers));
+				const tl = gsap.timeline({
+					scrollTrigger: {
+						trigger: sectionEl,
+						start: 'top top',
+						end: 'bottom bottom',
+						scrub: 1.2,
+						invalidateOnRefresh: true,
+						onUpdate: (self) => {
+							progress = self.progress;
+						}
 					}
-				},
-				0.15
-			);
+				});
 
-			tl.to(bars, { scaleY: 1, stagger: 0.03, duration: 0.35, ease: 'power2.out' }, 0.5);
-			tl.to(legendEl, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' }, 0.9);
+				tl.fromTo(line1El, { y: '105%', x: '-1.4rem' }, { y: '0%', x: '0rem', duration: 0.35, ease: 'power3.out' }, 0);
+				tl.fromTo(line2El, { y: '105%', x: '1.4rem' }, { y: '0%', x: '0rem', duration: 0.35, ease: 'power3.out' }, 0.05);
+				tl.to(cursorEl, { opacity: 1, duration: 0.05 }, 0.12);
 
-			tl.fromTo(markEl, { yPercent: -6 }, { yPercent: 6, ease: 'none' }, 0);
+				tl.to(rows, { opacity: 1, y: 0, stagger: 0.05, ease: 'power2.out' }, 0.15);
+				tl.to([metaEl, yearsEl], { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' }, 0.1);
 
-			const targetInsight = insightText();
-			let frame = 0;
-			const ticker = () => {
-				frame++;
-				if (frame % 2 !== 0) return;
-				if (progress < 0.82) {
-					insightEl.textContent = '';
-					return;
-				}
-				const local = Math.min((progress - 0.82) / 0.18, 1);
-				insightEl.textContent = renderScramble(targetInsight, local);
-			};
-			gsap.ticker.add(ticker);
+				tl.to(
+					cells,
+					{
+						opacity: (i, target) => parseFloat((target as HTMLElement).dataset.opacity ?? '0.06'),
+						stagger: { amount: 0.5, from: 'start' },
+						ease: 'none'
+					},
+					0.15
+				);
 
-			cleanup = () => {
-				gsap.ticker.remove(ticker);
-				tl.scrollTrigger?.kill();
-				tl.kill();
-			};
+				tl.to(
+					counters,
+					{
+						total: stats.total,
+						streak: stats.currentStreak,
+						commits: stats.commits,
+						repos: stats.repos,
+						stars: stats.stars,
+						followers: stats.followers,
+						duration: 0.55,
+						ease: 'power1.out',
+						onUpdate: () => {
+							totalNumEl.textContent = String(Math.floor(counters.total));
+							streakNumEl.textContent = String(Math.floor(counters.streak));
+							commitsNumEl.textContent = String(Math.floor(counters.commits));
+							reposNumEl.textContent = String(Math.floor(counters.repos));
+							starsNumEl.textContent = formatCompact(Math.floor(counters.stars));
+							followersNumEl.textContent = formatCompact(Math.floor(counters.followers));
+						}
+					},
+					0.15
+				);
+
+				tl.to(bars, { scaleY: 1, stagger: 0.03, duration: 0.35, ease: 'power2.out' }, 0.5);
+				tl.to(legendEl, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' }, 0.9);
+
+				tl.fromTo(markEl, { yPercent: -6 }, { yPercent: 6, ease: 'none' }, 0);
+
+				const targetInsight = insightText();
+				let frame = 0;
+				const ticker = () => {
+					frame++;
+					if (frame % 2 !== 0) return;
+					if (progress < 0.82) {
+						insightEl.textContent = '';
+						return;
+					}
+					const local = Math.min((progress - 0.82) / 0.18, 1);
+					insightEl.textContent = renderScramble(targetInsight, local);
+				};
+				gsap.ticker.add(ticker);
+
+				return () => {
+					gsap.ticker.remove(ticker);
+					tl.scrollTrigger?.kill();
+					tl.kill();
+				};
+			});
+
+			cleanup = () => mm.revert();
 		})();
 
 		return () => cleanup?.();

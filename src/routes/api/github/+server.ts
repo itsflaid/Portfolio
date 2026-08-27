@@ -113,17 +113,23 @@ export const GET: RequestHandler = async () => {
 		]);
 		const years: number[] = profile?.contributionsCollection?.contributionYears ?? [];
 
+		const sortedYears = years.slice().sort((a, b) => a - b);
+		const yearResults = await Promise.all(
+			sortedYears.map((year) =>
+				ghGraphQL(token, YEAR_QUERY, {
+					from: `${year}-01-01T00:00:00.000Z`,
+					to: `${year}-12-31T23:59:59.999Z`
+				})
+			)
+		);
+
 		const byYear: Record<string, DayCell[][]> = {};
 		const days: ContributionDay[] = [];
 		let total = 0;
 		let commits = 0;
 
-		for (const year of years.slice().sort((a, b) => a - b)) {
-			const yearViewer = await ghGraphQL(token, YEAR_QUERY, {
-				from: `${year}-01-01T00:00:00.000Z`,
-				to: `${year}-12-31T23:59:59.999Z`
-			});
-
+		sortedYears.forEach((year, i) => {
+			const yearViewer = yearResults[i];
 			const calendar = yearViewer?.contributionsCollection?.contributionCalendar;
 			const yearWeeks: { contributionDays: ContributionDay[] }[] = calendar?.weeks ?? [];
 
@@ -132,7 +138,7 @@ export const GET: RequestHandler = async () => {
 
 			total += calendar?.totalContributions ?? 0;
 			commits += yearViewer?.contributionsCollection?.totalCommitContributions ?? 0;
-		}
+		});
 
 		const { current, longest } = computeStreaks(days);
 		const activeDays = days.filter((d) => d.contributionCount > 0).length;

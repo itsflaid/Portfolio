@@ -281,7 +281,7 @@
           <span class="intro__scroll">
             SCROLL TO EXPLORE
             <svg viewBox="0 0 24 24" aria-hidden="true"
-              ><path d="M12 4v16m0 0-6-6m6 6 6-6" /></svg
+              ><path d="M4 12h16m0 0-6-6m6 6-6 6" /></svg
             >
           </span>
         </div>
@@ -706,11 +706,11 @@
   @keyframes intro-scroll-bounce {
     0%,
     100% {
-      transform: translateY(0);
+      transform: translateX(0);
       opacity: 0.6;
     }
     50% {
-      transform: translateY(5px);
+      transform: translateX(5px);
       opacity: 1;
     }
   }

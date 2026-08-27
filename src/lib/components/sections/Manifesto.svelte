@@ -33,12 +33,12 @@
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
-    const isMobile = window.matchMedia("(max-width: 860px)").matches;
+    if (reduceMotion) return;
 
-    if (reduceMotion || isMobile) return;
-
-    const viewportWidth = viewportEl.clientWidth;
-    const trackRect = trackEl.getBoundingClientRect();
+    const mm = gsap.matchMedia();
+    mm.add("(min-width: 768px)", () => {
+      const viewportWidth = viewportEl.clientWidth;
+      const trackRect = trackEl.getBoundingClientRect();
 
     const lastCluster =
       trackEl.querySelector<HTMLElement>(".cluster--into");
@@ -1014,15 +1014,18 @@
       });
     }
 
-    return () => {
-      ScrollTrigger.removeEventListener(
-        "refreshInit",
-        computeMaxScroll,
-      );
+      return () => {
+        ScrollTrigger.removeEventListener(
+          "refreshInit",
+          computeMaxScroll,
+        );
 
-      tl.scrollTrigger?.kill();
-      tl.kill();
-    };
+        tl.scrollTrigger?.kill();
+        tl.kill();
+      };
+    });
+
+    return () => mm.revert();
   });
 </script>
 

@@ -8,6 +8,11 @@
 	let lenis: Lenis | null = null;
 
 	onMount(() => {
+		if ('scrollRestoration' in history) {
+			history.scrollRestoration = 'manual';
+		}
+		window.scrollTo(0, 0);
+
 		gsap.registerPlugin(ScrollTrigger);
 
 		ScrollTrigger.config({ autoRefreshEvents: 'visibilitychange,DOMContentLoaded,resize' });
