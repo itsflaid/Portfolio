@@ -31,7 +31,7 @@
 			<div class="marquee__group">
 				{#each words as word (word)}
 					<span class="marquee__word">{word}</span>
-					<img class="marquee__sep" src="/logo/logo-trans.png" alt="" aria-hidden="true" draggable="false" />
+					<img class="marquee__sep" src="/logo/logo-nav.png" alt="" aria-hidden="true" draggable="false" />
 				{/each}
 			</div>
 		{/each}
@@ -41,7 +41,7 @@
 <style>
 	.marquee {
 		position: relative;
-		background: transparent;
+		background: var(--black);
 		overflow: hidden;
 		padding: clamp(0.6rem, 1.8vh, 1rem) 0 clamp(0.42rem, 1.26vh, 0.7rem);
 		z-index: 3;
@@ -64,7 +64,7 @@
 		font-weight: 400;
 		font-size: clamp(0.8rem, 2.1vw, 1.6rem);
 		letter-spacing: 0.01em;
-		color: var(--fg-light);
+		color: var(--fg-dark);
 		white-space: nowrap;
 		padding: 0 clamp(1rem, 2.5vw, 2rem);
 	}

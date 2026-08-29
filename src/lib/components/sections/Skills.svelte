@@ -16,7 +16,6 @@
     siPrisma,
     siPhp,
     siLaravel,
-    siGoogle,
     siBetterauth,
     siMysql,
     siPostgresql,
@@ -83,18 +82,18 @@
     {
       label: "BACKEND",
       items: [
-        { name: "Node.js", icon: si(siNodedotjs), tier: "sering" },
-        { name: "Laravel", icon: si(siLaravel), tier: "jarang" },
-        { name: "Express", icon: si(siExpress), tier: "sering" },
+        { name: "Laravel", icon: si(siLaravel), tier: "sering" },
         { name: "PHP", icon: si(siPhp), tier: "jarang" },
+        { name: "Express", icon: si(siExpress), tier: "sering" },
+        { name: "Node.js", icon: si(siNodedotjs), tier: "jarang" },
         { name: "Prisma", icon: si(siPrisma), tier: "sering" },
-        { name: "NextAuth", icon: nextAuthIcon, tier: "sering" },
-        { name: "REST API", icon: restApiIcon, tier: "sering" },
-        {
-          name: "BetterAuth",
-          icon: { ...si(siBetterauth), hex: "#000000" },
-          tier: "jarang",
-        },
+        // { name: "NextAuth", icon: nextAuthIcon, tier: "sering" },
+        // { name: "REST API", icon: restApiIcon, tier: "sering" },
+        // {
+        //   name: "BetterAuth",
+        //   icon: { ...si(siBetterauth), hex: "#000000" },
+        //   tier: "jarang",
+        // },
       ],
     },
     {
@@ -125,7 +124,7 @@
         { name: "Groq", icon: groqIcon, tier: "jarang" },
         { name: "Codex", icon: codexIcon, tier: "jarang" },
         { name: "OpenCode", icon: si(siOpencode), tier: "sering" },
-        { name: "Github Copilot", icon: si(siGithubcopilot), tier: "jarang" },
+        // { name: "Github Copilot", icon: si(siGithubcopilot), tier: "jarang" },
       ],
     },
     {
@@ -449,7 +448,7 @@
         >
       </h2>
       <p class="skills__lead" data-reveal>
-        Tools and technologies I reach for when shipping real products.
+        Tools and technologies I reach for when build real products.
       </p>
     </div>
   </div>

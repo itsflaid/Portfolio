@@ -509,7 +509,7 @@
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
-    padding: clamp(2rem, 6vh, 4rem) 0 clamp(2rem, 6vh, 3.5rem);
+    padding: clamp(5rem, 10vh, 8rem) 0 clamp(2rem, 6vh, 3.5rem);
   }
   .projects__mark {
     position: absolute;
@@ -730,7 +730,7 @@
     align-items: baseline;
     justify-content: space-between;
     margin: 0 clamp(1.5rem, 5vw, 4rem);
-    padding-bottom: clamp(1.25rem, 3vh, 2rem);
+    padding-bottom: clamp(1.5rem, 3.2vh, 2rem);
     border-bottom: 1px solid rgba(10, 10, 10, 0.14);
   }
   .projects__eyebrow,
