@@ -33,10 +33,6 @@
     siGsap,
     siFramer,
     siDocker,
-    siBootstrap,
-    siLivewire,
-    siGithubcopilot,
-    siAstro,
     siLaragon,
   } from "simple-icons";
 
@@ -45,155 +41,96 @@
     groqIcon,
     gptIcon,
     codexIcon,
-    restApiIcon,
-    nextAuthIcon,
     figmaIcon,
-    canvaIcon,
-    pixellabIcon,
-    vsCodeIcon,
+    nineRouterIcon,
   } from "$lib/data/icons";
   import type { SkillIcon } from "$lib/data/icons";
 
-  type SkillTier = "sering" | "jarang";
-  type SkillItem = { name: string; icon: SkillIcon; tier: SkillTier };
+  type SkillItem = {
+    name: string;
+    icon: SkillIcon;
+    color: "a" | "b";
+    shape: "a" | "b" | "c";
+  };
   type SkillGroup = { label: string; items: SkillItem[] };
 
   const groups: SkillGroup[] = [
     {
-      label: "FRONTEND",
+      label: "FRONTEND & DESIGN",
       items: [
-        { name: "Next.js", icon: si(siNextdotjs), tier: "sering" },
-        { name: "Bootstrap", icon: si(siBootstrap), tier: "jarang" },
-        { name: "Tailwind", icon: si(siTailwindcss), tier: "sering" },
-        { name: "SvelteKit", icon: si(siSvelte), tier: "jarang" },
-        { name: "TypeScript", icon: si(siTypescript), tier: "sering" },
-        { name: "Vue", icon: si(siVuedotjs), tier: "jarang" },
-        { name: "JavaScript", icon: si(siJavascript), tier: "sering" },
-        {
-          name: "TanStack Query",
-          icon: { ...si(siTanstack), hex: "#FF4154" },
-          tier: "jarang",
-        },
-        { name: "React", icon: si(siReact), tier: "sering" },
-        { name: "Astro", icon: si(siAstro), tier: "jarang" },
-        { name: "Livewire", icon: si(siLivewire), tier: "jarang" },
+        { name: "Next.js", icon: si(siNextdotjs), color: "a", shape: "c" },
+        { name: "Figma", icon: figmaIcon, color: "b", shape: "a" },
+        { name: "TypeScript", icon: si(siTypescript), color: "a", shape: "b" },
+        { name: "React", icon: si(siReact), color: "a", shape: "a" },
+        { name: "SvelteKit", icon: si(siSvelte), color: "b", shape: "a" },
+        { name: "Vue", icon: si(siVuedotjs), color: "b", shape: "c" },
+        { name: "Framer Motion", icon: si(siFramer), color: "a", shape: "a" },
+        { name: "GSAP", icon: si(siGsap), color: "b", shape: "a" },
+        { name: "Tailwind", icon: si(siTailwindcss), color: "a", shape: "a" },
       ],
     },
     {
-      label: "BACKEND",
+      label: "BACKEND & DATABASE",
       items: [
-        { name: "Laravel", icon: si(siLaravel), tier: "sering" },
-        { name: "PHP", icon: si(siPhp), tier: "jarang" },
-        { name: "Express", icon: si(siExpress), tier: "sering" },
-        { name: "Node.js", icon: si(siNodedotjs), tier: "jarang" },
-        { name: "Prisma", icon: si(siPrisma), tier: "sering" },
-        // { name: "NextAuth", icon: nextAuthIcon, tier: "sering" },
-        // { name: "REST API", icon: restApiIcon, tier: "sering" },
-        // {
-        //   name: "BetterAuth",
-        //   icon: { ...si(siBetterauth), hex: "#000000" },
-        //   tier: "jarang",
-        // },
+        { name: "Laravel", icon: si(siLaravel), color: "a", shape: "c" },
+        { name: "Node.js", icon: si(siNodedotjs), color: "b", shape: "b" },
+        { name: "Express", icon: si(siExpress), color: "a", shape: "a" },
+        { name: "Neon", icon: si(siNeon), color: "b", shape: "a" },
+        { name: "Prisma", icon: si(siPrisma), color: "a", shape: "a" },
+        { name: "PostgreSQL", icon: si(siPostgresql), color: "a", shape: "c" },
+        { name: "PHP", icon: si(siPhp), color: "b", shape: "a" },
+        { name: "MySQL", icon: si(siMysql), color: "a", shape: "a" },
+        { name: "Supabase", icon: si(siSupabase), color: "b", shape: "a" },
       ],
     },
     {
-      label: "DATABASE",
+      label: "AI-NATIVE WORKFLOW",
       items: [
-        { name: "PostgreSQL", icon: si(siPostgresql), tier: "sering" },
-        { name: "Supabase", icon: si(siSupabase), tier: "jarang" },
-        { name: "MySQL", icon: si(siMysql), tier: "sering" },
-        { name: "Neon", icon: si(siNeon), tier: "sering" },
-      ],
-    },
-    {
-      label: "DESIGN & MOTION",
-      items: [
-        { name: "Figma", icon: figmaIcon, tier: "sering" },
-        { name: "GSAP", icon: si(siGsap), tier: "jarang" },
-        { name: "Canva", icon: canvaIcon, tier: "sering" },
-        { name: "Pixellab", icon: pixellabIcon, tier: "sering" },
-        { name: "Framer Motion", icon: si(siFramer), tier: "sering" },
-      ],
-    },
-    {
-      label: "AI TOOLS & LLM",
-      items: [
-        { name: "Claude", icon: si(siClaude), tier: "sering" },
-        { name: "OpenRouter", icon: si(siOpenrouter), tier: "jarang" },
-        { name: "GPT", icon: gptIcon, tier: "sering" },
-        { name: "Groq", icon: groqIcon, tier: "jarang" },
-        { name: "Codex", icon: codexIcon, tier: "jarang" },
-        { name: "OpenCode", icon: si(siOpencode), tier: "sering" },
-        // { name: "Github Copilot", icon: si(siGithubcopilot), tier: "jarang" },
+        { name: "Claude", icon: si(siClaude), color: "a", shape: "b" },
+        { name: "9router", icon: nineRouterIcon, color: "b", shape: "a" },
+        { name: "Codex", icon: codexIcon, color: "a", shape: "c" },
+        { name: "Groq", icon: groqIcon, color: "b", shape: "a" },
+        { name: "OpenCode", icon: si(siOpencode), color: "a", shape: "b" },
       ],
     },
     {
       label: "TOOLS & INFRA",
       items: [
-        { name: "Git", icon: si(siGit), tier: "sering" },
-        { name: "Vite", icon: si(siVite), tier: "jarang" },
-        { name: "npm", icon: si(siNpm), tier: "sering" },
-        { name: "GitHub", icon: si(siGithub), tier: "sering" },
-        { name: "Vercel", icon: si(siVercel), tier: "sering" },
-        { name: "Docker", icon: si(siDocker), tier: "jarang" },
-        { name: "Upstash", icon: si(siUpstash), tier: "jarang" },
-        { name: "Laragon", icon: si(siLaragon), tier: "sering" },
-        { name: "VS Code", icon: vsCodeIcon, tier: "sering" },
+        { name: "Git", icon: si(siGit), color: "a", shape: "c" },
+        { name: "GitHub", icon: si(siGithub), color: "b", shape: "b" },
+        { name: "Vercel", icon: si(siVercel), color: "a", shape: "a" },
+        { name: "Docker", icon: si(siDocker), color: "b", shape: "a" },
+        { name: "Upstash", icon: si(siUpstash), color: "a", shape: "a" },
+        { name: "Laragon", icon: si(siLaragon), color: "b", shape: "a" },
       ],
     },
   ];
-
-  function hashString(str: string) {
-    let h = 0;
-    for (let i = 0; i < str.length; i++)
-      h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
-    return h;
-  }
-  function mulberry32(seed: number) {
-    let s = seed;
-    return () => {
-      s |= 0;
-      s = (s + 0x6d2b79f5) | 0;
-      let t = Math.imul(s ^ (s >>> 15), 1 | s);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-  }
 
   type Shape = "wide" | "tall" | "normal";
   type Fill = "ghost" | "solid";
   type LayoutCell = { shape: Shape; fill: Fill; tone?: string };
 
-  function buildLayout(group: SkillGroup): LayoutCell[] {
-    const rng = mulberry32(hashString(group.label));
-    const n = group.items.length;
-    // Kuota kotak besar per grup, proporsional ke jumlah item — biar kolom gak
-    // jomplang. ~1 "tall" per kolom (grid 4 kolom), "wide" dijatah lebih longgar
-    // karena dia gak nambah tinggi kolom, cuma lebar. Ini tetap random murni,
-    // cuma buat variasi bentuk visual.
-    let tallLeft = Math.max(1, Math.round(n / 4));
-    let wideLeft = Math.max(1, Math.round(n / 6));
+  const shapeMap: Record<string, Shape> = {
+    a: "normal",
+    b: "wide",
+    c: "tall",
+  };
 
+  function buildLayout(group: SkillGroup, cols = 4): LayoutCell[] {
+    let col = 0;
     return group.items.map((item) => {
-      const shapeRoll = rng();
-      let shape: Shape = "normal";
-      if (shapeRoll < 0.14 && wideLeft > 0) {
-        shape = "wide";
-        wideLeft--;
-      } else if (shapeRoll < 0.4 && tallLeft > 0) {
-        shape = "tall";
-        tallLeft--;
+      let shape: Shape = shapeMap[item.shape] ?? "normal";
+      if (shape === "wide" && col % cols === cols - 1) {
+        shape = "normal";
       }
-      // Fill BUKAN random: solid = tech yang sering dipakai, ghost = pernah
-      // dipakai. Ini yang bikin grid jadi "peta" keahlian asli, bukan
-      // dekorasi selang-seling.
-      const fill: Fill = item.tier === "sering" ? "solid" : "ghost";
+      col += shape === "wide" ? 2 : 1;
+      const fill: Fill = item.color === "a" ? "solid" : "ghost";
       const tone = fill === "solid" ? "var(--black)" : undefined;
       return { shape, fill, tone };
     });
   }
 
-  const layouts = groups.map(buildLayout);
+  const layouts = groups.map((g) => buildLayout(g));
 
   let skillsEl: HTMLElement;
   let darkEl: HTMLElement;
@@ -458,17 +395,6 @@
       >SKILLS</span
     >
 
-    <div class="skills__legend" aria-hidden="true">
-      <span class="skills__legend-item">
-        <i class="skills__legend-swatch skills__legend-swatch--solid"></i>sering
-        dipakai
-      </span>
-      <span class="skills__legend-item">
-        <i class="skills__legend-swatch skills__legend-swatch--ghost"
-        ></i>jarang/pernah dipakai
-      </span>
-    </div>
-
     <div class="skills__col" bind:this={stackEl}>
       {#each groups as group, gi}
         <div class="skills__group">
@@ -652,36 +578,6 @@
     right: auto;
     left: -0.5vw;
     color: var(--fg-dark);
-  }
-
-  .skills__legend {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    gap: clamp(1rem, 2.5vw, 1.5rem);
-    margin-bottom: clamp(1.5rem, 3.5vh, 2.25rem);
-  }
-  .skills__legend-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-family: var(--ff-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.06em;
-    color: var(--gray, rgba(10, 10, 10, 0.55));
-  }
-  .skills__legend-swatch {
-    display: block;
-    width: 8px;
-    height: 8px;
-    flex: 0 0 auto;
-  }
-  .skills__legend-swatch--solid {
-    background: var(--black);
-  }
-  .skills__legend-swatch--ghost {
-    background: var(--white);
-    border: 1px solid var(--gray-light, rgba(10, 10, 10, 0.3));
   }
 
   .skills__col {
@@ -872,8 +768,8 @@
     }
 
     .skills__grid {
-      grid-template-columns: repeat(3, 1fr);
-      grid-auto-rows: clamp(58px, 19vw, 78px);
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: clamp(58px, 14vw, 78px);
     }
     .skills__box-label {
       opacity: 1;
