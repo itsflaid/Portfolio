@@ -18,7 +18,7 @@
 		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		if (reduceMotion) return;
 
-		ScrollTrigger.create({
+		const st = ScrollTrigger.create({
 			trigger: heroEl,
 			start: 'top top',
 			end: 'bottom top',
@@ -26,7 +26,7 @@
 			pinSpacing: false
 		});
 
-		return () => { tl.scrollTrigger?.kill(); tl.kill(); };
+		return () => { st.kill(); };
 	});
 </script>
 

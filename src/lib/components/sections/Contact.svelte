@@ -367,7 +367,7 @@
 <style>
 	.contact {
 		position: relative;
-		height: 200vh;
+		height: 280vh;
 		background: var(--white);
 		z-index: 3;
 	}

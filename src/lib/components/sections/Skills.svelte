@@ -153,6 +153,7 @@
     const darkContent = gsap.utils.toArray<HTMLElement>(
       darkEl.querySelectorAll("[data-reveal]"),
     );
+    const darkBg = darkEl.querySelector<HTMLElement>(".skills__dark-bg")!;
     const groupEls = gsap.utils.toArray<HTMLElement>(
       lightEl.querySelectorAll(".skills__group"),
     );
@@ -275,7 +276,7 @@
       exitTl = gsap.timeline({
         scrollTrigger: {
           trigger: skillsEl,
-          start: "bottom 65%",
+          start: "bottom 85%",
           end: "bottom top",
           scrub: 1,
         },
@@ -286,8 +287,8 @@
         0,
       );
       exitTl.to(
-        darkEl,
-        { width: "100%", duration: 0.9, ease: "power1.inOut" },
+        darkBg,
+        { width: "200%", duration: 0.9, ease: "power1.inOut" },
         0.15,
       );
     } else {
@@ -330,7 +331,7 @@
       exitTl = gsap.timeline({
         scrollTrigger: {
           trigger: skillsEl,
-          start: "bottom 65%",
+          start: "bottom 85%",
           end: "bottom top",
           scrub: 1,
         },
@@ -341,8 +342,8 @@
         0,
       );
       exitTl.to(
-        darkEl,
-        { width: "100%", duration: 0.9, ease: "power1.inOut" },
+        darkBg,
+        { width: "200%", duration: 0.9, ease: "power1.inOut" },
         0.15,
       );
 
@@ -367,6 +368,7 @@
 
 <section class="skills" id="skills" bind:this={skillsEl}>
   <div class="skills__dark" bind:this={darkEl}>
+    <div class="skills__dark-bg"></div>
     <span class="skills__dots" aria-hidden="true">
       {#each dots as _}<i></i>{/each}
     </span>
@@ -455,8 +457,16 @@
     align-items: center;
     justify-content: center;
     padding: clamp(2rem, 6vw, 4rem);
-    overflow: hidden;
     will-change: transform, width;
+  }
+  .skills__dark-bg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    background: var(--black);
+    z-index: -1;
   }
   .skills__dark-content {
     position: relative;
