@@ -15,14 +15,6 @@ Full-stack developer based in Kutai Kartanegara, Indonesia. I build web applicat
 
 `JavaScript` `TypeScript` `Svelte` `SvelteKit` `Next.js` `Node.js` `Tailwind CSS` `GSAP` `PostgreSQL` `Git`
 
-## Selected Projects
-
-- **DevMap** — Developer productivity tool
-- **DevNote** — Note-taking app for devs
-- **ChatMe** — Real-time chat application
-- **DailyFit** — Fitness tracking app
-- **Kasbonin** — Micro-lending platform
-- **DeHome** — Home service marketplace
 
 ## Let's Connect
 
