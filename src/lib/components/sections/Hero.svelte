@@ -51,7 +51,7 @@
 				onclick={openResumeModal}
 				data-cursor-text="OPEN"
 			>
-				<span class="hero__cta-index">01</span>
+				<!-- <span class="hero__cta-index">01</span> -->
 				<span class="hero__cta-label">RESUME</span>
 				<svg class="hero__cta-icon" viewBox="0 0 24 24" aria-hidden="true"
 					><path d="M7 17 17 7M8 7h9v9" /></svg
@@ -59,7 +59,7 @@
 			</button>
 			<span class="hero__cta-divider" aria-hidden="true"></span>
 			<a class="hero__cta-item" href="#projects" onclick={goProjects} data-cursor-text="SCROLL">
-				<span class="hero__cta-index">02</span>
+				<!-- <span class="hero__cta-index">02</span> -->
 				<span class="hero__cta-label">THE PROJECTS</span>
 				<svg class="hero__cta-icon" viewBox="0 0 24 24" aria-hidden="true"
 					><path d="M12 4v14m0 0-5-5m5 5 5-5" /></svg
@@ -205,9 +205,9 @@
 		text-decoration: none;
 		cursor: pointer;
 	}
-	.hero__cta-index {
+	/* 	.hero__cta-index {
 		color: var(--gray);
-	}
+	} */
 	.hero__cta-label {
 		position: relative;
 	}

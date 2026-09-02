@@ -328,6 +328,11 @@
         if (groupTl.scrollTrigger) groupTriggers.push(groupTl.scrollTrigger);
       });
 
+      // Note: darkBg width:200% exit-tween sengaja dihapus di mobile.
+      // .skills__dark udah non-sticky & full-width di breakpoint ini, jadi
+      // dia udah lama scroll-past sebelum trigger "bottom 85%" kena — animasinya
+      // gak pernah keliatan, tapi width-tween tetap maksa reflow & bikin
+      // horizontal overflow (root cause "melebar ke kanan" sebelum GithubActivity muncul).
       exitTl = gsap.timeline({
         scrollTrigger: {
           trigger: skillsEl,
@@ -340,11 +345,6 @@
         [...darkContent, headingEl],
         { opacity: 0, y: -20, duration: 0.5, ease: "power1.in" },
         0,
-      );
-      exitTl.to(
-        darkBg,
-        { width: "200%", duration: 0.9, ease: "power1.inOut" },
-        0.15,
       );
 
       return () => {
