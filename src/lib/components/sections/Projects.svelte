@@ -7,13 +7,11 @@
   import { openTechModal, registerTechModalClose } from "$lib/techModal";
 
   let projectsEl: HTMLElement;
-  let viewportEl: HTMLElement;
-  let trackEl: HTMLElement;
+  let introEl: HTMLElement;
   let introLine1El: HTMLElement;
   let introLine2El: HTMLElement;
   let introCursorEl: HTMLElement;
-  let introContentEl: HTMLElement;
-  let outroContentEl: HTMLElement;
+  let outroEl: HTMLElement;
   let outroLine1El: HTMLElement;
   let outroLine2El: HTMLElement;
   let outroListEl: HTMLElement;
@@ -30,9 +28,9 @@
 
   function pausePreviews() {
     modalOpen = true;
-    if (!trackEl) return;
+    if (!projectsEl) return;
     const pans = gsap.utils.toArray<HTMLElement>(
-      trackEl.querySelectorAll(".media__pan"),
+      projectsEl.querySelectorAll(".media__pan"),
     );
     pausedPreviews.clear();
     pans.forEach((pan) => {
@@ -46,9 +44,9 @@
 
   function resumePreviews() {
     modalOpen = false;
-    if (!trackEl) return;
+    if (!projectsEl) return;
     const pans = gsap.utils.toArray<HTMLElement>(
-      trackEl.querySelectorAll(".media__pan"),
+      projectsEl.querySelectorAll(".media__pan"),
     );
     pans.forEach((pan) => {
       const video = pan.querySelector("video");
@@ -64,71 +62,12 @@
   onMount(() => {
     gsap.registerPlugin(ScrollTrigger);
 
-    ScrollTrigger.config({ ignoreMobileResize: true });
-
-    	const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-	if (reduceMotion) {
-		gsap.set([introLine1El, introLine2El], { y: '0%' });
-		gsap.set(introCursorEl, { opacity: 1 });
-		gsap.set([outroLine1El, outroLine2El], { y: '0%' });
-		gsap.set([outroListEl, outroLinkEl], { opacity: 1 });
-		return;
-	}
-
-	let edgeGap = 0;
-	const setSpacing = () => {
-		const card = trackEl.querySelector(
-			'.projects__card:not(.projects__card--intro):not(.projects__card--outro)'
-		) as HTMLElement | null;
-		if (!card) return;
-		edgeGap = Math.max(0, (viewportEl.clientWidth - card.offsetWidth) / 2);
-		trackEl.style.paddingLeft = `${edgeGap}px`;
-		trackEl.style.paddingRight = `${edgeGap}px`;
-		if (introContentEl) gsap.set(introContentEl, { x: -edgeGap });
-		if (outroContentEl) gsap.set(outroContentEl, { x: edgeGap });
-	};
-	setSpacing();
-	ScrollTrigger.addEventListener('refreshInit', setSpacing);
-
-	const getScroll = () => Math.max(0, trackEl.scrollWidth - viewportEl.clientWidth);
-
-	const introTl = gsap.timeline({
-		scrollTrigger: {
-			trigger: projectsEl,
-			start: 'top 90%',
-			end: 'top top',
-			scrub: 0.4
-		}
-	});
-	introTl
-		.fromTo(introLine1El, { y: '105%' }, { y: '0%', ease: 'none' }, 0)
-		.fromTo(introLine2El, { y: '105%' }, { y: '0%', ease: 'none' }, 0.18)
-		.fromTo(introCursorEl, { opacity: 0 }, { opacity: 1, ease: 'none' }, 0.55);
-
-	const tl = gsap.timeline({
-		scrollTrigger: {
-			trigger: projectsEl,
-			start: 'top top',
-			end: () => '+=' + getScroll(),
-			pin: true,
-			scrub: 1,
-			invalidateOnRefresh: true,
-			onUpdate: (self) => {
-				activeIndex = Math.round(self.progress * (projects.length - 1));
-			}
-		}
-	});
-
-	tl.to(trackEl, { x: () => -getScroll(), duration: 1, ease: 'none' }, 0);
-
-	tl.fromTo(outroLine1El, { y: '105%' }, { y: '0%', duration: 0.05, ease: 'power2.out' }, 0.85);
-	tl.fromTo(outroLine2El, { y: '105%' }, { y: '0%', duration: 0.05, ease: 'power2.out' }, 0.89);
-	tl.fromTo(outroListEl, { opacity: 0 }, { opacity: 1, duration: 0.03, ease: 'power1.out' }, 0.93);
-	tl.fromTo(outroLinkEl, { opacity: 0 }, { opacity: 1, duration: 0.03, ease: 'power1.out' }, 0.96);
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
 
     const pans = gsap.utils.toArray<HTMLElement>(
-      trackEl.querySelectorAll(".media__pan"),
+      projectsEl.querySelectorAll(".media__pan"),
     );
     const swapTimers = new Map<HTMLElement, number>();
     const swapped = new Set<HTMLElement>();
@@ -160,7 +99,7 @@
           primeVideo(pan, video);
         });
       },
-      { threshold: 0, rootMargin: "0px 40%" },
+      { threshold: 0, rootMargin: "40% 0px" },
     );
 
     const observer = new IntersectionObserver(
@@ -228,19 +167,174 @@
     );
     sectionObserver.observe(projectsEl);
 
+    if (reduceMotion) {
+      gsap.set([introLine1El, introLine2El], { y: "0%" });
+      gsap.set(introCursorEl, { opacity: 1 });
+      gsap.set([outroLine1El, outroLine2El], { y: "0%" });
+      gsap.set([outroListEl, outroLinkEl], { opacity: 1 });
+      gsap.set([".project__media", ".project__info"], {
+        opacity: 1,
+        xPercent: 0,
+      });
+
+      return () => {
+        swapTimers.forEach((id) => window.clearTimeout(id));
+        preloadObserver.disconnect();
+        observer.disconnect();
+        sectionObserver.disconnect();
+      };
+    }
+
+    const introTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: introEl,
+        start: "top 80%",
+        end: "bottom top",
+        toggleActions: "restart reverse restart reverse",
+      },
+    });
+    introTl
+      .fromTo(
+        introLine1El,
+        { y: "105%" },
+        { y: "0%", duration: 0.6, ease: "power2.out" },
+        0,
+      )
+      .fromTo(
+        introLine2El,
+        { y: "105%" },
+        { y: "0%", duration: 0.6, ease: "power2.out" },
+        0.15,
+      )
+      .fromTo(introCursorEl, { opacity: 0 }, { opacity: 1, ease: "none" }, 0.5);
+
+    const outroTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: outroEl,
+        start: "top 80%",
+        end: "bottom top",
+        toggleActions: "restart reverse restart reverse",
+      },
+    });
+    outroTl
+      .fromTo(
+        outroLine1El,
+        { y: "105%" },
+        { y: "0%", duration: 0.6, ease: "power2.out" },
+        0,
+      )
+      .fromTo(
+        outroLine2El,
+        { y: "105%" },
+        { y: "0%", duration: 0.6, ease: "power2.out" },
+        0.12,
+      )
+      .fromTo(
+        outroListEl,
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power1.out" },
+        0.35,
+      )
+      .fromTo(
+        outroLinkEl,
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power1.out" },
+        0.45,
+      );
+
+    const projectTriggers: ScrollTrigger[] = [];
+    const projectEls = gsap.utils.toArray<HTMLElement>(".project");
+    const isMobileLayout = window.matchMedia("(max-width: 900px)").matches;
+
+    projectEls.forEach((el) => {
+      const media = el.querySelector<HTMLElement>(".project__media");
+      const info = el.querySelector<HTMLElement>(".project__info");
+      if (!media || !info) return;
+
+      let leftEl: HTMLElement;
+      let rightEl: HTMLElement;
+
+      if (isMobileLayout) {
+        leftEl = media;
+        rightEl = info;
+      } else {
+        const isReversed = el.classList.contains("project--reverse");
+        leftEl = isReversed ? info : media;
+        rightEl = isReversed ? media : info;
+      }
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: el,
+          start: "top 85%",
+          end: "top 45%",
+          scrub: 0.6,
+        },
+      });
+
+      tl.fromTo(
+        leftEl,
+        { xPercent: -115, opacity: 0 },
+        { xPercent: 0, opacity: 1, ease: "none" },
+        0,
+      ).fromTo(
+        rightEl,
+        { xPercent: 115, opacity: 0 },
+        { xPercent: 0, opacity: 1, ease: "none" },
+        0,
+      );
+
+      if (tl.scrollTrigger) projectTriggers.push(tl.scrollTrigger);
+    });
+
+    const parallaxTriggers: ScrollTrigger[] = [];
+    pans.forEach((pan) => {
+      const layers = pan.querySelectorAll<HTMLElement>("img, video");
+      if (!layers.length) return;
+
+      const parallaxTween = gsap.fromTo(
+        layers,
+        { yPercent: -6 },
+        {
+          yPercent: 6,
+          ease: "none",
+          scrollTrigger: {
+            trigger: pan,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
+        },
+      );
+      if (parallaxTween.scrollTrigger)
+        parallaxTriggers.push(parallaxTween.scrollTrigger);
+    });
+
+    const indexTriggers = projectEls.map((el, i) =>
+      ScrollTrigger.create({
+        trigger: el,
+        start: "top center",
+        end: "bottom center",
+        onEnter: () => (activeIndex = i),
+        onEnterBack: () => (activeIndex = i),
+      }),
+    );
+
     registerCaseStudyClose(resumePreviews);
     registerTechModalClose(resumePreviews);
 
     return () => {
-      ScrollTrigger.removeEventListener("refreshInit", setSpacing);
       swapTimers.forEach((id) => window.clearTimeout(id));
       preloadObserver.disconnect();
       observer.disconnect();
       sectionObserver.disconnect();
       introTl.scrollTrigger?.kill();
       introTl.kill();
-      tl.scrollTrigger?.kill();
-      tl.kill();
+      outroTl.scrollTrigger?.kill();
+      outroTl.kill();
+      projectTriggers.forEach((st) => st.kill());
+      parallaxTriggers.forEach((st) => st.kill());
+      indexTriggers.forEach((st) => st.kill());
     };
   });
 </script>
@@ -260,242 +354,255 @@
     </div>
   </div>
 
-  <div class="projects__viewport" bind:this={viewportEl} data-cursor-text="DRAG">
-    <ul class="projects__track" bind:this={trackEl}>
-      <li class="projects__card projects__card--intro">
-        <span class="projects__dots" aria-hidden="true">
-          {#each dots as _}<i></i>{/each}
-        </span>
-        <div class="intro__content" bind:this={introContentEl}>
-          <h2 class="intro__heading">
-            <span class="line-mask"
-              ><span class="line" bind:this={introLine1El}>FEATURED</span></span
-            >
-            <span class="line-mask"
-              ><span class="line" bind:this={introLine2El}
-                >PROJECTS<span class="cursor" bind:this={introCursorEl}>_</span
-                ></span
-              ></span
-            >
-          </h2>
-          <span class="intro__scroll">
-            SCROLL TO EXPLORE
-            <svg viewBox="0 0 24 24" aria-hidden="true"
-              ><path d="M4 12h16m0 0-6-6m6 6-6 6" /></svg
-            >
-          </span>
-        </div>
-      </li>
-      {#each projects as project, i}
-        <li class="projects__card">
-          <div class="card__media">
-            <div class="media__pan">
-              <img
-                class="media__img"
-                src={project.thumb}
-                alt="{project.title} preview"
-                loading="lazy"
-                decoding="async"
-                draggable="false"
-              />
-              {#if project.video}
-                <video
-                  class="media__video"
-                  muted
-                  loop
-                  playsinline
-                  preload="metadata"
-                  aria-hidden="true"
-                  tabindex="-1"
-                >
-                  <source src="{project.video}.webm" type="video/webm" />
-                  <source src="{project.video}.mp4" type="video/mp4" />
-                </video>
-              {/if}
-            </div>
-          </div>
-          <div class="card__info">
-            <div class="card__row">
-              <span class="card__index">{project.index}</span>
-              <h3 class="card__title">{project.title}</h3>
-            </div>
-            <p class="card__tag">{project.tag}</p>
-            {#if project.metrics?.length}
-              <ul class="card__metrics">
-                {#each project.metrics as metric}
-                  <li>{metric}</li>
-                {/each}
-              </ul>
+  <div class="projects__intro" bind:this={introEl}>
+    <span class="projects__dots" aria-hidden="true">
+      {#each dots as _}<i></i>{/each}
+    </span>
+    <div class="intro__content">
+      <h2 class="intro__heading">
+        <span class="line-mask"
+          ><span class="line" bind:this={introLine1El}>FEATURED</span></span
+        >
+        <span class="line-mask"
+          ><span class="line" bind:this={introLine2El}
+            >PROJECTS<span class="cursor" bind:this={introCursorEl}>_</span
+            ></span
+          ></span
+        >
+      </h2>
+      <span class="intro__scroll">
+        SCROLL TO EXPLORE
+        <svg viewBox="0 0 24 24" aria-hidden="true"
+          ><path d="M4 12h16m0 0-6-6m6 6-6 6" /></svg
+        >
+      </span>
+    </div>
+  </div>
+
+  <ul class="projects__list">
+    {#each projects as project, i}
+      <li class="project" class:project--reverse={i % 2 === 1}>
+        <div class="project__media">
+          <div class="media__pan">
+            <img
+              class="media__img"
+              src={project.thumb}
+              alt="{project.title} preview"
+              loading="lazy"
+              decoding="async"
+              draggable="false"
+            />
+            {#if project.video}
+              <video
+                class="media__video"
+                muted
+                loop
+                playsinline
+                preload="metadata"
+                aria-hidden="true"
+                tabindex="-1"
+              >
+                <source src="{project.video}.webm" type="video/webm" />
+                <source src="{project.video}.mp4" type="video/mp4" />
+              </video>
             {/if}
-            <p class="card__desc">{project.desc}</p>
-            <div class="card__tech">
-              <span class="tech__label">STACK</span>
-              <ul class="tech__list">
-                {#if project.techPreview && project.techGroups}
-                  {#each project.techPreview as tech}
-                    <li style={tech.icon ? `--tech-color: ${tech.icon.hex}` : ""}>
-                      {#if tech.icon}
-                        <svg
-                          class="tech-icon"
-                          viewBox="0 0 24 24"
-                          aria-hidden="true"
-                          ><path d={tech.icon.path} fill-rule="evenodd" /></svg
-                        >
-                      {/if}
-                      <span>{tech.name}</span>
-                    </li>
-                  {/each}
-                  {#if techTotalCount(project) > project.techPreview.length}
-                    <!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
-                    <li
-                      class="tech__more"
-                      role="button"
-                      tabindex="0"
-                      onclick={() => {
+          </div>
+        </div>
+        <div class="project__info">
+          <div class="project__index-row">
+            <span class="project__index">{project.index}</span>
+            <h3 class="project__title">{project.title}</h3>
+          </div>
+          <span class="project__rule" aria-hidden="true"></span>
+          <p class="project__tag">{project.tag}</p>
+          {#if project.metrics?.length}
+            <ul class="project__metrics">
+              {#each project.metrics as metric}
+                <li>{metric}</li>
+              {/each}
+            </ul>
+          {/if}
+          <p class="project__desc">{project.desc}</p>
+          <div class="project__tech">
+            <span class="tech__label">STACK</span>
+            <ul class="tech__list">
+              {#if project.techPreview && project.techGroups}
+                {#each project.techPreview as tech}
+                  <li style={tech.icon ? `--tech-color: ${tech.icon.hex}` : ""}>
+                    {#if tech.icon}
+                      <svg
+                        class="tech-icon"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        ><path d={tech.icon.path} fill-rule="evenodd" /></svg
+                      >
+                    {/if}
+                    <span>{tech.name}</span>
+                  </li>
+                {/each}
+                {#if techTotalCount(project) > project.techPreview.length}
+                  <!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
+                  <li
+                    class="tech__more"
+                    role="button"
+                    tabindex="0"
+                    onclick={() => {
+                      pausePreviews();
+                      openTechModal(project);
+                    }}
+                    onkeydown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
                         pausePreviews();
                         openTechModal(project);
-                      }}
-                      onkeydown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          pausePreviews();
-                          openTechModal(project);
-                        }
-                      }}
-                    >
-                      <span>+{techTotalCount(project) - project.techPreview.length} MORE</span>
-                    </li>
-                  {/if}
-                {/if}
-              </ul>
-            </div>
-            <div class="card__actions">
-              {#if project.caseStudy}
-                <div class="card__actions-left">
-                  <button
-                    type="button"
-                    class="card__btn card__btn--case"
-                    onclick={() => {
-                        pausePreviews();
-                        openCaseStudyModal(project);
-                      }}
-                    data-cursor-text="READ"
+                      }
+                    }}
                   >
-                    <span>Case Study</span>
-                    <svg viewBox="0 0 24 24" aria-hidden="true"
-                      ><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path
-                        d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg
+                    <span
+                      >+{techTotalCount(project) - project.techPreview.length}
+                      MORE</span
                     >
-                  </button>
-                </div>
+                  </li>
+                {/if}
               {/if}
-              <div class="card__actions-right">
-                {#if project.demo}
-                  <a
-                    class="card__btn card__btn--demo"
-                    href={project.demo}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={project.demoLabel ?? 'Live Demo'}
-                  >
-                    <span>{project.demoLabel ?? 'Live Demo'}</span>
-                    <svg viewBox="0 0 24 24" aria-hidden="true"
-                      ><path d="M7 17 17 7M8 7h9v9" /></svg
-                    >
-                  </a>
-                {/if}
-                {#if project.npm}
-                  <a
-                    class="card__btn card__btn--npm"
-                    href={project.npm}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="NPM Package"
-                  >
-                    <svg class="card__btn-npm" viewBox="0 0 24 24" aria-hidden="true"
-                      ><path d="M1.763 0C.786 0 0 .786 0 1.763v20.474C0 23.214.786 24 1.763 24h20.474c.977 0 1.763-.786 1.763-1.763V1.763C24 .786 23.214 0 22.237 0zM5.13 5.323l13.837.019-.009 13.836h-3.464l.01-10.382h-3.456L12.04 19.17H5.113z" /></svg
-                    >
-                    <span>NPM</span>
-                  </a>
-                {/if}
-                <a
-                  class="card__btn card__btn--repo"
-                  href={project.repo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Repository"
-                >
-                <svg class="card__btn-gh" viewBox="0 0 24 24" aria-hidden="true"
-                  ><path
-                    d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.63.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.36 1.12 2.94.85.09-.67.35-1.12.63-1.38-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.28 2.75 1.05a9.36 9.36 0 0 1 5.01 0c1.9-1.33 2.74-1.05 2.74-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.6.69.49A10.26 10.26 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z"
-                  /></svg
-                >
-                <span>Repository</span>
-              </a>
-              </div>
-            </div>
-          </div>
-        </li>
-      {/each}
-
-      <li class="projects__card projects__card--outro">
-        <div class="outro__content" bind:this={outroContentEl}>
-          <h2 class="outro__heading">
-            <span class="line-mask"
-              ><span class="line" bind:this={outroLine1El}>THAT'S THE</span
-              ></span
-            >
-            <span class="line-mask"
-              ><span class="line" bind:this={outroLine2El}>HIGHLIGHT REEL</span
-              ></span
-            >
-          </h2>
-          <div class="outro__list-group" bind:this={outroListEl}>
-            <span class="outro__list-label">Other Projects:</span>
-            <ul class="outro__list">
-              <li>
-                <a href="https://github.com/itsflaid/mynime" target="_blank" rel="noopener noreferrer"
-                  >MyNime <span>· Vue</span></a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://github.com/itsflaid/techgear-store-v2"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >TechGear Store <span>· PHP</span></a
-                >
-              </li>
-              <li>
-                <a
-                  href="https://github.com/itsflaid/gamefy-topup"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >Topup Games <span>· Laravel</span></a
-                >
-              </li>
-              <li>
-                <a href="https://github.com/itsflaid/portfolio" target="_blank" rel="noopener noreferrer"
-                  >This Portfolio <span>· SvelteKit</span></a
-                >
-              </li>
             </ul>
           </div>
-          <a
-            class="outro__link"
-            href="https://github.com/Mufacoderz"
-            target="_blank"
-            rel="noopener noreferrer"
-            bind:this={outroLinkEl}
-          >
-            MORE ON GITHUB
-            <svg viewBox="0 0 24 24" aria-hidden="true"
-              ><path d="M7 17 17 7M17 7H9m8 0v8" /></svg
-            >
-          </a>
+          <div class="project__actions">
+            {#if project.caseStudy}
+              <div class="project__actions-left">
+                <button
+                  type="button"
+                  class="project__btn project__btn--case"
+                  onclick={() => {
+                    pausePreviews();
+                    openCaseStudyModal(project);
+                  }}
+                  data-cursor-text="READ"
+                >
+                  <span>Case Study</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"
+                    ><path
+                      d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"
+                    /><path
+                      d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"
+                    /></svg
+                  >
+                </button>
+              </div>
+            {/if}
+            <div class="project__actions-right">
+              {#if project.demo}
+                <a
+                  class="project__btn project__btn--demo"
+                  href={project.demo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={project.demoLabel ?? "Live Demo"}
+                >
+                  <span>{project.demoLabel ?? "Live Demo"}</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"
+                    ><path d="M7 17 17 7M8 7h9v9" /></svg
+                  >
+                </a>
+              {/if}
+              {#if project.npm}
+                <a
+                  class="project__btn project__btn--npm"
+                  href={project.npm}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="NPM Package"
+                >
+                  <svg
+                    class="project__btn-npm"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    ><path
+                      d="M1.763 0C.786 0 0 .786 0 1.763v20.474C0 23.214.786 24 1.763 24h20.474c.977 0 1.763-.786 1.763-1.763V1.763C24 .786 23.214 0 22.237 0zM5.13 5.323l13.837.019-.009 13.836h-3.464l.01-10.382h-3.456L12.04 19.17H5.113z" /></svg
+                  >
+                  <span>NPM</span>
+                </a>
+              {/if}
+              <a
+                class="project__btn project__btn--repo"
+                href={project.repo}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Repository"
+              >
+                <svg
+                  class="project__btn-gh"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  ><path
+                    d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.63.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.36 1.12 2.94.85.09-.67.35-1.12.63-1.38-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.28 2.75 1.05a9.36 9.36 0 0 1 5.01 0c1.9-1.33 2.74-1.05 2.74-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.6.69.49A10.26 10.26 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z"
+                /></svg
+              >
+                <span>Repository</span>
+              </a>
+            </div>
+          </div>
         </div>
       </li>
-    </ul>
+    {/each}
+  </ul>
+
+  <div class="projects__outro" bind:this={outroEl}>
+    <div class="outro__content">
+      <h2 class="outro__heading">
+        <span class="line-mask"
+          ><span class="line" bind:this={outroLine1El}>THAT'S THE</span></span
+        >
+        <span class="line-mask"
+          ><span class="line" bind:this={outroLine2El}>HIGHLIGHT REEL</span></span
+        >
+      </h2>
+      <div class="outro__list-group" bind:this={outroListEl}>
+        <span class="outro__list-label">Other Projects:</span>
+        <ul class="outro__list">
+          <li>
+            
+              <a href="https://github.com/itsflaid/mynime"
+              target="_blank"
+              rel="noopener noreferrer">MyNime <span>· Vue</span></a
+            >
+          </li>
+          <li>
+            
+              <a href="https://github.com/itsflaid/techgear-store-v2"
+              target="_blank"
+              rel="noopener noreferrer">TechGear Store <span>· PHP</span></a
+            >
+          </li>
+          <li>
+            
+              <a href="https://github.com/itsflaid/gamefy-topup"
+              target="_blank"
+              rel="noopener noreferrer">Topup Games <span>· Laravel</span></a
+            >
+          </li>
+          <li>
+            
+              <a href="https://github.com/itsflaid/portfolio"
+              target="_blank"
+              rel="noopener noreferrer">This Portfolio <span>· SvelteKit</span></a
+            >
+          </li>
+        </ul>
+      </div>
+      <a 
+        class="outro__link"
+        href="https://github.com/Mufacoderz"
+        target="_blank"
+        rel="noopener noreferrer"
+        bind:this={outroLinkEl}
+      >
+        MORE ON GITHUB
+        <svg viewBox="0 0 24 24" aria-hidden="true"
+          ><path d="M7 17 17 7M17 7H9m8 0v8" /></svg
+        >
+      </a>
+    </div>
   </div>
 </section>
 
@@ -522,6 +629,37 @@
     user-select: none;
     pointer-events: none;
   }
+
+  .projects__head {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin: 0 clamp(1.5rem, 5vw, 4rem);
+    padding-bottom: clamp(1.5rem, 3.2vh, 2rem);
+    border-bottom: 1px solid rgba(10, 10, 10, 0.14);
+  }
+  .projects__eyebrow,
+  .projects__count {
+    font-family: var(--ff-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    color: var(--gray);
+  }
+  .projects__head-right {
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .projects__intro {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(4rem, 10vh, 7rem) 1.5rem;
+  }
   .projects__dots {
     position: absolute;
     top: clamp(1.5rem, 4vw, 3rem);
@@ -542,43 +680,15 @@
     opacity: 0.1;
     animation: projects-dot-blink 3s ease-in-out infinite;
   }
-  .projects__dots i:nth-child(2) {
-    animation-delay: 0.3s;
-  }
-  .projects__dots i:nth-child(3) {
-    animation-delay: 0.6s;
-  }
-  .projects__dots i:nth-child(4) {
-    animation-delay: 0.9s;
-  }
-  .projects__dots i:nth-child(5) {
-    animation-delay: 1.2s;
-  }
-  .projects__dots i:nth-child(6) {
-    animation-delay: 1.5s;
-  }
-  .projects__dots i:nth-child(7) {
-    animation-delay: 1.8s;
-  }
-  .projects__dots i:nth-child(8) {
-    animation-delay: 2.1s;
-  }
-  .projects__dots i:nth-child(9) {
-    animation-delay: 2.4s;
-  }
+  .projects__dots i:nth-child(2) { animation-delay: 0.3s; }
+  .projects__dots i:nth-child(3) { animation-delay: 0.6s; }
+  .projects__dots i:nth-child(4) { animation-delay: 0.9s; }
+  .projects__dots i:nth-child(5) { animation-delay: 1.2s; }
+  .projects__dots i:nth-child(6) { animation-delay: 1.5s; }
+  .projects__dots i:nth-child(7) { animation-delay: 1.8s; }
+  .projects__dots i:nth-child(8) { animation-delay: 2.1s; }
+  .projects__dots i:nth-child(9) { animation-delay: 2.4s; }
 
-  .projects__card.projects__card--intro,
-  .projects__card.projects__card--outro {
-    position: relative;
-    flex: 0 0 auto;
-    width: 100vw;
-    max-width: 100vw;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    color: var(--black);
-  }
   .intro__content,
   .outro__content {
     position: relative;
@@ -644,9 +754,7 @@
     text-decoration: none;
     transition: opacity 0.2s ease;
   }
-  .outro__list li a:hover {
-    opacity: 0.6;
-  }
+  .outro__list li a:hover { opacity: 0.6; }
   .outro__link {
     display: inline-flex;
     align-items: center;
@@ -661,9 +769,7 @@
     padding-bottom: 0.15rem;
     transition: opacity 0.2s ease;
   }
-  .outro__link:hover {
-    opacity: 0.6;
-  }
+  .outro__link:hover { opacity: 0.6; }
   .outro__link svg {
     width: 13px;
     height: 13px;
@@ -671,14 +777,8 @@
     stroke: currentColor;
     stroke-width: 2;
   }
-  .line-mask {
-    display: block;
-    overflow: hidden;
-  }
-  .line {
-    display: block;
-    transform: translateY(105%);
-  }
+  .line-mask { display: block; overflow: hidden; }
+  .line { display: block; transform: translateY(105%); }
   .cursor {
     display: inline-block;
     font-family: var(--ff-mono);
@@ -704,155 +804,115 @@
     animation: intro-scroll-bounce 1.6s ease-in-out infinite;
   }
   @keyframes intro-scroll-bounce {
-    0%,
-    100% {
-      transform: translateX(0);
-      opacity: 0.6;
-    }
-    50% {
-      transform: translateX(5px);
-      opacity: 1;
-    }
+    0%, 100% { transform: translateX(0); opacity: 0.6; }
+    50%      { transform: translateX(5px); opacity: 1; }
   }
   @keyframes projects-blink {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0;
-    }
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0; }
   }
-  .projects__head {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin: 0 clamp(1.5rem, 5vw, 4rem);
-    padding-bottom: clamp(1.5rem, 3.2vh, 2rem);
-    border-bottom: 1px solid rgba(10, 10, 10, 0.14);
-  }
-  .projects__eyebrow,
-  .projects__count {
-    font-family: var(--ff-mono);
-    font-size: 0.8rem;
-    letter-spacing: 0.08em;
-    color: var(--gray);
-  }
-  .projects__head-right {
-    display: flex;
-    align-items: center;
-    gap: clamp(1rem, 2vw, 1.5rem);
-  }
-  .projects__viewport {
-    position: relative;
-    z-index: 1;
-    overflow: hidden;
-    flex: 1;
-    display: flex;
-    align-items: center;
-    padding: 0;
-  }
-  .projects__track {
+
+  .projects__list {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
-    align-items: stretch;
-    gap: clamp(1.5rem, 4vw, 6rem);
-    width: max-content;
-    will-change: transform;
+    flex-direction: column;
+    gap: clamp(4rem, 10vh, 8rem);
   }
-  .projects__card {
-    flex: 0 0 auto;
-    width: clamp(85vw, 88vw, 1200px);
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: clamp(2rem, 4vw, 4rem);
-  }
-  .card__media {
+
+  .project {
     position: relative;
-    flex: 0 0 52%;
-    min-width: 0;
-    aspect-ratio: 4 / 3;
-    max-height: clamp(320px, 60vh, 720px);
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: clamp(2rem, 4vw, 4rem);
+    align-items: center;
+    margin-inline: clamp(1.5rem, 5vw, 4rem);
+    padding-block: clamp(2rem, 6vh, 4rem);
+  }
+  .project__media { order: 1; }
+  .project__info { order: 2; }
+  .project--reverse .project__media { order: 2; }
+  .project--reverse .project__info { order: 1; }
+
+  .project__media {
+    position: relative;
+    aspect-ratio: 16 / 10;
     overflow: hidden;
     background: var(--accent-ph);
     box-shadow: 0 24px 48px rgba(10, 10, 10, 0.1);
-    transition: transform 0.6s cubic-bezier(0.2, 0.6, 0.2, 1);
+    will-change: transform, opacity;
   }
   .media__pan {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     overflow: hidden;
   }
   .media__pan img,
   .media__pan video {
     display: block;
     position: absolute;
-    top: 0;
+    top: -15%;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 130%;
     object-fit: cover;
     object-position: center;
   }
-  .media__pan img {
-    transition: opacity 0.6s ease;
-  }
+  .media__pan img { transition: opacity 0.6s ease; }
   .media__pan video {
     object-fit: cover;
     background: #000;
     opacity: 0;
     transition: opacity 0.6s ease;
   }
-  :global(.media__pan.is-video) .media__img {
-    opacity: 0;
-  }
-  :global(.media__pan.is-video) .media__video {
-    opacity: 1;
-  }
+  :global(.media__pan.is-video) .media__img { opacity: 0; }
+  :global(.media__pan.is-video) .media__video { opacity: 1; }
 
-  .projects__card:hover .card__media {
-    transform: scale(1.02);
-  }
-  .card__info {
+  .project:hover .project__media { transform: scale(1.02); }
+
+  .project__info {
     display: flex;
     flex-direction: column;
     gap: clamp(0.5rem, 1.2vh, 0.85rem);
-    flex: 1 1 auto;
     min-width: 0;
+    will-change: transform, opacity;
   }
-  .card__row {
+  .project__index-row {
     display: flex;
     align-items: baseline;
     gap: clamp(0.9rem, 2vw, 1.5rem);
   }
-  .card__index {
+  .project__index {
     font-family: var(--ff-mono);
     font-size: 0.85rem;
     color: var(--gray);
   }
-  .card__title {
+  .project__title {
+    margin: 0;
     font-family: var(--ff-display);
     font-weight: 400;
     letter-spacing: 0.005em;
-    font-size: clamp(1.35rem, 2vw, 1.9rem);
+    font-size: clamp(2rem, 3vw, 3.2rem);
     line-height: 1;
   }
-  .card__tag {
+  .project__rule {
+    display: block;
+    height: 1px;
+    width: 100%;
+    background: rgba(10, 10, 10, 0.14);
+    transform-origin: left;
+    margin: 0.6rem 0;
+  }
+  .project__tag {
+    margin: 0;
     font-family: var(--ff-body);
     font-size: clamp(0.78rem, 0.95vw, 0.9rem);
     color: var(--ink-soft);
     opacity: 0.75;
     max-width: 42ch;
   }
-  .card__metrics {
+  .project__metrics {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -860,7 +920,7 @@
     flex-wrap: wrap;
     gap: 0.5rem;
   }
-  .card__metrics li {
+  .project__metrics li {
     font-family: var(--ff-mono);
     font-size: 0.65rem;
     letter-spacing: 0.04em;
@@ -870,14 +930,15 @@
     padding: 0.3rem 0.7rem;
     white-space: nowrap;
   }
-  .card__desc {
+  .project__desc {
+    margin: 0;
     font-family: var(--ff-body);
     font-size: clamp(0.82rem, 1vw, 0.95rem);
     line-height: 1.55;
     color: var(--gray);
     max-width: 52ch;
   }
-  .card__tech {
+  .project__tech {
     display: flex;
     align-items: center;
     gap: clamp(0.9rem, 2vw, 1.5rem);
@@ -940,23 +1001,22 @@
     height: 0.85em;
     color: inherit;
   }
-  .tech-icon path {
-    fill: currentColor;
-  }
-  .card__actions {
+  .tech-icon path { fill: currentColor; }
+
+  .project__actions {
     display: flex;
     flex-wrap: wrap;
     gap: clamp(0.6rem, 1.2vw, 0.9rem);
     margin-top: clamp(0.9rem, 2vh, 1.25rem);
   }
-  .card__actions-left,
-  .card__actions-right {
+  .project__actions-left,
+  .project__actions-right {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: clamp(0.6rem, 1.2vw, 0.9rem);
   }
-  .card__btn {
+  .project__btn {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -973,7 +1033,7 @@
       color 0.3s ease,
       border-color 0.3s ease;
   }
-  .card__btn svg {
+  .project__btn svg {
     width: 14px;
     height: 14px;
     fill: none;
@@ -982,38 +1042,33 @@
     stroke-linecap: round;
     stroke-linejoin: round;
   }
-  .card__btn--case {
-    background: var(--black);
-    color: var(--white);
-  }
-  .card__btn--case:hover {
-    background: var(--accent-ph);
-  }
-  .card__btn--demo {
+  .project__btn--case { background: var(--black); color: var(--white); }
+  .project__btn--case:hover { background: var(--accent-ph); }
+  .project__btn--demo {
     background: transparent;
     color: var(--black);
     border: 1px solid rgba(10, 10, 10, 0.3);
   }
-  .card__btn--demo:hover {
+  .project__btn--demo:hover {
     background: var(--black);
     color: var(--white);
     border-color: var(--black);
   }
-  .card__btn--npm {
+  .project__btn--npm {
     background: transparent;
     color: var(--black);
     border: 1px solid rgba(10, 10, 10, 0.3);
   }
-  .card__btn--npm .card__btn-npm {
+  .project__btn--npm .project__btn-npm {
     fill: currentColor;
     stroke: none;
   }
-  .card__btn--npm:hover {
+  .project__btn--npm:hover {
     background: var(--black);
     color: var(--white);
     border-color: var(--black);
   }
-  .card__btn--repo {
+  .project__btn--repo {
     background: transparent;
     color: var(--black);
     border: 0;
@@ -1022,138 +1077,110 @@
     padding-left: 0;
     padding-right: 0;
   }
-  .card__btn--repo .card__btn-gh {
+  .project__btn--repo .project__btn-gh {
     fill: currentColor;
     stroke: none;
   }
-  .card__btn--repo:hover {
+  .project__btn--repo:hover {
     border-bottom-color: var(--black);
     background: none;
   }
-  .card__btn:hover {
-    transform: translateY(-2px);
+  .project__btn:hover { transform: translateY(-2px); }
+
+  .projects__outro {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(4rem, 10vh, 7rem) 1.5rem;
   }
 
   @keyframes projects-dot-blink {
-    0%,
-    100% {
-      opacity: 0.06;
+    0%, 100% { opacity: 0.06; }
+    50%      { opacity: 0.32; }
+  }
+
+  /* Desktop-only: teks rata kanan saat media di sisi kanan (reversed).
+     Dikunci min-width: 901px supaya tidak pernah bocor ke layout mobile. */
+  @media (min-width: 901px) {
+    .project--reverse .project__info {
+      align-items: flex-end;
+      text-align: right;
     }
-    50% {
-      opacity: 0.32;
+    .project--reverse .project__actions {
+      justify-content: flex-end;
     }
   }
 
+  /* ---- Mobile: layout tetap seperti versi pre-redesign, tidak diubah. ---- */
   @media (max-width: 900px) {
     .projects {
       padding-top: clamp(2.5rem, 6vh, 4rem);
     }
-
     .projects__head {
       margin: 0 1.25rem;
       padding-bottom: 0.85rem;
     }
+    .projects__dots { display: none; }
+    .projects__head-right { gap: 0.5rem; }
 
-    .projects__dots {
-      display: none;
-    }
-
-    .projects__head-right {
-      gap: 0.5rem;
-    }
-
-    .projects__card {
-      flex-direction: column;
-      align-items: stretch;
-      width: 92vw;
+    .project {
+      grid-template-columns: 1fr;
+      margin-inline: 1.25rem;
       gap: clamp(1.25rem, 3vh, 2rem);
     }
-    .card__media {
-      flex: 0 0 auto;
-      width: 100%;
+    .project__media,
+    .project--reverse .project__media {
+      order: 0;
       max-height: clamp(180px, 32vh, 300px);
+    }
+    .project__info,
+    .project--reverse .project__info {
+      order: 1;
+      margin-top: 30px;
     }
   }
 
   @media (max-width: 640px) {
-    .card__actions {
+    .project__actions {
       flex-wrap: nowrap;
       gap: 0.5rem;
     }
-    .card__actions-left,
-    .card__actions-right {
+    .project__actions-left,
+    .project__actions-right {
       flex: 1 1 0%;
       gap: 0.5rem;
     }
-    .card__btn {
+    .project__btn {
       flex: 1 1 0%;
       justify-content: center;
       padding: 0.6rem;
     }
-    .card__btn--case {
+    .project__btn--case {
       width: 100%;
       padding: 0.6rem 0.9rem;
     }
-    .card__btn--demo span,
-    .card__btn--npm span,
-    .card__btn--repo span {
+    .project__btn--demo span,
+    .project__btn--npm span,
+    .project__btn--repo span {
       display: none;
     }
-    .card__btn--repo {
-      border: 1px solid rgba(10, 10, 10, 0.3);
-      border-radius: 0;
-      padding-left: 0.6rem;
-      padding-right: 0.6rem;
+    .project__btn--demo,
+    .project__btn--npm,
+    .project__btn--repo {
+      border: 0;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .projects__dots i {
-      animation: none;
-    }
-    .card__media {
-      transition: none;
-    }
-    .media__pan video {
-      display: none;
-    }
-    .intro__scroll svg {
-      animation: none;
-    }
-    .cursor {
-      animation: none;
-    }
-
-    .projects__viewport {
-      overflow: visible;
-      align-items: flex-start;
-    }
-    .projects__track {
-      flex-direction: column;
-      width: auto;
-      padding: 0;
-      gap: clamp(1.5rem, 4vh, 3rem);
-    }
-    .projects__card,
-    .projects__card.projects__card--intro,
-    .projects__card.projects__card--outro {
-      width: 92vw;
-      max-width: 92vw;
-      margin: 0 auto;
-    }
-    .projects__card:not(.projects__card--intro):not(.projects__card--outro) {
-      flex-direction: column;
-      align-items: stretch;
-      gap: clamp(1.25rem, 3vh, 2rem);
-    }
-    .projects__card--intro,
-    .projects__card--outro {
-      padding: clamp(3rem, 8vh, 5rem) 1.5rem;
-    }
-    .card__media {
-      flex: 0 0 auto;
-      width: 100%;
-      max-height: clamp(180px, 32vh, 300px);
+    .projects__dots i { animation: none; }
+    .media__pan video { display: none; }
+    .intro__scroll svg { animation: none; }
+    .cursor { animation: none; }
+    .project__media,
+    .project__info {
+      transform: none !important;
+      opacity: 1 !important;
     }
   }
 </style>
