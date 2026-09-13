@@ -89,6 +89,17 @@
       video.load();
     };
 
+    let activeVideoPan: HTMLElement | null = null;
+
+    const playPanVideo = (pan: HTMLElement, video: HTMLVideoElement) => {
+      if (activeVideoPan && activeVideoPan !== pan) {
+        activeVideoPan.querySelector<HTMLVideoElement>("video")?.pause();
+      }
+      activeVideoPan = pan;
+      pan.classList.add("is-video");
+      video.play().catch(() => {});
+    };
+
     const preloadObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -119,16 +130,15 @@
                   return;
                 }
                 swapTimers.delete(pan);
-                pan.classList.add("is-video");
-                video.play().catch(() => {});
+                playPanVideo(pan, video);
               }, VIDEO_SWAP_DELAY);
               swapTimers.set(pan, id);
             } else {
-              pan.classList.add("is-video");
-              video.play().catch(() => {});
+              playPanVideo(pan, video);
             }
           } else {
             video.pause();
+            if (activeVideoPan === pan) activeVideoPan = null;
             if (swapTimers.has(pan)) {
               clearSwapTimer(pan);
               swapped.delete(pan);
@@ -1165,11 +1175,7 @@
     .project__btn--repo span {
       display: none;
     }
-    .project__btn--demo,
-    .project__btn--npm,
-    .project__btn--repo {
-      border: 0;
-    }
+    
   }
 
   @media (prefers-reduced-motion: reduce) {

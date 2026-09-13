@@ -35,15 +35,27 @@
 		}
 
 		lenis = new Lenis({
-			duration: 1.1,
-			easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+			lerp: 0.085,
+			wheelMultiplier: 0.9
 		});
 		setLenis(lenis);
 
 		lenis.on('scroll', ScrollTrigger.update);
 
+		// Batas waktu (ms) maksimum yang boleh "dilihat" Lenis dalam satu tick.
+		// Kalau main thread stall lebih lama dari ini, kelebihannya dibuang,
+		// bukan diteruskan ke Lenis — animasi cuma lanjut normal begitu frame
+		// jalan lagi, bukan "bayar utang" loncat jauh sekaligus.
+		const MAX_RAF_STEP_MS = 50;
+		let virtualTime = 0;
+		let lastRealTime = 0;
+
 		const raf = (time: number) => {
-			lenis?.raf(time * 1000);
+			const realTime = time * 1000;
+			const rawDelta = lastRealTime === 0 ? 0 : realTime - lastRealTime;
+			lastRealTime = realTime;
+			virtualTime += Math.min(rawDelta, MAX_RAF_STEP_MS);
+			lenis?.raf(virtualTime);
 		};
 		gsap.ticker.add(raf);
 		gsap.ticker.lagSmoothing(0);
