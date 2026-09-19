@@ -23,7 +23,12 @@ import {
 	siGreensock,
 	siLivewire,
 	siBootstrap,
-	siNeon
+	siNeon,
+	siSvelte,
+	siDrizzle,
+	siBetterauth,
+	siChartdotjs,
+	siCloudflarepages
 } from 'simple-icons';
 import type { SimpleIcon } from 'simple-icons';
 import { groqIcon, inertiaIcon, nextAuthIcon, si } from './icons';
@@ -385,6 +390,56 @@ export const projects: Project[] = [
 	},
 	{
 		index: '07',
+		title: 'KATALYST',
+		tag: 'Pricing simulator with business copilot',
+
+		thumb: '/preview/image/katalyst.webp',
+		video: '/preview/video/katalyst',
+		desc: 'Business decision-support platform that helps UMKM owners analyze performance and simulate pricing decisions.',
+		techPreview: [
+			{ name: 'SvelteKit', icon: si(siSvelte) },
+			{ name: 'Drizzle', icon: si(siDrizzle) },
+			{ name: 'Better Auth', icon: si(siBetterauth) }
+		],
+		techGroups: [
+			{
+				label: 'FRAMEWORK & UI',
+				items: [
+					{ name: 'SvelteKit', icon: si(siSvelte) },
+					{ name: 'Tailwind CSS', icon: si(siTailwindcss) },
+					{ name: 'Chart.js', icon: si(siChartdotjs) }
+				]
+			},
+			{
+				label: 'DATABASE & AUTH',
+				items: [
+					{ name: 'Better Auth', icon: si(siBetterauth) },
+					{ name: 'Drizzle ORM', icon: si(siDrizzle) },
+					{ name: 'PostgreSQL', icon: si(siPostgresql) },
+					{ name: 'Neon', icon: si(siNeon) }
+				]
+			},
+			{
+				label: 'DEPLOY',
+				items: [{ name: 'Cloudflare Pages', icon: si(siCloudflarepages) }]
+			}
+		],
+
+		repo: 'https://github.com/itsflaid/katalyst',
+		demo: 'https://katalyst-6pk.pages.dev/',
+		caseStudy: {
+			problem: {
+				en: 'lorem ipsum',
+				id: 'lorem ipsum'
+			},
+			solution: {
+				en: 'lorem ipsum',
+				id: 'lorem ipsum'
+			}
+		}
+	},
+	{
+		index: '08',
 		title: 'KASBON.IN',
 		tag: 'Real-time Shared Ledger System for a family-run store',
 

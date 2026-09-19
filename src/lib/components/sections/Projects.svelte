@@ -304,9 +304,9 @@
 
       const parallaxTween = gsap.fromTo(
         layers,
-        { yPercent: -6 },
+        { yPercent: -4 },
         {
-          yPercent: 6,
+          yPercent: 4,
           ease: "none",
           scrollTrigger: {
             trigger: pan,
@@ -862,10 +862,10 @@
   .media__pan video {
     display: block;
     position: absolute;
-    top: -15%;
+    top: -10%;
     left: 0;
     width: 100%;
-    height: 130%;
+    height: 120%;
     object-fit: cover;
     object-position: center;
   }
