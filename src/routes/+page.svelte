@@ -24,7 +24,7 @@ const personLd = {
 	"@context": "https://schema.org",
 	"@type": "Person",
 	name: SITE.name,
-	alternateName: ["Flaid", "itsflaid", "mufacoderz"],
+	alternateName: ["Flaid", "itsflaid"],
 	jobTitle: "Fullstack Developer",
 	url: SITE.url,
 	email: `mailto:${SITE.email}`,

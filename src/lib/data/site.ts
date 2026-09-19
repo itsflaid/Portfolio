@@ -33,5 +33,4 @@ export const sameAs: string[] = [
 	SITE.instagram,
 	SITE.npm,
 	SITE.tiktok,
-	'https://github.com/mufacoderz',
 ];

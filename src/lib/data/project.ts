@@ -50,7 +50,11 @@ export type CaseStudyContent = {
 };
 
 export type Project = {
+	slug: string;
 	index: string;
+	order: number;
+	featured: boolean;
+	featuredOrder?: number;
 	title: string;
 	tag: string;
 	thumb: string;
@@ -68,7 +72,11 @@ export type Project = {
 
 export const projects: Project[] = [
 	{
+		slug: 'devmap',
 		index: '01',
+		order: 1,
+		featured: true,
+		featuredOrder: 1,
 		title: 'DEVMAP',
 		tag: 'Analyze once, reuse context everywhere',
 		thumb: '/preview/image/devmap.webp',
@@ -105,8 +113,8 @@ export const projects: Project[] = [
 		repo: 'https://github.com/itsflaid/devmap',
 		caseStudy: {
 			problem: {
-				en: 'While working on DevNote (Project 2), I found that my use of AI in the development process became increasingly intensive as the project grew more complex. As a result, it became harder for me to maintain a complete understanding of the codebase and how its different parts were connected. At the same time, I noticed a broader problem among developers using AI: whenever a new session starts, the AI has to rebuild its context and understanding of the project again. Some AI coding tools already provide their own approaches to preserving context, such as CLAUDE.md in Claude and indexing in Cursor, but these solutions remain tied to their respective ecosystems. This approach keeps DevMap independent from any specific AI agent or coding assistant ecosystem, allowing project context to be reused across different AI-assisted development workflows.',
-				id: 'Saat mengerjakan DevNote (Project 2), penggunaan AI dalam proses development saya mulai semakin intens seiring project yang semakin kompleks. Akibatnya, saya semakin sulit mempertahankan pemahaman menyeluruh terhadap struktur dan hubungan antarbagian codebase. Di sisi lain, saya melihat masalah yang lebih umum di kalangan developer yang menggunakan AI: setiap kali memulai sesi baru, AI perlu membangun kembali konteks dan pemahaman terhadap project yang sedang dikerjakan. Beberapa AI coding tools memang sudah memiliki pendekatan untuk menyimpan konteks, seperti CLAUDE.md pada Claude dan indexing pada Cursor, tetapi solusi tersebut masih bergantung pada ekosistem masing-masing. Dengan pendekatan ini, DevMap tidak bergantung pada satu AI agent atau ekosistem coding assistant tertentu, sehingga konteks project dapat digunakan kembali dalam berbagai workflow AI-assisted development.'
+				en: 'While working on DevNote (Project 4), I found that my use of AI in the development process became increasingly intensive as the project grew more complex. As a result, it became harder for me to maintain a complete understanding of the codebase and how its different parts were connected. At the same time, I noticed a broader problem among developers using AI: whenever a new session starts, the AI has to rebuild its context and understanding of the project again. Some AI coding tools already provide their own approaches to preserving context, such as CLAUDE.md in Claude and indexing in Cursor, but these solutions remain tied to their respective ecosystems. This approach keeps DevMap independent from any specific AI agent or coding assistant ecosystem, allowing project context to be reused across different AI-assisted development workflows.',
+				id: 'Saat mengerjakan DevNote (Project 4), penggunaan AI dalam proses development saya mulai semakin intens seiring project yang semakin kompleks. Akibatnya, saya semakin sulit mempertahankan pemahaman menyeluruh terhadap struktur dan hubungan antarbagian codebase. Di sisi lain, saya melihat masalah yang lebih umum di kalangan developer yang menggunakan AI: setiap kali memulai sesi baru, AI perlu membangun kembali konteks dan pemahaman terhadap project yang sedang dikerjakan. Beberapa AI coding tools memang sudah memiliki pendekatan untuk menyimpan konteks, seperti CLAUDE.md pada Claude dan indexing pada Cursor, tetapi solusi tersebut masih bergantung pada ekosistem masing-masing. Dengan pendekatan ini, DevMap tidak bergantung pada satu AI agent atau ekosistem coding assistant tertentu, sehingga konteks project dapat digunakan kembali dalam berbagai workflow AI-assisted development.'
 			},
 			solution: {
 				en: 'DevMap was created as a tool to help developers and AI understand a codebase without having to rebuild its context from scratch. DevMap uses static analysis to analyze the project structure, relationships between files, dependencies, and key components within the codebase. The analysis is then transformed into reusable context that can be used by both AI agents and developers. This approach keeps DevMap independent from any specific AI agent or platform, allowing project context to be reused across different AI-assisted development workflows.',
@@ -115,7 +123,10 @@ export const projects: Project[] = [
 		}
 	},
 	{
-		index: '02',
+		slug: 'devnote',
+		index: '04',
+		order: 4,
+		featured: false,
 		title: 'DEVNOTE',
 		tag: 'A platform for developers to manage and organize code, snippets, resources, and knowledge.',
 		thumb: '/preview/image/devnote.webp',
@@ -164,8 +175,8 @@ export const projects: Project[] = [
 		repo: 'https://github.com/itsflaid/devnote',
 		caseStudy: {
 			problem: {
-				en: 'While working on ChatMe (Project 3) and DailyFit (Project 4), which use similar technologies, I noticed that many parts of my development process, from project setup to specific code snippets and files, could be reused across different projects. Instead of repeatedly opening an older project just to find and copy code, I needed a dedicated place to store and manage reusable snippets, code, and files. Once that space existed, I felt something was still missing without a way to share it with others, so I added public sharing on top of it. That need grew further when a friend at university fell behind on code during a programming class — I could share code through DevNote, but once he needed several files at once, sending them one by one became impractical. Sharing multiple files also usually required a repository or pushing to GitHub first, which felt excessive just for quick sharing. That led to the need for grouping multiple files in one place and sharing them together without creating a repository or pushing to GitHub.',
-				id: 'Saat mengerjakan ChatMe (Project 3) dan DailyFit (Project 4) yang menggunakan teknologi yang serupa, saya mulai melihat bahwa banyak hal dalam development, mulai dari setup hingga potongan kode dan file tertentu, sebenarnya dapat saya gunakan kembali di project lain. Daripada harus terus membuka project sebelumnya hanya untuk mencari dan menyalin kode, saya butuh tempat khusus untuk menyimpan dan mengelola snippet, kode, maupun file yang sering digunakan kembali. Setelah tempat itu jadi, saya merasa masih kurang lengkap kalau belum bisa membagikannya ke orang lain, sehingga muncul fitur publik dan sharing. Kebutuhan itu kemudian berkembang lagi ketika ada teman kuliah yang tertinggal kode saat mata kuliah pemrograman — kode bisa saya bagikan lewat DevNote, tapi begitu dia butuh banyak file sekaligus, mengirimkannya satu per satu jadi tidak praktis. Selain itu, membagikan banyak file biasanya butuh repository atau push ke GitHub dulu, padahal untuk kebutuhan berbagi cepat itu terasa berlebihan. Dari situ muncul kebutuhan untuk mengelompokkan banyak file dalam satu tempat dan membagikannya sekaligus tanpa harus membuat repository atau push ke GitHub.'
+				en: 'While working on ChatMe (Project 3) and DailyFit (Project 5), which use similar technologies, I noticed that many parts of my development process, from project setup to specific code snippets and files, could be reused across different projects. Instead of repeatedly opening an older project just to find and copy code, I needed a dedicated place to store and manage reusable snippets, code, and files. Once that space existed, I felt something was still missing without a way to share it with others, so I added public sharing on top of it. That need grew further when a friend at university fell behind on code during a programming class — I could share code through DevNote, but once he needed several files at once, sending them one by one became impractical. Sharing multiple files also usually required a repository or pushing to GitHub first, which felt excessive just for quick sharing. That led to the need for grouping multiple files in one place and sharing them together without creating a repository or pushing to GitHub.',
+				id: 'Saat mengerjakan ChatMe (Project 3) dan DailyFit (Project 5) yang menggunakan teknologi yang serupa, saya mulai melihat bahwa banyak hal dalam development, mulai dari setup hingga potongan kode dan file tertentu, sebenarnya dapat saya gunakan kembali di project lain. Daripada harus terus membuka project sebelumnya hanya untuk mencari dan menyalin kode, saya butuh tempat khusus untuk menyimpan dan mengelola snippet, kode, maupun file yang sering digunakan kembali. Setelah tempat itu jadi, saya merasa masih kurang lengkap kalau belum bisa membagikannya ke orang lain, sehingga muncul fitur publik dan sharing. Kebutuhan itu kemudian berkembang lagi ketika ada teman kuliah yang tertinggal kode saat mata kuliah pemrograman — kode bisa saya bagikan lewat DevNote, tapi begitu dia butuh banyak file sekaligus, mengirimkannya satu per satu jadi tidak praktis. Selain itu, membagikan banyak file biasanya butuh repository atau push ke GitHub dulu, padahal untuk kebutuhan berbagi cepat itu terasa berlebihan. Dari situ muncul kebutuhan untuk mengelompokkan banyak file dalam satu tempat dan membagikannya sekaligus tanpa harus membuat repository atau push ke GitHub.'
 			},
 			solution: {
 				en: 'DevNote is a platform for storing, managing, and reusing snippets, code, and files needed throughout development. Beyond acting as a personal code library, it includes sharing so code or files can be handed off to others directly. Workspace extends that further, grouping several files into one shareable space instead of sending them one by one. What started as a personal snippet store grew into a way to manage and share knowledge and resources across developers.',
@@ -174,7 +185,11 @@ export const projects: Project[] = [
 		}
 	},
 	{
+		slug: 'chatme',
 		index: '03',
+		order: 3,
+		featured: true,
+		featuredOrder: 3,
 		title: 'CHATME',
 		tag: 'Chat-UI-based personal notes and reminders web application',
 		thumb: '/preview/image/chatme.webp',
@@ -231,7 +246,10 @@ export const projects: Project[] = [
 		}
 	},
 	{
-		index: '04',
+		slug: 'dailyfit',
+		index: '05',
+		order: 5,
+		featured: false,
 		title: 'DAILYFIT',
 		tag: 'Simple daily home workout web application',
 		thumb: '/preview/image/dailyfit.webp',
@@ -276,7 +294,7 @@ export const projects: Project[] = [
 		repo: 'https://github.com/itsflaid/dailyfit',
 		caseStudy: {
 			problem: {
-				en: 'Like ChatMe, this started with WhatsApp — this time for tracking a workout list. The list kept changing: swapping exercises or building a new routine meant starting a fresh list each time, and old ones just piled up with no practical way to manage routines or track progress over time. The goal was a fitness app sized to daily use, without the complexity of features that weren\u2019t actually needed.',
+				en: 'Like ChatMe (Project 3), this started with WhatsApp — this time for tracking a workout list. The list kept changing: swapping exercises or building a new routine meant starting a fresh list each time, and old ones just piled up with no practical way to manage routines or track progress over time. The goal was a fitness app sized to daily use, without the complexity of features that weren\u2019t actually needed.',
 				id: 'Sama seperti ChatMe, ini berawal dari WhatsApp — kali ini untuk menyimpan daftar gerakan workout. Daftarnya sering berubah: ganti gerakan atau menyusun rutinitas baru berarti bikin daftar baru lagi, dan yang lama cuma menumpuk tanpa cara praktis untuk mengelola rutinitas atau melihat perkembangan dari waktu ke waktu. Targetnya adalah fitness app yang pas untuk kebutuhan harian, tanpa fitur kompleks yang sebenarnya tidak dipakai.'
 			},
 			solution: {
@@ -286,7 +304,10 @@ export const projects: Project[] = [
 		}
 	},
 	{
-		index: '05',
+		slug: 'mufadz-portal',
+		index: '06',
+		order: 6,
+		featured: false,
 		title: 'MUFADZ PORTAL',
 		tag: 'An all-in-one platform for Islamic services, from Quran to prayer schedule.',
 		thumb: '/preview/image/mufadz.webp',
@@ -341,7 +362,10 @@ export const projects: Project[] = [
 		}
 	},
 	{
-		index: '06',
+		slug: 'de-home-spa',
+		index: '07',
+		order: 7,
+		featured: false,
 		title: 'DE HOME SPA',
 		tag: 'An AI-powered home spa platform for personalized treatment recommendations and guidance.',
 		thumb: '/preview/image/de-home-spa.webp',
@@ -389,9 +413,13 @@ export const projects: Project[] = [
 		}
 	},
 	{
-		index: '07',
+		slug: 'katalyst',
+		index: '02',
+		order: 2,
+		featured: true,
+		featuredOrder: 2,
 		title: 'KATALYST',
-		tag: 'Pricing simulator with business copilot',
+		tag: 'Pricing simulator & business analytics engine for UMKM',
 
 		thumb: '/preview/image/katalyst.webp',
 		video: '/preview/video/katalyst',
@@ -439,7 +467,10 @@ export const projects: Project[] = [
 		}
 	},
 	{
+		slug: 'kasbonin',
 		index: '08',
+		order: 8,
+		featured: false,
 		title: 'KASBON.IN',
 		tag: 'Real-time Shared Ledger System for a family-run store',
 
@@ -485,3 +516,11 @@ export const projects: Project[] = [
 	},
 
 ];
+
+/** All projects in archive display order (best-first). */
+export const allProjects: Project[] = [...projects].sort((a, b) => a.order - b.order);
+
+/** Curated homepage selection, in featured order. */
+export const featuredProjects: Project[] = projects
+	.filter((p) => p.featured)
+	.sort((a, b) => (a.featuredOrder ?? 0) - (b.featuredOrder ?? 0));

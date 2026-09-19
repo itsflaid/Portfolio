@@ -1,12 +1,26 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { gsap } from 'gsap';
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { scrollToTarget, jumpToTop } from '$lib/scroll';
 
 	import { navLinks as quickLinks, socials, SITE } from '$lib/data/site';
 
 	const year = new Date().getFullYear();
+
+	function goSection(e: MouseEvent, href: string) {
+		e.preventDefault();
+		if ($page.url.pathname !== '/') {
+			goto(`/${href}`, { noScroll: true }).then(async () => {
+				await tick();
+				scrollToTarget(href);
+			});
+			return;
+		}
+		scrollToTarget(href);
+	}
 
 	let contactEl: HTMLElement;
 	let darkEl: HTMLElement;
@@ -269,7 +283,7 @@
 					<ul class="contact__group-list">
 						{#each quickLinks as link, i}
 							<li>
-								<a href={link.href}>
+								<a href={link.href} onclick={(e) => goSection(e, link.href)}>
 									<span class="contact__group-index">0{i + 1}</span>
 									<span>{link.label}</span>
 								</a>

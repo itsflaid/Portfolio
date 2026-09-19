@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { gsap } from 'gsap';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { scrollToTarget, stopLenis, startLenis } from '$lib/scroll';
 
 	import { navLinks as menuLinks } from '$lib/data/site';
@@ -15,6 +17,13 @@
 		e.preventDefault();
 		closeMenu();
 		startLenis();
+		if ($page.url.pathname !== '/') {
+			goto(`/${href}`, { noScroll: true }).then(async () => {
+				await tick();
+				scrollToTarget(href);
+			});
+			return;
+		}
 		scrollToTarget(href);
 	}
 
