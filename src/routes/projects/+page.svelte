@@ -4,7 +4,7 @@
   import { ScrollTrigger } from "gsap/ScrollTrigger";
   import Nav from "$lib/components/Nav.svelte";
   import ProjectCard from "$lib/components/ProjectCard.svelte";
-  import Contact from "$lib/components/sections/Contact.svelte";
+  import ArchiveClose from "$lib/components/sections/ArchiveClose.svelte";
   import CaseStudyModal from "$lib/components/modals/CaseStudyModal.svelte";
   import TechModal from "$lib/components/modals/TechModal.svelte";
   import { allProjects } from "$lib/data/project";
@@ -335,7 +335,7 @@
   </div>
 </main>
 
-<Contact />
+<ArchiveClose />
 <CaseStudyModal />
 <TechModal />
 
