@@ -9,6 +9,9 @@
   import TechModal from "$lib/components/modals/TechModal.svelte";
   import { allProjects } from "$lib/data/project";
   import { SITE } from "$lib/data/site";
+  import { smallerBuilds } from "$lib/data/builds";
+  import { theme } from "$lib/theme";
+  import NeoArchive from "$lib/neo/NeoArchive.svelte";
   import { registerCaseStudyClose } from "$lib/caseStudy";
   import { registerTechModalClose } from "$lib/techModal";
   import { setupPreviewVideos, type PreviewController } from "$lib/preview";
@@ -34,26 +37,9 @@
 
   let previews: PreviewController | null = null;
 
-  const smallerBuilds = [
-    { name: "MyNime", stack: "Vue", href: "https://github.com/itsflaid/mynime" },
-    {
-      name: "TechGear Store",
-      stack: "PHP",
-      href: "https://github.com/itsflaid/techgear-store-v2",
-    },
-    {
-      name: "Topup Games",
-      stack: "Laravel",
-      href: "https://github.com/itsflaid/gamefy-topup",
-    },
-    {
-      name: "This Portfolio",
-      stack: "SvelteKit",
-      href: "https://github.com/itsflaid/portfolio",
-    },
-  ];
-
   onMount(() => {
+    // Neo mode renders its own page (NeoArchive); nothing below is mounted for it.
+    if (!pageEl) return;
     gsap.registerPlugin(ScrollTrigger);
 
     previews = setupPreviewVideos(pageEl);
@@ -252,6 +238,9 @@
   <meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
 
+{#if $theme === "neo"}
+  <NeoArchive />
+{:else}
 <Nav />
 
 <main class="archive" bind:this={pageEl}>
@@ -338,6 +327,7 @@
 <ArchiveClose />
 <CaseStudyModal />
 <TechModal />
+{/if}
 
 <style>
   .archive {

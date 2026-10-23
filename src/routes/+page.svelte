@@ -1,5 +1,7 @@
 <script lang="ts">
 import { SITE, sameAs } from "$lib/data/site";
+import { theme } from "$lib/theme";
+import NeoHome from "$lib/neo/NeoHome.svelte";
 import Grain from "$lib/components/layout/Grain.svelte";
 import Nav from "$lib/components/Nav.svelte";
 import Hero from "$lib/components/sections/Hero.svelte";
@@ -47,24 +49,28 @@ const personLd = {
 	{@html `<script type="application/ld+json">${JSON.stringify(personLd)}</script>`}
 </svelte:head>
 
-<Grain />
-<Nav />
-<!-- <ScrollModeToggle /> -->
-<Hero />
-<About />
-<Experience />
-<div class="desktop-only">
-    <Manifesto />
-</div>
-<Marquee />
-<Projects />
-<Skills />
-<GithubActivity />
+{#if $theme === "neo"}
+	<NeoHome />
+{:else}
+	<Grain />
+	<Nav />
+	<!-- <ScrollModeToggle /> -->
+	<Hero />
+	<About />
+	<Experience />
+	<div class="desktop-only">
+	    <Manifesto />
+	</div>
+	<Marquee />
+	<Projects />
+	<Skills />
+	<GithubActivity />
 
-<Contact />
-<ResumeModal />
-<CaseStudyModal />
-<TechModal />
+	<Contact />
+	<ResumeModal />
+	<CaseStudyModal />
+	<TechModal />
+{/if}
 
 <style>
 	.desktop-only {

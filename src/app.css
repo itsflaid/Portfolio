@@ -10,6 +10,13 @@
 	src: url('/fonts/bebas-neue-latin.woff2') format('woff2');
 }
 @font-face {
+	font-family: 'Archivo Black';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url('/fonts/archivo-black-latin.woff2') format('woff2');
+}
+@font-face {
 	font-family: 'Hanken Grotesk';
 	font-style: normal;
 	font-weight: 400;

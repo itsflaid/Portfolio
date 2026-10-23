@@ -1,0 +1,215 @@
+/*
+ * Neo-brutalist mode — global layer.
+ * Everything here is scoped to html[data-theme='neo'], so normal mode is untouched.
+ * The neo page itself lives in src/lib/neo/*.svelte (scoped styles); this file only
+ * covers what those can't reach: the pre-paint cover, page chrome, and the shared
+ * modals (case study / stack / resume), which are re-skinned by remapping tokens.
+ */
+
+/* Pre-paint cover: app.html sets data-boot when neo is saved; layout lifts it after mount. */
+html[data-boot] body {
+	visibility: hidden;
+}
+
+html[data-theme='neo'] {
+	--n-ink: #0b0b0f;
+	--n-paper: #f7f2e6;
+	--n-paper-2: #ebe4d1;
+	--n-blue: #2d6bff;
+	--n-yellow: #ffd83d;
+	--n-pink: #ff6fa5;
+	--n-mint: #38e0b0;
+	--n-lilac: #b596ff;
+	--n-border: 3px;
+	--n-shadow: 6px 6px 0 var(--n-ink);
+
+	scroll-behavior: smooth;
+	scrollbar-color: var(--n-ink) var(--n-paper);
+	scroll-padding-top: 5.5rem;
+}
+
+html[data-theme='neo'] body {
+	background: var(--n-paper);
+	color: var(--n-ink);
+}
+
+html[data-theme='neo'] ::selection {
+	background: var(--n-yellow);
+	color: var(--n-ink);
+}
+
+html[data-theme='neo'] ::-webkit-scrollbar-track {
+	background: var(--n-paper);
+	border-left: 3px solid var(--n-ink);
+}
+html[data-theme='neo'] ::-webkit-scrollbar-thumb {
+	background: var(--n-blue);
+	border: 3px solid var(--n-ink);
+	border-radius: 0;
+}
+html[data-theme='neo'] ::-webkit-scrollbar-thumb:hover {
+	background: var(--n-yellow);
+}
+
+html[data-theme='neo'] :focus-visible {
+	outline: 4px solid var(--n-ink);
+	outline-offset: 3px;
+	box-shadow: 0 0 0 3px var(--n-paper);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html[data-theme='neo'] {
+		scroll-behavior: auto;
+	}
+}
+
+/* ---------- shared modals, re-skinned ---------- */
+
+/* The modals read these tokens; in neo they flip from dark-on-black to ink-on-paper. */
+html[data-theme='neo'] {
+	--black: var(--n-paper);
+	--fg-dark: var(--n-ink);
+	--gray: #4a4a55;
+	--ff-display: 'Archivo Black', 'Bebas Neue', sans-serif;
+}
+
+html[data-theme='neo'] .cs-modal__backdrop,
+html[data-theme='neo'] .tm-modal__backdrop,
+html[data-theme='neo'] .resume-modal__backdrop {
+	background: rgba(11, 11, 15, 0.6);
+}
+
+html[data-theme='neo'] .cs-modal__panel,
+html[data-theme='neo'] .tm-modal__panel,
+html[data-theme='neo'] .resume-modal__panel {
+	background: var(--n-paper);
+	color: var(--n-ink);
+	border: 3px solid var(--n-ink);
+	border-radius: 0;
+	box-shadow: 10px 10px 0 var(--n-ink);
+}
+
+html[data-theme='neo'] .cs-modal__title,
+html[data-theme='neo'] .tm-modal__title,
+html[data-theme='neo'] .resume-modal__name {
+	font-family: 'Archivo Black', sans-serif;
+	font-weight: 400;
+	letter-spacing: 0;
+	text-transform: uppercase;
+	color: var(--n-ink);
+}
+
+html[data-theme='neo'] .cs-modal__eyebrow,
+html[data-theme='neo'] .tm-modal__eyebrow,
+html[data-theme='neo'] .resume-modal__eyebrow {
+	display: inline-block;
+	align-self: flex-start;
+	background: var(--n-yellow);
+	color: var(--n-ink);
+	border: 2px solid var(--n-ink);
+	padding: 0.15rem 0.5rem;
+}
+
+html[data-theme='neo'] .cs-modal__close,
+html[data-theme='neo'] .tm-modal__close,
+html[data-theme='neo'] .resume-modal__close {
+	width: 34px;
+	height: 34px;
+	background: var(--n-pink);
+	color: var(--n-ink);
+	border: 3px solid var(--n-ink);
+	box-shadow: 3px 3px 0 var(--n-ink);
+}
+html[data-theme='neo'] .cs-modal__close:hover,
+html[data-theme='neo'] .tm-modal__close:hover,
+html[data-theme='neo'] .resume-modal__close:hover {
+	color: var(--n-ink);
+	background: var(--n-yellow);
+}
+html[data-theme='neo'] .cs-modal__close svg,
+html[data-theme='neo'] .tm-modal__close svg,
+html[data-theme='neo'] .resume-modal__close svg {
+	stroke-width: 3;
+}
+
+html[data-theme='neo'] .cs-modal__lang,
+html[data-theme='neo'] .cs-modal__tabs {
+	border: 3px solid var(--n-ink);
+	border-radius: 0;
+}
+html[data-theme='neo'] .cs-modal__lang-btn,
+html[data-theme='neo'] .cs-modal__tab {
+	color: var(--n-ink);
+	font-weight: 600;
+}
+html[data-theme='neo'] .cs-modal__lang-btn.is-active {
+	background: var(--n-blue);
+	color: #fff;
+}
+html[data-theme='neo'] .cs-modal__tab-indicator {
+	background: var(--n-blue);
+}
+html[data-theme='neo'] .cs-modal__tab.is-active {
+	color: #fff;
+}
+html[data-theme='neo'] .cs-modal__body {
+	color: var(--n-ink);
+	opacity: 1;
+	scrollbar-color: var(--n-ink) var(--n-paper);
+}
+html[data-theme='neo'] .cs-modal__actions {
+	border-top: 3px solid var(--n-ink);
+}
+html[data-theme='neo'] .cs-modal__btn {
+	border: 3px solid var(--n-ink);
+	border-radius: 0;
+	background: var(--n-yellow);
+	color: var(--n-ink);
+	font-weight: 700;
+	box-shadow: 4px 4px 0 var(--n-ink);
+}
+html[data-theme='neo'] .cs-modal__btn:hover {
+	background: var(--n-mint);
+	color: var(--n-ink);
+	border-color: var(--n-ink);
+	transform: translate(-1px, -1px);
+}
+
+html[data-theme='neo'] .tm-modal__group-label {
+	color: var(--n-ink);
+	font-weight: 700;
+}
+html[data-theme='neo'] .tm-modal__pills li {
+	background: #fff;
+	color: var(--n-ink);
+	border: 2px solid var(--n-ink);
+	border-radius: 0;
+}
+html[data-theme='neo'] .tm-modal__pills li .tech-icon {
+	fill: var(--n-ink);
+}
+html[data-theme='neo'] .tm-modal__body {
+	scrollbar-color: var(--n-ink) var(--n-paper);
+}
+
+html[data-theme='neo'] .resume-modal__role {
+	color: var(--n-ink);
+}
+html[data-theme='neo'] .resume-modal__row {
+	border-color: var(--n-ink);
+}
+html[data-theme='neo'] .resume-modal__rule {
+	background: var(--n-ink);
+}
+html[data-theme='neo'] .resume-modal__download {
+	background: var(--n-blue);
+	color: #fff;
+	border: 3px solid var(--n-ink);
+	border-radius: 0;
+	box-shadow: 5px 5px 0 var(--n-ink);
+	font-weight: 700;
+}
+html[data-theme='neo'] .resume-modal__download:hover {
+	background: var(--n-yellow);
+	color: var(--n-ink);
+}

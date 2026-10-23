@@ -5,6 +5,9 @@
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
 	import { setLenis } from '$lib/scroll';
 
+	/** Neo mode uses the browser's native scroll. */
+	export let disabled = false;
+
 	let lenis: Lenis | null = null;
 
 	onMount(() => {
@@ -28,7 +31,7 @@
 			if (!cancelled) ScrollTrigger.refresh();
 		});
 
-		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+		if (disabled || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 			return () => {
 				cancelled = true;
 			};
