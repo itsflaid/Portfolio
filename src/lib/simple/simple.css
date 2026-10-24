@@ -1,0 +1,96 @@
+/*
+ * Simple mode — design tokens and page chrome. Everything is scoped under .sm so it
+ * never touches the animated layout, even when both stylesheets are loaded.
+ */
+.sm {
+	--sm-bg: #fafaf8;
+	--sm-ink: #0a0a0a;
+	--sm-body: #2a2a28;
+	--sm-mute: #6b6b66;
+	--sm-line: #dcdcd6;
+	--sm-soft: #f0f0ec;
+	--sm-mono: 'JetBrains Mono', 'Courier New', monospace;
+	--sm-sans: 'Hanken Grotesk', system-ui, sans-serif;
+
+	min-height: 100vh;
+	background: var(--sm-bg);
+	color: var(--sm-ink);
+	font-family: var(--sm-sans);
+	font-size: 16px;
+	line-height: 1.55;
+}
+html:has(.sm) {
+	scroll-padding-top: 72px;
+}
+body:has(.sm) {
+	background: #fafaf8;
+}
+@media (prefers-reduced-motion: no-preference) {
+	html:has(.sm) {
+		scroll-behavior: smooth;
+	}
+}
+
+.sm *,
+.sm *::before,
+.sm *::after {
+	box-sizing: border-box;
+}
+.sm a {
+	color: inherit;
+}
+.sm :focus-visible {
+	outline: 2px solid var(--sm-ink);
+	outline-offset: 3px;
+}
+.sm .sm-wrap {
+	max-width: 720px;
+	margin: 0 auto;
+	padding: 0 24px;
+}
+.sm .sm-mono {
+	font-family: var(--sm-mono);
+	font-size: 12px;
+	letter-spacing: 0.02em;
+	color: var(--sm-mute);
+}
+.sm .sm-label {
+	font-family: var(--sm-mono);
+	font-size: 12px;
+	font-weight: 400;
+	letter-spacing: 0.08em;
+	color: var(--sm-mute);
+	text-transform: uppercase;
+	margin: 0;
+}
+.sm .sm-section {
+	border-top: 1px solid var(--sm-line);
+	padding: 36px 0;
+}
+.sm .sm-section > .sm-label {
+	margin-bottom: 24px;
+}
+.sm .sm-btn {
+	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
+	padding: 10px 16px;
+	font-family: var(--sm-sans);
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--sm-ink);
+	background: transparent;
+	border: 1px solid var(--sm-ink);
+	text-decoration: none;
+	cursor: pointer;
+}
+.sm .sm-btn:hover {
+	background: var(--sm-soft);
+}
+.sm .sm-btn--solid {
+	background: var(--sm-ink);
+	color: var(--sm-bg);
+}
+.sm .sm-btn--solid:hover {
+	background: #262624;
+}
