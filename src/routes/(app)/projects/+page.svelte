@@ -9,6 +9,7 @@
   import TechModal from "$lib/components/modals/TechModal.svelte";
   import { allProjects } from "$lib/data/project";
   import { SITE } from "$lib/data/site";
+  import { smallerBuilds } from "$lib/data/builds";
   import { registerCaseStudyClose } from "$lib/caseStudy";
   import { registerTechModalClose } from "$lib/techModal";
   import { setupPreviewVideos, type PreviewController } from "$lib/preview";
@@ -33,25 +34,6 @@
   let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
   let previews: PreviewController | null = null;
-
-  const smallerBuilds = [
-    { name: "MyNime", stack: "Vue", href: "https://github.com/itsflaid/mynime" },
-    {
-      name: "TechGear Store",
-      stack: "PHP",
-      href: "https://github.com/itsflaid/techgear-store-v2",
-    },
-    {
-      name: "Topup Games",
-      stack: "Laravel",
-      href: "https://github.com/itsflaid/gamefy-topup",
-    },
-    {
-      name: "This Portfolio",
-      stack: "SvelteKit",
-      href: "https://github.com/itsflaid/portfolio",
-    },
-  ];
 
   onMount(() => {
     gsap.registerPlugin(ScrollTrigger);
