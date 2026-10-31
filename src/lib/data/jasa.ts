@@ -3,8 +3,6 @@ import { SITE } from '$lib/data/site';
 // format 6281234567890 (tanpa +). Kosong = tombol kontak jatuh ke email
 export const WHATSAPP_NUMBER = '';
 
-export const AVAILABLE = true;
-
 export const CONTACT_LABEL = WHATSAPP_NUMBER ? 'Chat WhatsApp' : 'Kirim pesan';
 
 export function contactHref(message: string): string {
@@ -18,6 +16,10 @@ export const isWeb = (href: string) => href.startsWith('http');
 export const MESSAGES = {
 	general: 'Halo Fadil, saya tertarik dengan jasa pembuatan website. Boleh saya konsultasi dulu?',
 	landing: 'Halo Fadil, saya butuh landing page untuk bisnis saya. Boleh saya konsultasi dulu?',
+	landingTemplate:
+		'Halo Fadil, saya mau landing page dari template. Boleh saya konsultasi dulu?',
+	landingCustom:
+		'Halo Fadil, saya mau landing page dengan desain custom. Boleh saya konsultasi dulu?',
 	webapp: 'Halo Fadil, saya butuh aplikasi web untuk bisnis saya. Boleh saya konsultasi dulu?',
 	template: (name: string) =>
 		`Halo Fadil, saya tertarik dengan template "${name}". Boleh saya tanya lebih lanjut?`,
@@ -142,7 +144,7 @@ export const processSteps = [
 	},
 	{
 		title: 'Pilih & rancang',
-		text: 'Pilih template atau tentukan alur aplikasinya, lalu sepakati ruang lingkup.'
+		text: 'Pilih template atau desain custom untuk landing page, atau tentukan alur aplikasinya. Lalu sepakati ruang lingkup.'
 	},
 	{
 		title: 'Pembuatan',
@@ -155,6 +157,7 @@ export const processSteps = [
 ];
 
 export type Plan = {
+	group: string;
 	name: string;
 	for: string;
 	price: string; // kosong = tampil priceNote
@@ -167,28 +170,46 @@ export type Plan = {
 
 export const plans: Plan[] = [
 	{
-		name: 'Landing Page',
-		for: 'Pilih satu dari template yang tersedia.',
+		group: 'Landing Page',
+		name: 'Ikut template',
+		for: `Pilih satu dari ${landingTemplates.length} template yang tersedia.`,
 		price: '',
 		priceNote: 'Hubungi untuk estimasi',
 		items: [
-			'Template disesuaikan dengan logo, warna, foto, dan teks bisnismu',
+			'Logo, warna, foto, dan teks disesuaikan dengan bisnismu',
 			'Tampilan rapi di HP dan desktop',
 			'Tombol WhatsApp, peta lokasi, dan tautan media sosial',
 			'Bantuan setup domain dan hosting',
 			'Revisi sesuai kesepakatan'
 		],
 		cta: 'Pilih template',
-		message: MESSAGES.landing
+		message: MESSAGES.landingTemplate
 	},
 	{
-		name: 'Web App',
+		group: 'Landing Page',
+		name: 'Custom',
+		for: 'Desain dibuat dari nol mengikuti brand dan kebutuhanmu.',
+		price: '',
+		priceNote: 'Sesuai desain dan kebutuhan',
+		items: [
+			'Struktur halaman dan alur konten dirancang bersama',
+			'Desain khusus, tidak memakai template',
+			'Tampilan rapi di HP dan desktop',
+			'Bantuan setup domain dan hosting',
+			'Revisi sesuai kesepakatan'
+		],
+		cta: 'Diskusi desain',
+		message: MESSAGES.landingCustom
+	},
+	{
+		group: 'Web App',
+		name: 'Diskusi dulu',
 		for: 'Sistem yang mengikuti alur kerja bisnismu.',
 		price: '',
-		priceNote: 'Sesuai kebutuhan',
+		priceNote: 'Estimasi setelah diskusi',
 		items: [
 			'Diskusi alur kerja dan fitur yang benar-benar dipakai',
-			'Desain dan pembuatan dari nol sesuai kebutuhan',
+			'Desain dan pembuatan sesuai kebutuhan',
 			'Login, database, dan hak akses per peran',
 			'Deploy dan serah terima',
 			'Dukungan setelah launch dibahas di awal'

@@ -14,10 +14,11 @@
 	</div>
 
 	<div class="plans">
-		{#each plans as plan, i (plan.name)}
+		{#each plans as plan, i (`${plan.group}-${plan.name}`)}
 			{@const href = contactHref(plan.message)}
 			<article class="plan" class:plan--dark={plan.dark} use:reveal={i * 80}>
-				<p class="plan__kicker">{plan.name}</p>
+				<p class="plan__kicker">{plan.group}</p>
+				<h3 class="plan__name">{plan.name}</h3>
 				<p class="plan__for">{plan.for}</p>
 
 				<div class="plan__price">
@@ -53,9 +54,9 @@
 		gap: 1rem;
 		margin-top: clamp(2.5rem, 5vw, 4rem);
 	}
-	@media (min-width: 52rem) {
+	@media (min-width: 62rem) {
 		.plans {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
+			grid-template-columns: repeat(3, minmax(0, 1fr));
 		}
 	}
 	.plan {
@@ -85,6 +86,14 @@
 	.plan--dark .plan__from {
 		color: var(--jz-night-muted);
 	}
+	.plan__name {
+		margin-top: -0.6rem;
+		font-size: clamp(1.6rem, 2.8vw, 2rem);
+		line-height: 1.05;
+	}
+	.plan--dark .plan__name {
+		color: #fff;
+	}
 	.plan__for {
 		margin-top: -0.6rem;
 		color: var(--jz-muted);
@@ -99,7 +108,7 @@
 		border-color: var(--jz-night-rule);
 	}
 	.plan__price strong {
-		font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+		font-size: clamp(1.15rem, 2vw, 1.4rem);
 		line-height: 1.05;
 		letter-spacing: -0.04em;
 		color: var(--jz-ink);
