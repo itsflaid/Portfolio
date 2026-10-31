@@ -5,190 +5,222 @@
 	import { scrollToTarget } from '$lib/scroll';
 	import { openResumeModal } from '$lib/resume';
 
-	let heroEl: HTMLElement;
-	let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+	const line1 = 'MUHAMMAD'.split('');
+	const line2 = 'FADIL'.split('');
+
+	let frameEl: HTMLElement;
+	let nameEl: HTMLElement;
+	let metaEls: HTMLElement[] = [];
+	let time = '';
 
 	function goProjects(e: MouseEvent) {
 		e.preventDefault();
 		scrollToTarget('#projects');
 	}
 
+	function tick() {
+		time = new Intl.DateTimeFormat('en-GB', {
+			hour: '2-digit',
+			minute: '2-digit',
+			hour12: false,
+			timeZone: 'Asia/Makassar'
+		}).format(new Date());
+	}
+
 	onMount(() => {
 		gsap.registerPlugin(ScrollTrigger);
+		tick();
+		const clock = setInterval(tick, 20000);
+
 		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-		if (reduceMotion) return;
+		if (reduceMotion) {
+			return () => clearInterval(clock);
+		}
 
-		const st = ScrollTrigger.create({
-			trigger: heroEl,
-			start: 'top top',
-			end: 'bottom top',
-			pin: true,
-			pinSpacing: false
-		});
+		const ctx = gsap.context(() => {
+			const chars = nameEl.querySelectorAll<HTMLElement>('.hero__char');
 
-		return () => { st.kill(); };
+			// Entrance: satu momen — huruf naik dari balik mask, lalu meta masuk.
+			gsap
+				.timeline({ defaults: { ease: 'power4.out' } })
+				.fromTo(chars, { yPercent: 110 }, { yPercent: 0, duration: 1.1, stagger: 0.045 }, 0.1)
+				.fromTo(
+					metaEls,
+					{ opacity: 0, y: 12 },
+					{ opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: 'power2.out' },
+					0.7
+				);
+
+			// Momentum: saat di-scroll, dua baris nama bergeser berlawanan arah,
+			// konten pinggir memudar. Hero tetap di-pin sehingga About menimpanya.
+			const scrub = {
+				trigger: frameEl,
+				start: 'top top',
+				end: 'bottom top',
+				scrub: 0.8
+			};
+			gsap.to('.hero__line--1', { xPercent: -9, ease: 'none', scrollTrigger: scrub });
+			gsap.to('.hero__line--2', { xPercent: 9, ease: 'none', scrollTrigger: scrub });
+			gsap.to('.hero__bar, .hero__foot', { opacity: 0, ease: 'none', scrollTrigger: scrub });
+
+			ScrollTrigger.create({
+				trigger: frameEl,
+				start: 'top top',
+				end: 'bottom top',
+				pin: true,
+				pinSpacing: false
+			});
+		}, frameEl);
+
+		return () => {
+			clearInterval(clock);
+			ctx.revert();
+		};
 	});
 </script>
 
-<div class="hero-frame" bind:this={heroEl}>
-<section class="hero" id="top">
-	<!-- <span class="hero__mark hero__mark--1" aria-hidden="true"><i>F</i><i>L</i><i>A</i><i>I</i><i>D</i></span> -->
-	<span class="hero__mark hero__mark--2" aria-hidden="true"><i>F</i><i>L</i><i>A</i><i>I</i><i>D</i></span>
-	<span class="hero__dots hero__dots--bl" aria-hidden="true">
-		{#each dots as _}<i></i>{/each}
-	</span>
-	<!-- <span class="hero__spin" aria-hidden="true"></span> -->
-	<div class="hero__content">
-		<span class="hero__eyebrow">FULLSTACK DEVELOPER — KUTAI KARTANEGARA, ID</span>
-		<h1><span class="hero__name">MUHAMMAD</span><span class="hero__name">FADIL</span></h1>
-		<span class="hero__sub">
-			I build full-stack web applications from idea to deployment, combining design, engineering, and AI-assisted development.
-		</span>
-		<nav class="hero__cta" aria-label="Quick actions">
-			<button
-				type="button"
-				class="hero__cta-item"
-				onclick={openResumeModal}
-				data-cursor-text="OPEN"
-			>
-				<!-- <span class="hero__cta-index">01</span> -->
-				<span class="hero__cta-label">RESUME</span>
-				<svg class="hero__cta-icon" viewBox="0 0 24 24" aria-hidden="true"
-					><path d="M7 17 17 7M8 7h9v9" /></svg
-				>
-			</button>
-			<span class="hero__cta-divider" aria-hidden="true"></span>
-			<a class="hero__cta-item" href="#projects" onclick={goProjects} data-cursor-text="SCROLL">
-				<!-- <span class="hero__cta-index">02</span> -->
-				<span class="hero__cta-label">THE PROJECTS</span>
-				<svg class="hero__cta-icon" viewBox="0 0 24 24" aria-hidden="true"
-					><path d="M12 4v14m0 0-5-5m5 5 5-5" /></svg
-				>
-			</a>
-		</nav>
-	</div>
-</section>
+<div class="hero-frame" bind:this={frameEl}>
+	<section class="hero" id="top">
+		<div class="hero__bar">
+			<span bind:this={metaEls[0]}>FLAID® — PORTFOLIO {new Date().getFullYear()}</span>
+			<span class="hero__bar-mid" bind:this={metaEls[1]}>FULLSTACK DEVELOPER</span>
+			<span bind:this={metaEls[2]}>SAMARINDA · {time || '--:--'} WITA</span>
+		</div>
+
+		<h1 class="hero__name" bind:this={nameEl} aria-label="Muhammad Fadil">
+			<span class="hero__line hero__line--1" aria-hidden="true">
+				{#each line1 as c}<span class="hero__mask"><span class="hero__char">{c}</span></span>{/each}
+			</span>
+			<span class="hero__line hero__line--2" aria-hidden="true">
+				{#each line2 as c}<span class="hero__mask"><span class="hero__char">{c}</span></span>{/each}
+			</span>
+		</h1>
+
+		<div class="hero__foot">
+			<p class="hero__sub" bind:this={metaEls[3]}>
+				I build full-stack web applications from idea to deployment, combining design,
+				engineering, and AI-assisted development.
+			</p>
+
+			<div class="hero__side" bind:this={metaEls[4]}>
+				<span class="hero__status"><i aria-hidden="true"></i>OPEN FOR FREELANCE</span>
+				<nav class="hero__cta" aria-label="Quick actions">
+					<button type="button" class="hero__cta-item" onclick={openResumeModal} data-cursor-text="OPEN">
+						<span class="hero__cta-label">RESUME</span>
+						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" /></svg>
+					</button>
+					<a class="hero__cta-item" href="#projects" onclick={goProjects} data-cursor-text="SCROLL">
+						<span class="hero__cta-label">THE PROJECTS</span>
+						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v14m0 0-5-5m5 5 5-5" /></svg>
+					</a>
+				</nav>
+			</div>
+		</div>
+	</section>
 </div>
 
 <style>
 	.hero-frame {
 		position: relative;
 		height: 100vh;
+		height: 100svh;
 	}
 	.hero {
 		position: relative;
-		height: 100vh;
 		z-index: 1;
+		height: 100%;
 		overflow: hidden;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		text-align: center;
-		padding: clamp(1.5rem, 5vw, 4rem);
+		display: grid;
+		grid-template-rows: auto 1fr auto;
+		padding: clamp(4.75rem, 8vw, 5.5rem) clamp(1.1rem, 2.6vw, 2.25rem) clamp(1.1rem, 2.6vw, 2.25rem);
 		background: var(--white);
+		color: var(--black);
 	}
 
-	.hero__mark {
-		position: absolute;
-		font-family: var(--ff-display);
-		font-weight: 400;
-		letter-spacing: 0.01em;
+	.hero__bar {
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem;
+		padding-bottom: 0.9rem;
+		border-bottom: 1px solid rgba(10, 10, 10, 0.18);
+		font-family: var(--ff-mono);
+		font-size: clamp(0.62rem, 0.9vw, 0.74rem);
+		letter-spacing: 0.08em;
 		color: var(--black);
-		white-space: nowrap;
-		z-index: 0;
-		user-select: none;
-		pointer-events: none;
-		font-size: clamp(6rem, 16vw, 13rem);
 	}
-	.hero__mark i {
-		font-style: normal;
-		display: inline-block;
-		opacity: 0.065;
+	.hero__bar span:last-child {
+		text-align: right;
 	}
-	/* .hero__mark--1 {
-		top: -3vw;
-		left: -2vw;
-	} */
-	.hero__mark--2 {
-		bottom: -3vw;
-		right: -2vw;
-	}
-	.hero__content {
-		position: relative;
-		z-index: 2;
-		width: 100%;
-		max-width: 80rem;
+
+	.hero__name {
+		align-self: center;
+		margin: 0;
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-	}
-	.hero__eyebrow {
-		display: block;
-		font-family: var(--ff-mono);
-		font-size: 0.8rem;
-		letter-spacing: 0.08em;
-		color: var(--gray);
-		margin-bottom: 1.5rem;
-		opacity: 0;
-		animation: rise 0.8s ease 0.1s forwards;
-	}
-	.hero h1 {
 		font-family: var(--ff-display);
 		font-weight: 400;
-		line-height: 0.95;
-		letter-spacing: 0.01em;
-		font-size: clamp(3.1rem, 15vw, 11rem);
-		opacity: 0;
-		animation: rise 0.8s ease 0.3s forwards;
+		font-size: min(23.5vw, 38vh);
+		line-height: 0.82;
+		letter-spacing: 0.005em;
+		text-transform: uppercase;
 	}
-	.hero__name {
-		display: inline;
+	.hero__line {
+		display: flex;
+		will-change: transform;
 	}
-	.hero__name + .hero__name::before {
-		content: '\00a0';
+	.hero__line--2 {
+		align-self: flex-end;
 	}
-	@media (max-width: 768px) {
-		.hero h1 {
-			font-size: clamp(4.5rem, 18vw, 7rem);
-			line-height: 0.9;
-		}
-		.hero__name {
-			display: block;
-			white-space: nowrap;
-		}
-		.hero__name + .hero__name::before {
-			content: none;
-		}
-		.hero__sub {
-			max-width: 22rem;
-		}
-		.hero__cta {
-			gap: 0.85rem;
-		}
-		.hero__cta-item {
-			font-size: 0.7rem;
-		}
+	.hero__mask {
+		display: inline-block;
+		overflow: hidden;
+		padding-top: 0.04em;
+	}
+	.hero__char {
+		display: inline-block;
+		will-change: transform;
+	}
+
+	.hero__foot {
+		display: grid;
+		grid-template-columns: minmax(0, 26rem) auto;
+		justify-content: space-between;
+		align-items: end;
+		gap: 1.5rem;
+		padding-top: 1rem;
+		border-top: 1px solid rgba(10, 10, 10, 0.18);
 	}
 	.hero__sub {
-		display: block;
-		font-size: clamp(1rem, 2vw, 1.25rem);
+		margin: 0;
+		font-family: var(--ff-body);
+		font-size: clamp(0.9rem, 1.15vw, 1.05rem);
+		line-height: 1.5;
 		color: var(--ink-soft);
-		max-width: 35rem;
-		margin: 2rem auto 0;
-		line-height: 1.55;
-		opacity: 0;
-		animation: rise 0.8s ease 0.55s forwards;
+	}
+	.hero__side {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 0.85rem;
+	}
+	.hero__status {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-family: var(--ff-mono);
+		font-size: 0.7rem;
+		letter-spacing: 0.08em;
+	}
+	.hero__status i {
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+		background: #1f9d55;
+		animation: pulse 2s ease-in-out infinite;
 	}
 	.hero__cta {
-		position: relative;
-		z-index: 2;
 		display: flex;
-		align-items: center;
-		gap: clamp(1rem, 2.5vw, 1.75rem);
-		margin-top: clamp(2rem, 5vh, 3rem);
-		opacity: 0;
-		animation: rise 0.8s ease 0.75s forwards;
+		gap: clamp(1rem, 2.4vw, 1.75rem);
 	}
 	.hero__cta-item {
 		display: inline-flex;
@@ -197,17 +229,13 @@
 		background: none;
 		border: 0;
 		padding: 0;
-		margin: 0;
 		font-family: var(--ff-mono);
-		font-size: 0.78rem;
+		font-size: 0.76rem;
 		letter-spacing: 0.08em;
 		color: var(--black);
 		text-decoration: none;
 		cursor: pointer;
 	}
-	/* 	.hero__cta-index {
-		color: var(--gray);
-	} */
 	.hero__cta-label {
 		position: relative;
 	}
@@ -227,7 +255,7 @@
 		transform: scaleX(1);
 		transform-origin: left;
 	}
-	.hero__cta-icon {
+	.hero__cta-item svg {
 		width: 12px;
 		height: 12px;
 		fill: none;
@@ -236,114 +264,30 @@
 		stroke-linecap: round;
 		stroke-linejoin: round;
 	}
-	.hero__cta-divider {
-		width: 1px;
-		height: 1rem;
-		background: rgba(10, 10, 10, 0.2);
-	}
-	.hero__dots {
-		position: absolute;
-		bottom: clamp(1.5rem, 4vw, 3rem);
-		left: clamp(1.5rem, 4vw, 3rem);
-		display: grid;
-		grid-template-columns: repeat(3, 8px);
-		grid-template-rows: repeat(3, 8px);
-		gap: 9px;
-		z-index: 1;
-		pointer-events: none;
-	}
-	.hero__dots i {
-		display: block;
-		width: 8px;
-		height: 8px;
-		background: var(--black);
-		font-style: normal;
-		opacity: 0.06;
-		animation: dot-blink 3s ease-in-out infinite;
-	}
-	.hero__dots i:nth-child(2) { animation-delay: 0.3s; }
-	.hero__dots i:nth-child(3) { animation-delay: 0.6s; }
-	.hero__dots i:nth-child(4) { animation-delay: 0.9s; }
-	.hero__dots i:nth-child(5) { animation-delay: 1.2s; }
-	.hero__dots i:nth-child(6) { animation-delay: 1.5s; }
-	.hero__dots i:nth-child(7) { animation-delay: 1.8s; }
-	.hero__dots i:nth-child(8) { animation-delay: 2.1s; }
-	.hero__dots i:nth-child(9) { animation-delay: 2.4s; }
 
-	/* .hero__spin {
-		position: absolute;
-		right: clamp(2rem, 5vw, 4rem);
-		top: 50%;
-		width: 26px;
-		height: 26px;
-		z-index: 1;
-		pointer-events: none;
-		opacity: 0.35;
-		transform: translateY(-50%);
-		animation: spin 10s linear infinite;
+	@keyframes pulse {
+		0%, 100% { opacity: 1; }
+		50% { opacity: 0.35; }
 	}
-	.hero__spin::before,
-	.hero__spin::after {
-		content: '';
-		position: absolute;
-		background: var(--black);
-	}
-	.hero__spin::before {
-		left: 50%;
-		top: 0;
-		bottom: 0;
-		width: 1px;
-		transform: translateX(-50%);
-	}
-	.hero__spin::after {
-		top: 50%;
-		left: 0;
-		right: 0;
-		height: 1px;
-		transform: translateY(-50%);
-	} */
 
-	@keyframes rise {
-		from {
-			opacity: 0;
-			transform: translateY(16px);
+	@media (max-width: 768px) {
+		.hero__bar-mid {
+			display: none;
 		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
+		.hero__name {
+			font-size: min(24vw, 26vh);
 		}
-	}
-	@keyframes dot-blink {
-		0%,
-		100% {
-			opacity: 0.06;
+		.hero__foot {
+			grid-template-columns: 1fr;
+			gap: 1.1rem;
 		}
-		50% {
-			opacity: 0.32;
-		}
-	}
-	@keyframes spin {
-		from {
-			transform: translateY(-50%) rotate(0);
-		}
-		to {
-			transform: translateY(-50%) rotate(360deg);
+		.hero__side {
+			align-items: flex-start;
 		}
 	}
 	@media (prefers-reduced-motion: reduce) {
-		.hero__eyebrow,
-		.hero h1,
-		.hero__sub,
-		.hero__cta {
+		.hero__status i {
 			animation: none;
-			opacity: 1;
 		}
-		.hero__dots i {
-			animation: none;
-			opacity: 0.2;
-		}
-		/* .hero__spin {
-			animation: none;
-		} */
 	}
 </style>
