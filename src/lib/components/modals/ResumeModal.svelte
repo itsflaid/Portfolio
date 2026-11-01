@@ -85,7 +85,6 @@
 				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
 			</button>
 
-			<span class="resume-modal__eyebrow">// RESUME</span>
 			<h3 id="resume-modal-title" class="resume-modal__name">Muhammad Fadil</h3>
 			<p class="resume-modal__role">Fullstack Developer</p>
 
@@ -184,13 +183,6 @@
 		stroke: currentColor;
 		stroke-width: 1.6;
 		stroke-linecap: round;
-	}
-	.resume-modal__eyebrow {
-		font-family: var(--ff-mono);
-		font-size: 0.75rem;
-		letter-spacing: 0.08em;
-		color: var(--gray);
-		margin-bottom: 0.5rem;
 	}
 	.resume-modal__name {
 		margin: 0;

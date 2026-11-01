@@ -5,13 +5,9 @@
 
 	import { entries } from '$lib/data/experience';
 
-	const headingText = 'Experience & Education';
-	const eyebrowText = '// BACKGROUND';
-
 	let sectionEl: HTMLElement;
 	let spineEl: HTMLElement;
 	let headingEl: HTMLHeadingElement;
-	let eyebrowEl: HTMLSpanElement;
 	let dotsWrapEl: HTMLElement;
 	let entryEls: HTMLElement[] = [];
 	let tickEls: HTMLElement[] = [];
@@ -30,7 +26,6 @@
 			gsap.set(tickEls, { scale: 1 });
 			gsap.set(headingEl, { opacity: 1, y: 0 });
 			gsap.set(titleCharEls.flat(), { opacity: 1, y: 0, rotateX: 0 });
-			gsap.set(eyebrowEl, { clipPath: 'inset(0 0% 0 0)' });
 			gsap.set('.xp__dots i', { opacity: 0.06, scale: 1 });
 			return;
 		}
@@ -48,21 +43,6 @@
 					scrollTrigger: {
 						trigger: sectionEl,
 						start: 'top 75%',
-						toggleActions: 'play none none reverse'
-					}
-				}
-			);
-
-			gsap.fromTo(
-				eyebrowEl,
-				{ clipPath: 'inset(0 100% 0 0)' },
-				{
-					clipPath: 'inset(0 0% 0 0)',
-					duration: 0.5,
-					ease: 'steps(12)',
-					scrollTrigger: {
-						trigger: headingEl,
-						start: 'top 85%',
 						toggleActions: 'play none none reverse'
 					}
 				}
@@ -189,8 +169,7 @@
 	</span>
 	<span class="xp__spin" aria-hidden="true"></span>
 	<div class="xp__head">
-		<span class="xp__eyebrow" bind:this={eyebrowEl}>{eyebrowText}</span>
-		<h2 class="xp__heading" bind:this={headingEl}>{headingText}</h2>
+		<h2 class="xp__heading" bind:this={headingEl}>EXPERIENCE<br />&amp; EDUCATION</h2>
 	</div>
 
 	<div class="xp__timeline">
@@ -319,22 +298,13 @@
 		gap: 0.75rem;
 		margin-bottom: clamp(3rem, 8vh, 5rem);
 	}
-	.xp__eyebrow {
-		display: inline-block;
-		font-family: var(--ff-mono);
-		font-size: 0.8rem;
-		letter-spacing: 0.08em;
-		color: var(--gray);
-		white-space: nowrap;
-	}
 	.xp__heading {
 		margin: 0;
 		font-family: var(--ff-display);
 		font-weight: 400;
-		line-height: 1;
+		line-height: 0.88;
 		letter-spacing: 0.005em;
-		font-size: clamp(2rem, 5vw, 3.5rem);
-		perspective: 400px;
+		font-size: clamp(3.6rem, 11vw, 10rem);
 	}
 	.xp__char {
 		display: inline-block;

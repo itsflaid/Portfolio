@@ -348,7 +348,6 @@
     draggable="false"
   />
   <div class="projects__head">
-    <span class="projects__eyebrow">// PROJECTS</span>
     <div class="projects__head-right">
       <span class="projects__count">0{activeIndex + 1} / 0{featuredProjects.length}</span>
     </div>
@@ -442,12 +441,11 @@
     z-index: 1;
     display: flex;
     align-items: baseline;
-    justify-content: space-between;
+    justify-content: flex-end;
     margin: 0 clamp(1.5rem, 5vw, 4rem);
     padding-bottom: clamp(1.5rem, 3.2vh, 2rem);
     border-bottom: 1px solid rgba(10, 10, 10, 0.14);
   }
-  .projects__eyebrow,
   .projects__count {
     font-family: var(--ff-mono);
     font-size: 0.8rem;

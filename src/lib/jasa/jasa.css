@@ -1,0 +1,192 @@
+/* Halaman /jasa. Semua scoped di bawah .jz */
+.jz {
+	--jz-paper: #f5f4f2;
+	--jz-surface: #ffffff;
+	--jz-ink: #141311;
+	--jz-text: #3a3834;
+	--jz-muted: #77736b;
+	--jz-rule: #e4e1db;
+	--jz-rule-strong: #d2cec5;
+	--jz-wash: #edebe6;
+	--jz-night: #12110f;
+	--jz-night-2: #1b1a17;
+	--jz-night-rule: rgba(255, 255, 255, 0.1);
+	--jz-night-text: #d9d5cc;
+	--jz-night-muted: #8d8980;
+	--jz-ok: #4ade80;
+
+	--jz-sans: 'Hanken Grotesk', system-ui, sans-serif;
+	--jz-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+	--jz-max: 76rem;
+	--jz-gutter: clamp(1.25rem, 5vw, 3.5rem);
+	--jz-space: clamp(4.5rem, 9vw, 7.5rem);
+	--jz-header: 4.25rem;
+	--jz-radius: 1rem;
+	--jz-radius-lg: 1.5rem;
+	--jz-shadow: 0 1px 0 rgba(20, 19, 17, 0.04), 0 14px 34px -18px rgba(20, 19, 17, 0.22);
+	--jz-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+	min-height: 100vh;
+	background: var(--jz-paper);
+	color: var(--jz-text);
+	font-family: var(--jz-sans);
+	font-size: 1.0625rem;
+	line-height: 1.6;
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+	overflow-x: clip;
+}
+body:has(.jz) {
+	background: #f5f4f2;
+}
+html:has(.jz) {
+	scroll-padding-top: calc(4.25rem + 1rem);
+}
+@media (prefers-reduced-motion: no-preference) {
+	html:has(.jz) {
+		scroll-behavior: smooth;
+	}
+}
+
+.jz *,
+.jz *::before,
+.jz *::after {
+	box-sizing: border-box;
+}
+.jz a {
+	color: inherit;
+	text-decoration: none;
+}
+.jz h1,
+.jz h2,
+.jz h3,
+.jz p,
+.jz ul,
+.jz dl,
+.jz dd {
+	margin: 0;
+}
+.jz h1,
+.jz h2,
+.jz h3 {
+	color: var(--jz-ink);
+	font-weight: 700;
+	letter-spacing: -0.04em;
+	text-wrap: balance;
+}
+.jz ul {
+	padding: 0;
+	list-style: none;
+}
+.jz ::selection {
+	background: var(--jz-ink);
+	color: #fff;
+}
+.jz :focus-visible {
+	outline: 2px solid var(--jz-ink);
+	outline-offset: 3px;
+	border-radius: 4px;
+}
+
+.jz .jz-wrap {
+	width: min(100% - (var(--jz-gutter) * 2), var(--jz-max));
+	margin-inline: auto;
+}
+.jz .jz-section {
+	padding-block: var(--jz-space);
+}
+.jz .jz-head {
+	display: grid;
+	gap: 1rem;
+	justify-items: center;
+	max-width: 46rem;
+	margin-inline: auto;
+	text-align: center;
+}
+.jz .jz-title {
+	font-size: clamp(2.1rem, 5vw, 3.75rem);
+	line-height: 1.02;
+}
+.jz .jz-lede {
+	max-width: 36rem;
+	font-size: clamp(1.0625rem, 1.6vw, 1.2rem);
+	line-height: 1.5;
+	color: var(--jz-muted);
+}
+
+.jz .jz-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	min-height: 2.9rem;
+	padding: 0 1.4rem;
+	border: 1px solid var(--jz-ink);
+	border-radius: 999px;
+	background: var(--jz-ink);
+	color: #fff;
+	font: 500 0.9375rem var(--jz-sans);
+	white-space: nowrap;
+	cursor: pointer;
+	transition:
+		transform 180ms var(--jz-ease),
+		background 150ms ease,
+		color 150ms ease,
+		border-color 150ms ease;
+}
+.jz .jz-btn:hover {
+	transform: translateY(-1px);
+	background: #000;
+}
+.jz .jz-btn--sm {
+	min-height: 2.35rem;
+	padding: 0 1rem;
+	font-size: 0.875rem;
+}
+.jz .jz-btn--ghost {
+	background: var(--jz-surface);
+	color: var(--jz-ink);
+	border-color: var(--jz-rule-strong);
+}
+.jz .jz-btn--ghost:hover {
+	background: var(--jz-surface);
+	border-color: var(--jz-ink);
+}
+.jz .jz-btn--light {
+	background: #fff;
+	color: var(--jz-ink);
+	border-color: #fff;
+}
+.jz .jz-btn--light:hover {
+	background: #e9e7e2;
+}
+.jz .jz-btn--line {
+	background: transparent;
+	color: #fff;
+	border-color: var(--jz-night-rule);
+}
+.jz .jz-btn--line:hover {
+	background: transparent;
+	border-color: #fff;
+}
+
+/* scroll reveal, disembunyikan hanya kalau JS aktif */
+.jz .rv {
+	transition:
+		opacity 700ms var(--jz-ease) var(--rv-d, 0ms),
+		translate 700ms var(--jz-ease) var(--rv-d, 0ms);
+}
+.jz--js .rv:not(.in) {
+	opacity: 0;
+	translate: 0 1.1rem;
+}
+@media (prefers-reduced-motion: reduce) {
+	.jz .rv {
+		transition: none;
+	}
+	.jz--js .rv:not(.in) {
+		opacity: 1;
+		translate: none;
+	}
+}

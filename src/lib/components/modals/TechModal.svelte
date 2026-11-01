@@ -91,7 +91,6 @@
 				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
 			</button>
 
-			<span class="tm-modal__eyebrow">// FULL STACK</span>
 			<h3 id="tm-modal-title" class="tm-modal__title">{project.title}</h3>
 
 			<div class="tm-modal__body" data-lenis-prevent bind:this={bodyEl}>
@@ -181,13 +180,6 @@
 		stroke-linecap: round;
 	}
 
-	.tm-modal__eyebrow {
-		font-family: var(--ff-mono);
-		font-size: 0.75rem;
-		letter-spacing: 0.08em;
-		color: var(--gray);
-		padding-right: 2rem;
-	}
 
 	.tm-modal__title {
 		margin: 0.6rem 0 0;

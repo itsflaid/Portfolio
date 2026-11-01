@@ -12,7 +12,6 @@
 	let panelLeftEl: HTMLElement;
 	let panelRightEl: HTMLElement;
 	let seamEl: HTMLElement;
-	let eyebrowEl: HTMLElement;
 	let line1El: HTMLElement;
 	let line2El: HTMLElement;
 	let cursorEl: HTMLElement;
@@ -39,7 +38,7 @@
 			gsap.set(seamEl, { opacity: 0 });
 			gsap.set([line1El, line2El], { y: '0%' });
 			gsap.set(cursorEl, { opacity: 1 });
-			gsap.set([eyebrowEl, subEl, ctaEl], { opacity: 1, y: 0 });
+			gsap.set([subEl, ctaEl], { opacity: 1, y: 0 });
 			return;
 		}
 
@@ -78,7 +77,6 @@
 		contentTl
 			.fromTo(seamEl, { scaleY: 0, opacity: 1 }, { scaleY: 1, duration: 0.3, ease: 'power2.out' }, 0)
 			.to(seamEl, { opacity: 0, duration: 0.25, ease: 'power1.in' }, 0.2)
-			.fromTo(eyebrowEl, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' }, 0.1)
 			.fromTo(line1El, { y: '105%' }, { y: '0%', duration: 0.6, ease: 'power3.out' }, 0.15)
 			.fromTo(line2El, { y: '105%' }, { y: '0%', duration: 0.6, ease: 'power3.out' }, 0.27)
 			.to(cursorEl, { opacity: 1, duration: 0.2 }, 0.65)
@@ -107,7 +105,6 @@
 	<span class="close__mark" aria-hidden="true">FLAID</span>
 
 	<div class="close__content">
-		<span class="close__eyebrow" bind:this={eyebrowEl}>// END OF ARCHIVE</span>
 		<h2 class="close__heading">
 			<span class="line-mask"><span class="line" bind:this={line1El}>SEEN</span></span>
 			<span class="line-mask"
@@ -226,13 +223,6 @@
 		gap: clamp(1rem, 2.5vh, 1.6rem);
 		max-width: 44rem;
 		color: var(--fg-dark);
-	}
-	.close__eyebrow {
-		font-family: var(--ff-mono);
-		font-size: 0.8rem;
-		letter-spacing: 0.1em;
-		color: var(--gray);
-		opacity: 0;
 	}
 	.close__heading {
 		margin: 0;

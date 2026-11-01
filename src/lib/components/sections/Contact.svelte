@@ -27,14 +27,12 @@
 	let headingLine1El: HTMLElement;
 	let headingLine2El: HTMLElement;
 	let cursorEl: HTMLElement;
-	let endingEyebrowEl: HTMLElement;
 	let endingLine1El: HTMLElement;
 	let endingLine2El: HTMLElement;
 	let endingCursorEl: HTMLElement;
 	let endingCreditsEl: HTMLElement;
 	let endingBackEl: HTMLElement;
 	let mobileEndingEl: HTMLElement;
-	let mobileEndingEyebrowEl: HTMLElement;
 	let mobileEndingLine1El: HTMLElement;
 	let mobileEndingLine2El: HTMLElement;
 	let mobileEndingCursorEl: HTMLElement;
@@ -86,11 +84,11 @@
 			if (!isMobile) {
 				gsap.set(endingCursorEl, { opacity: 1 });
 				gsap.set([endingLine1El, endingLine2El], { y: '0%', x: '0rem' });
-				gsap.set([endingEyebrowEl, endingCreditsEl, endingBackEl], { opacity: 1, y: 0 });
+				gsap.set([endingCreditsEl, endingBackEl], { opacity: 1, y: 0 });
 			} else {
 				gsap.set(mobileEndingCursorEl, { opacity: 1 });
 				gsap.set([mobileEndingLine1El, mobileEndingLine2El], { y: '0%', x: '0rem' });
-				gsap.set([mobileEndingEyebrowEl, mobileEndingCreditsEl, mobileEndingBackEl], {
+				gsap.set([mobileEndingCreditsEl, mobileEndingBackEl], {
 					opacity: 1,
 					y: 0
 				});
@@ -158,12 +156,6 @@
 			const revealOut = [...darkContent, headingLine1El, headingLine2El];
 			curtain.to(revealOut, { opacity: 0, y: -16, duration: 0.35, ease: 'power2.in' }, 0.4);
 			curtain.fromTo(
-				endingEyebrowEl,
-				{ opacity: 0, y: 12 },
-				{ opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' },
-				0.72
-			);
-			curtain.fromTo(
 				endingLine1El,
 				{ y: '105%', x: '-1.4rem' },
 				{ y: '0%', x: '0rem', duration: 0.7, ease: 'power3.out' },
@@ -219,12 +211,6 @@
 				}
 			});
 			mobileEndingTl.fromTo(
-				mobileEndingEyebrowEl,
-				{ opacity: 0, y: 10 },
-				{ opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' },
-				0
-			);
-			mobileEndingTl.fromTo(
 				mobileEndingLine1El,
 				{ y: '105%', x: '-1rem' },
 				{ y: '0%', x: '0rem', duration: 0.6, ease: 'power3.out' },
@@ -271,7 +257,6 @@
 			<span class="contact__mark contact__mark--light" aria-hidden="true">FLAID</span>
 
 			<div class="contact__light-head" data-reveal-light>
-				<span class="contact__eyebrow-light">// SAY HELLO</span>
 				<p class="contact__light-lead">
 					If you have a problem worth solving? let's talk.
 				</p>
@@ -317,9 +302,6 @@
 			<span class="contact__mark contact__mark--dark" aria-hidden="true">FLAID</span>
 
 			<div class="contact__dark-content">
-				<span class="contact__eyebrow contact__eyebrow--dark" data-reveal
-					>// Have an idea?</span
-				>
 				<h2 class="contact__heading">
 					<span class="line-mask"><span class="line" bind:this={headingLine1El}>LETS</span></span>
 					<span class="line-mask"
@@ -334,7 +316,6 @@
 			</div>
 
 			<div class="contact__ending">
-				<span class="contact__ending-eyebrow" bind:this={endingEyebrowEl}>// THE END</span>
 				<h2 class="contact__ending-heading">
 					<span class="line-mask"><span class="line" bind:this={endingLine1El}>THANKS FOR</span></span>
 					<span class="line-mask"
@@ -353,7 +334,6 @@
 		</div>
 
 		<div class="contact__ending-mobile" bind:this={mobileEndingEl}>
-			<span class="contact__ending-mobile-eyebrow" bind:this={mobileEndingEyebrowEl}>// THE END</span>
 			<h2 class="contact__ending-mobile-heading">
 				<span class="line-mask"
 					><span class="line" bind:this={mobileEndingLine1El}>THANKS FOR</span></span
@@ -421,12 +401,6 @@
 		max-width: 26rem;
 		opacity: 0;
 		margin-top: auto;
-	}
-	.contact__eyebrow-light {
-		font-family: var(--ff-mono);
-		font-size: 0.8rem;
-		letter-spacing: 0.08em;
-		color: var(--gray);
 	}
 	.contact__light-lead {
 		font-family: var(--ff-body);
@@ -515,9 +489,6 @@
 		gap: clamp(1rem, 2.5vh, 1.5rem);
 		max-width: 24rem;
 	}
-	.contact__eyebrow--dark {
-		color: var(--gray);
-	}
 	.contact__heading {
 		margin: 0;
 		font-family: var(--ff-display);
@@ -570,13 +541,6 @@
 		width: 100%;
 		pointer-events: none;
 	}
-	.contact__ending-eyebrow {
-		font-family: var(--ff-mono);
-		font-size: 0.8rem;
-		letter-spacing: 0.1em;
-		color: var(--gray);
-		opacity: 0;
-	}
 	.contact__ending-heading {
 		margin: 0;
 		font-family: var(--ff-display);
@@ -619,13 +583,6 @@
 
 	.contact__ending-mobile {
 		display: none;
-	}
-	.contact__ending-mobile-eyebrow {
-		font-family: var(--ff-mono);
-		font-size: 0.78rem;
-		letter-spacing: 0.1em;
-		color: var(--gray);
-		opacity: 0;
 	}
 	.contact__ending-mobile-heading {
 		margin: 0;

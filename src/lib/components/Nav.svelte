@@ -58,11 +58,6 @@
 			{ opacity: 1, x: 0, duration: 0.4, stagger: 0.07, delay: 0.15 }
 		);
 		gsap.fromTo(q('.nav__menu-dots'), { opacity: 0 }, { opacity: 1, duration: 0.6, delay: 0.1 });
-		gsap.fromTo(
-			q('.nav__menu-eyebrow'),
-			{ opacity: 0, y: 12 },
-			{ opacity: 1, y: 0, duration: 0.4, delay: 0.1 }
-		);
 		gsap.fromTo(q('.nav__menu-logo'), { opacity: 0 }, { opacity: 0.06, duration: 1, delay: 0.25 });
 		gsap.fromTo(
 			q('.nav__menu-foot'),
@@ -136,7 +131,6 @@
 		</span>
 		<img class="nav__menu-logo" src="/logo/logo-nav.png" alt="" aria-hidden="true" draggable="false" />
 
-		<span class="nav__menu-eyebrow">// NAVIGATION</span>
 
 		<nav class="nav__menu-links">
 			{#each menuLinks as link, i}
@@ -298,14 +292,6 @@
 		z-index: 0;
 		user-select: none;
 		pointer-events: none;
-	}
-	.nav__menu-eyebrow {
-		position: relative;
-		z-index: 1;
-		font-family: var(--ff-mono);
-		font-size: 0.8rem;
-		letter-spacing: 0.08em;
-		color: var(--gray);
 	}
 	.nav__menu-links {
 		position: relative;
