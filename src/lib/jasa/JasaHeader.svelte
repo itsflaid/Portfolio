@@ -3,8 +3,8 @@
 	import ContactLink from './ContactLink.svelte';
 
 	const links = [
-		{ label: 'Landing page', href: '#landing' },
-		{ label: 'Aplikasi web', href: '#webapp' },
+		{ label: 'Website usaha', href: '#landing' },
+		{ label: 'Sistem digital', href: '#webapp' },
 		{ label: 'Proses', href: '#proses' },
 		{ label: 'Harga', href: '#harga' },
 		{ label: 'FAQ', href: '#faq' }

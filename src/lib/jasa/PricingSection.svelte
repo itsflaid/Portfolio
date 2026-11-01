@@ -14,9 +14,8 @@
 	</div>
 
 	<div class="plans">
-		{#each plans as plan, i (`${plan.group}-${plan.name}`)}
+		{#each plans as plan, i (plan.name)}
 			<article class="plan" use:reveal={i * 80}>
-				<p class="plan__group">{plan.group}</p>
 				<h3 class="plan__name">{plan.name}</h3>
 				<p class="plan__for">{plan.for}</p>
 
@@ -67,15 +66,7 @@
 		background: var(--jz-surface);
 		box-shadow: var(--jz-shadow);
 	}
-	.plan__group {
-		font-family: var(--jz-mono);
-		font-size: 0.75rem;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--jz-muted);
-	}
 	.plan__name {
-		margin-top: -0.6rem;
 		font-size: clamp(1.6rem, 2.8vw, 2rem);
 		line-height: 1.05;
 	}
