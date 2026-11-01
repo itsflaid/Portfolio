@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { SITE } from '$lib/data/site';
-	import { CONTACT_LABEL, MESSAGES, contactHref, isWeb } from '$lib/data/jasa';
+	import { MESSAGES } from '$lib/data/jasa';
+	import ContactLink from './ContactLink.svelte';
+	import Icon from './Icon.svelte';
 	import { reveal } from './reveal';
 
-	const cta = contactHref(MESSAGES.general);
 	const year = new Date().getFullYear();
 </script>
 
@@ -14,13 +15,11 @@
 			Satu pesan singkat cukup. Saya balas dengan gambaran dan estimasi, tanpa kewajiban lanjut.
 		</p>
 		<div class="cta__actions">
-			<a
-				class="jz-btn jz-btn--light"
-				href={cta}
-				target={isWeb(cta) ? '_blank' : undefined}
-				rel={isWeb(cta) ? 'noopener noreferrer' : undefined}>{CONTACT_LABEL}</a
-			>
-			<a class="jz-btn jz-btn--line" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+			<ContactLink tone="light" message={MESSAGES.general} />
+			<a class="jz-btn jz-btn--line" href={`mailto:${SITE.email}`}>
+				<Icon name="mail" />
+				{SITE.email}
+			</a>
 		</div>
 	</div>
 </section>

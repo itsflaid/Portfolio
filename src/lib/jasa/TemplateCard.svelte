@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { MESSAGES, type LandingTemplate } from '$lib/data/jasa';
 	import ContactLink from './ContactLink.svelte';
+	import Icon from './Icon.svelte';
 	import Frame from './Frame.svelte';
 
 	let { template }: { template: LandingTemplate } = $props();
@@ -21,13 +22,14 @@
 		</div>
 		<div class="card__actions">
 			{#if template.demo}
-				<a class="card__demo" href={template.demo} target="_blank" rel="noopener noreferrer"
-					>Demo ↗</a
-				>
+				<a class="card__demo" href={template.demo} target="_blank" rel="noopener noreferrer">
+					<Icon name="external" size="0.95em" />
+					Demo
+				</a>
 			{:else}
 				<span class="card__soon">Demo menyusul</span>
 			{/if}
-			<ContactLink size="sm" message={MESSAGES.template(template.name)} />
+			<ContactLink size="sm" label="Tertarik" message={MESSAGES.template(template.name)} />
 		</div>
 	</div>
 </article>
@@ -66,6 +68,9 @@
 		white-space: nowrap;
 	}
 	.card__demo {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
 		font-weight: 500;
 		color: var(--jz-ink);
 		text-decoration: underline;

@@ -14,6 +14,7 @@
 	let reduceMotion = false;
 
 	function go(e: MouseEvent, href: string) {
+		if (!href.startsWith('#')) return;
 		e.preventDefault();
 		closeMenu();
 		startLenis();
@@ -112,6 +113,7 @@
 		<a href="#projects" onclick={(e) => go(e, '#projects')}>Projects</a>
 		<a href="#skills" onclick={(e) => go(e, '#skills')}>Skills</a>
 		<a href="#contact" onclick={(e) => go(e, '#contact')}>Contact</a>
+		<a href="/jasa" data-sveltekit-reload>Jasa</a>
 	</div>
 	<button
 		class="nav__burger"
@@ -137,6 +139,7 @@
 				<a
 					class="nav__menu-link"
 					href={link.href}
+					data-sveltekit-reload={link.href.startsWith('#') ? undefined : ''}
 					onclick={(e) => go(e, link.href)}
 				>
 					<span class="nav__menu-index">0{i + 1}</span>

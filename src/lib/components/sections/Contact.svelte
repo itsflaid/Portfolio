@@ -11,6 +11,7 @@
 	const year = new Date().getFullYear();
 
 	function goSection(e: MouseEvent, href: string) {
+		if (!href.startsWith('#')) return;
 		e.preventDefault();
 		if ($page.url.pathname !== '/') {
 			goto(`/${href}`, { noScroll: true }).then(async () => {
@@ -268,7 +269,11 @@
 					<ul class="contact__group-list">
 						{#each quickLinks as link, i}
 							<li>
-								<a href={link.href} onclick={(e) => goSection(e, link.href)}>
+								<a
+									href={link.href}
+									data-sveltekit-reload={link.href.startsWith('#') ? undefined : ''}
+									onclick={(e) => goSection(e, link.href)}
+								>
 									<span class="contact__group-index">0{i + 1}</span>
 									<span>{link.label}</span>
 								</a>

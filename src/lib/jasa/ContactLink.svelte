@@ -1,11 +1,18 @@
 <script lang="ts">
-	import { CONTACT_LABEL, contactHref, isWeb } from '$lib/data/jasa';
+	import { CONTACT_LABEL, WHATSAPP_NUMBER, contactHref, isWeb } from '$lib/data/jasa';
+	import Icon from './Icon.svelte';
 
 	let {
 		message,
+		label = CONTACT_LABEL,
 		size = 'md',
 		tone = 'solid'
-	}: { message: string; size?: 'md' | 'sm'; tone?: 'solid' | 'light' } = $props();
+	}: {
+		message: string;
+		label?: string;
+		size?: 'md' | 'sm';
+		tone?: 'solid' | 'light';
+	} = $props();
 
 	const href = $derived(contactHref(message));
 </script>
@@ -16,5 +23,8 @@
 	class:jz-btn--light={tone === 'light'}
 	{href}
 	target={isWeb(href) ? '_blank' : undefined}
-	rel={isWeb(href) ? 'noopener noreferrer' : undefined}>{CONTACT_LABEL}</a
+	rel={isWeb(href) ? 'noopener noreferrer' : undefined}
 >
+	<Icon name={WHATSAPP_NUMBER ? 'whatsapp' : 'mail'} />
+	{label}
+</a>
