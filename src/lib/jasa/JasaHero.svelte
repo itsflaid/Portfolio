@@ -10,17 +10,17 @@
 <section class="hero jz-wrap" id="top">
 	<div class="hero__copy">
 		<h1 class="hero__title" data-in="2">
-			Landing page dari template atau desain custom,
-			<span class="hero__soft">dan aplikasi web yang mengikuti cara kerja bisnismu.</span>
+			Bantu usahamu lebih mudah ditemukan
+			<span class="hero__soft">dan dihubungi pelanggan.</span>
 		</h1>
 
 		<p class="hero__lede" data-in="3">
-			Saya Fadil, fullstack developer. Ceritakan kebutuhanmu dulu, nanti saya beri gambaran dan
-			estimasi.
+			Saya Fadil, fullstack developer. Landing page dari template atau desain custom, dan aplikasi
+			web yang mengikuti cara kerja bisnismu.
 		</p>
 
 		<div class="hero__actions" data-in="4">
-			<ContactLink message={MESSAGES.general} />
+			<ContactLink label="Konsultasi usahamu" message={MESSAGES.general} />
 			<a class="jz-btn jz-btn--ghost" href="#landing">Lihat template</a>
 		</div>
 	</div>
@@ -59,8 +59,8 @@
 		gap: clamp(1.1rem, 2.4vh, 1.6rem);
 	}
 	.hero__title {
-		font-size: clamp(2rem, min(3.7vw, 7vh), 3.5rem);
-		line-height: 1.04;
+		font-size: clamp(2.3rem, min(4.6vw, 9vh), 4.2rem);
+		line-height: 1;
 		letter-spacing: -0.045em;
 	}
 	.hero__soft {

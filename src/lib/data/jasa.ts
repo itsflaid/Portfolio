@@ -139,13 +139,12 @@ export const processSteps = [
 		text: 'Saya kerjakan dan tunjukkan hasil sementara, supaya revisi bisa dilakukan lebih awal.'
 	},
 	{
-		title: 'Launch & dukungan',
-		text: 'Website online, serah terima, dan saya bantu bila ada kendala setelahnya.'
+		title: 'Online & pendampingan',
+		text: 'Website atau sistemmu online, serah terima, dan saya bantu bila ada kendala setelahnya.'
 	}
 ];
 
 export type Plan = {
-	group: string;
 	name: string;
 	for: string;
 	priceNote: string;
@@ -156,9 +155,8 @@ export type Plan = {
 
 export const plans: Plan[] = [
 	{
-		group: 'Landing page',
-		name: 'Template atau desain custom',
-		for: `Pilih dari ${landingTemplates.length} template yang tersedia, atau minta desain dari nol mengikuti brand-mu. Mau yang mana, kita tentukan lewat chat.`,
+		name: 'Website usaha',
+		for: `Landing page dari ${landingTemplates.length} template atau desain custom. Mau yang mana, kita tentukan lewat chat.`,
 		priceNote: 'Hubungi untuk estimasi',
 		specs: [
 			['Jenis', 'Website statis'],
@@ -175,9 +173,8 @@ export const plans: Plan[] = [
 		message: MESSAGES.landing
 	},
 	{
-		group: 'Aplikasi web',
-		name: 'Mengikuti cara kerja bisnismu',
-		for: 'Sistem yang dirancang dari alur kerja usahamu, bukan sebaliknya.',
+		name: 'Sistem digital untuk usaha',
+		for: 'Aplikasi web yang mengikuti cara kerja bisnismu, bukan sebaliknya.',
 		priceNote: 'Estimasi setelah diskusi',
 		specs: [
 			['Jenis', 'Aplikasi web'],
