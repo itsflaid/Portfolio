@@ -1,7 +1,7 @@
 import { SITE } from '$lib/data/site';
 
 // format 6281234567890 (tanpa +). Kosong = tombol kontak jatuh ke email
-export const WHATSAPP_NUMBER = '';
+export const WHATSAPP_NUMBER = '6285753421213';
 
 export const CONTACT_LABEL = WHATSAPP_NUMBER ? 'Chat WhatsApp' : 'Kirim pesan';
 

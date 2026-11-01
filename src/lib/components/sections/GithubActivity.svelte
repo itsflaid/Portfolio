@@ -45,7 +45,6 @@
 
 	let sectionEl: HTMLElement;
 	let markEl: HTMLElement;
-	let eyebrowEl: HTMLElement;
 	let line1El: HTMLElement;
 	let line2El: HTMLElement;
 	let cursorEl: HTMLElement;
@@ -160,7 +159,6 @@
 			lockMonthlyWidth();
 
 			if (reduceMotion) {
-				gsap.set(eyebrowEl, { opacity: 1 });
 				gsap.set([line1El, line2El], { y: '0%', x: '0rem' });
 				gsap.set(cursorEl, { opacity: 1 });
 				gsap.set(cells, { opacity: (i, t) => parseFloat((t as HTMLElement).dataset.opacity ?? '0.06') });
@@ -397,7 +395,6 @@
 
 		<div class="ghactivity__inner">
 			<div class="ghactivity__left">
-				<span class="eyebrow" bind:this={eyebrowEl}>// GITHUB ACTIVITY</span>
 				<h2 class="heading">
 					<span class="line-mask"><span class="line" bind:this={line1El}>STILL</span></span>
 					<span class="line-mask"
@@ -625,12 +622,6 @@
 		gap: clamp(0.6rem, 1.6vh, 1rem);
 	}
 
-	.eyebrow {
-		font-family: var(--ff-mono);
-		font-size: 0.8rem;
-		letter-spacing: 0.1em;
-		color: var(--gray);
-	}
 	.heading {
 		margin: 0;
 		font-family: var(--ff-display);

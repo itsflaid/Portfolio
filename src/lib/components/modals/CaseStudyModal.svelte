@@ -137,7 +137,6 @@
 			</button>
 
 			<div class="cs-modal__top">
-				<span class="cs-modal__eyebrow">// CASE STUDY</span>
 				<div class="cs-modal__lang" role="group" aria-label="Language">
 					<button
 						class="cs-modal__lang-btn"
@@ -293,12 +292,6 @@
 		justify-content: space-between;
 		gap: 1rem;
 		padding-right: 2rem;
-	}
-	.cs-modal__eyebrow {
-		font-family: var(--ff-mono);
-		font-size: 0.75rem;
-		letter-spacing: 0.08em;
-		color: var(--gray);
 	}
 	.cs-modal__lang {
 		display: flex;

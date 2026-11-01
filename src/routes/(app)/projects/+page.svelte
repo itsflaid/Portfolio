@@ -238,7 +238,6 @@
 
 <main class="archive" bind:this={pageEl}>
   <div class="archive__head">
-    <span class="archive__eyebrow">// PROJECT ARCHIVE</span>
     <div class="archive__head-right">
       <span class="archive__count"
         >0{activeIndex + 1} / 0{allProjects.length}</span
@@ -339,12 +338,11 @@
     z-index: 1;
     display: flex;
     align-items: baseline;
-    justify-content: space-between;
+    justify-content: flex-end;
     margin: 0 clamp(1.5rem, 5vw, 4rem);
     padding-bottom: clamp(1.5rem, 3.2vh, 2rem);
     border-bottom: 1px solid rgba(10, 10, 10, 0.14);
   }
-  .archive__eyebrow,
   .archive__count {
     font-family: var(--ff-mono);
     font-size: 0.8rem;
