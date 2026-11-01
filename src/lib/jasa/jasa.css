@@ -104,13 +104,6 @@ html:has(.jz) {
 	margin-inline: auto;
 	text-align: center;
 }
-.jz .jz-kicker {
-	font-family: var(--jz-mono);
-	font-size: 0.75rem;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
-	color: var(--jz-muted);
-}
 .jz .jz-title {
 	font-size: clamp(2.1rem, 5vw, 3.75rem);
 	line-height: 1.02;

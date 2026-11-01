@@ -1,11 +1,6 @@
 <script lang="ts">
-	import {
-		CONTACT_LABEL,
-		MESSAGES,
-		contactHref,
-		isWeb,
-		type LandingTemplate
-	} from '$lib/data/jasa';
+	import { MESSAGES, type LandingTemplate } from '$lib/data/jasa';
+	import ContactLink from './ContactLink.svelte';
 	import MarqueeRow from './MarqueeRow.svelte';
 	import { reveal } from './reveal';
 
@@ -14,13 +9,11 @@
 	const half = $derived(Math.ceil(templates.length / 2));
 	const top = $derived(templates.slice(0, half));
 	const bottom = $derived(templates.slice(half));
-	const cta = contactHref(MESSAGES.landing);
 </script>
 
 <section class="landing jz-section" id="landing" aria-labelledby="landing-title">
 	<div class="jz-wrap">
 		<div class="jz-head" use:reveal>
-			<p class="jz-kicker">Landing Page</p>
 			<h2 class="jz-title" id="landing-title">
 				{templates.length} template, siap kamu pakai.
 			</h2>
@@ -39,12 +32,7 @@
 	<div class="jz-wrap">
 		<div class="more" use:reveal>
 			<p>Tidak ada yang pas? Template bisa diubah, atau saya buatkan dari nol.</p>
-			<a
-				class="jz-btn jz-btn--ghost"
-				href={cta}
-				target={isWeb(cta) ? '_blank' : undefined}
-				rel={isWeb(cta) ? 'noopener noreferrer' : undefined}>{CONTACT_LABEL}</a
-			>
+			<ContactLink message={MESSAGES.landing} />
 		</div>
 	</div>
 </section>

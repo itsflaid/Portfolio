@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { MESSAGES, contactHref, isWeb, type LandingTemplate } from '$lib/data/jasa';
+	import { MESSAGES, type LandingTemplate } from '$lib/data/jasa';
+	import ContactLink from './ContactLink.svelte';
 	import Frame from './Frame.svelte';
 
 	let { template }: { template: LandingTemplate } = $props();
-
-	const pick = $derived(contactHref(MESSAGES.template(template.name)));
 </script>
 
 <article class="card">
@@ -28,12 +27,7 @@
 			{:else}
 				<span class="card__soon">Demo menyusul</span>
 			{/if}
-			<a
-				class="card__pick"
-				href={pick}
-				target={isWeb(pick) ? '_blank' : undefined}
-				rel={isWeb(pick) ? 'noopener noreferrer' : undefined}>Pilih →</a
-			>
+			<ContactLink size="sm" message={MESSAGES.template(template.name)} />
 		</div>
 	</div>
 </article>
@@ -46,10 +40,8 @@
 		flex: 0 0 auto;
 	}
 	.card__body {
-		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
-		gap: 0.75rem;
+		display: grid;
+		gap: 0.85rem;
 		padding-inline: 0.15rem;
 	}
 	.card__name {
@@ -67,14 +59,13 @@
 	}
 	.card__actions {
 		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		gap: 0.25rem;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
 		font-size: 0.875rem;
 		white-space: nowrap;
 	}
-	.card__demo,
-	.card__pick {
+	.card__demo {
 		font-weight: 500;
 		color: var(--jz-ink);
 		text-decoration: underline;
@@ -83,8 +74,7 @@
 		text-underline-offset: 0.25em;
 		transition: text-decoration-color 150ms ease;
 	}
-	.card__demo:hover,
-	.card__pick:hover {
+	.card__demo:hover {
 		text-decoration-color: var(--jz-ink);
 	}
 	.card__soon {

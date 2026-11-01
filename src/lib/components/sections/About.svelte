@@ -12,7 +12,6 @@
 <section class="about" id="about">
 	<div class="about__inner">
 		<header class="about__head" use:reveal>
-			<span class="about__idx">01 // ABOUT</span>
 			<h2 class="about__title">
 				ME, BEHIND<br />THE CODE<span class="about__cursor" aria-hidden="true">_</span>
 			</h2>
@@ -50,14 +49,6 @@
 		margin: 0 auto;
 		display: grid;
 		gap: clamp(3rem, 7vw, 6rem);
-	}
-	.about__idx {
-		display: block;
-		margin-bottom: 1.5rem;
-		font-family: var(--ff-mono);
-		font-size: 0.74rem;
-		letter-spacing: 0.1em;
-		color: var(--gray);
 	}
 	.about__title {
 		margin: 0;

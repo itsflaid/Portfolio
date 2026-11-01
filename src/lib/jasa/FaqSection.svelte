@@ -5,7 +5,6 @@
 
 <section class="faq jz-section jz-wrap" id="faq" aria-labelledby="faq-title">
 	<div class="jz-head" use:reveal>
-		<p class="jz-kicker">FAQ</p>
 		<h2 class="jz-title" id="faq-title">Pertanyaan yang sering muncul.</h2>
 	</div>
 

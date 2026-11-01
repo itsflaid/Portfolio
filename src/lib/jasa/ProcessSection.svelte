@@ -5,7 +5,6 @@
 
 <section class="proses jz-section jz-wrap" id="proses" aria-labelledby="proses-title">
 	<div class="jz-head" use:reveal>
-		<p class="jz-kicker">Proses</p>
 		<h2 class="jz-title" id="proses-title">Dari obrolan sampai online.</h2>
 	</div>
 

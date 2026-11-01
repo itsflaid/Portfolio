@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { contactHref, isWeb, plans } from '$lib/data/jasa';
+	import { plans } from '$lib/data/jasa';
+	import ContactLink from './ContactLink.svelte';
 	import { reveal } from './reveal';
 </script>
 
 <section class="harga jz-section jz-wrap" id="harga" aria-labelledby="harga-title">
 	<div class="jz-head" use:reveal>
-		<p class="jz-kicker">Harga</p>
 		<h2 class="jz-title" id="harga-title">Jelas dari awal.</h2>
 		<p class="jz-lede">
 			Biaya mengikuti ruang lingkup. Setelah diskusi, kamu menerima estimasi tertulis sebelum
@@ -15,20 +15,19 @@
 
 	<div class="plans">
 		{#each plans as plan, i (`${plan.group}-${plan.name}`)}
-			{@const href = contactHref(plan.message)}
-			<article class="plan" class:plan--dark={plan.dark} use:reveal={i * 80}>
-				<p class="plan__kicker">{plan.group}</p>
+			<article class="plan" use:reveal={i * 80}>
+				<p class="plan__group">{plan.group}</p>
 				<h3 class="plan__name">{plan.name}</h3>
 				<p class="plan__for">{plan.for}</p>
 
-				<div class="plan__price">
-					{#if plan.price}
-						<span class="plan__from">Mulai dari</span>
-						<strong>{plan.price}</strong>
-					{:else}
-						<strong>{plan.priceNote}</strong>
-					{/if}
-				</div>
+				<dl class="plan__specs">
+					{#each plan.specs as [k, v]}
+						<div>
+							<dt>{k}</dt>
+							<dd>{v}</dd>
+						</div>
+					{/each}
+				</dl>
 
 				<ul class="plan__items">
 					{#each plan.items as item}
@@ -36,13 +35,10 @@
 					{/each}
 				</ul>
 
-				<a
-					class="jz-btn"
-					class:jz-btn--light={plan.dark}
-					{href}
-					target={isWeb(href) ? '_blank' : undefined}
-					rel={isWeb(href) ? 'noopener noreferrer' : undefined}>{plan.cta}</a
-				>
+				<div class="plan__foot">
+					<p class="plan__price">{plan.priceNote}</p>
+					<ContactLink message={plan.message} />
+				</div>
 			</article>
 		{/each}
 	</div>
@@ -60,8 +56,8 @@
 		}
 	}
 	.plan {
-		display: grid;
-		align-content: start;
+		display: flex;
+		flex-direction: column;
 		gap: 1.1rem;
 		padding: clamp(1.6rem, 3.5vw, 2.4rem);
 		border: 1px solid var(--jz-rule);
@@ -69,56 +65,42 @@
 		background: var(--jz-surface);
 		box-shadow: var(--jz-shadow);
 	}
-	.plan--dark {
-		border-color: var(--jz-night);
-		background: var(--jz-night);
-		color: var(--jz-night-text);
-	}
-	.plan__kicker {
+	.plan__group {
 		font-family: var(--jz-mono);
 		font-size: 0.75rem;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
 		color: var(--jz-muted);
 	}
-	.plan--dark .plan__kicker,
-	.plan--dark .plan__for,
-	.plan--dark .plan__from {
-		color: var(--jz-night-muted);
-	}
 	.plan__name {
 		margin-top: -0.6rem;
 		font-size: clamp(1.6rem, 2.8vw, 2rem);
 		line-height: 1.05;
 	}
-	.plan--dark .plan__name {
-		color: #fff;
-	}
 	.plan__for {
 		margin-top: -0.6rem;
 		color: var(--jz-muted);
 	}
-	.plan__price {
+	.plan__specs {
 		display: grid;
-		gap: 0.1rem;
-		padding-block: 1rem;
 		border-block: 1px solid var(--jz-rule);
 	}
-	.plan--dark .plan__price {
-		border-color: var(--jz-night-rule);
+	.plan__specs div {
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem;
+		padding-block: 0.6rem;
+		font-size: 0.9rem;
 	}
-	.plan__price strong {
-		font-size: clamp(1.15rem, 2vw, 1.4rem);
-		line-height: 1.05;
-		letter-spacing: -0.04em;
-		color: var(--jz-ink);
+	.plan__specs div + div {
+		border-top: 1px solid var(--jz-rule);
 	}
-	.plan--dark .plan__price strong {
-		color: #fff;
-	}
-	.plan__from {
-		font-size: 0.8125rem;
+	.plan__specs dt {
 		color: var(--jz-muted);
+	}
+	.plan__specs dd {
+		text-align: right;
+		font-weight: 500;
 	}
 	.plan__items {
 		display: grid;
@@ -138,11 +120,17 @@
 		font-size: 0.8125rem;
 		color: var(--jz-muted);
 	}
-	.plan--dark .plan__items li::before {
-		color: var(--jz-ok);
+	.plan__foot {
+		display: grid;
+		gap: 0.9rem;
+		margin-top: auto;
+		padding-top: 0.6rem;
 	}
-	.plan .jz-btn {
-		justify-self: start;
-		margin-top: 0.4rem;
+	.plan__price {
+		font-weight: 600;
+		letter-spacing: -0.02em;
+	}
+	.plan__foot :global(.jz-btn) {
+		justify-self: stretch;
 	}
 </style>

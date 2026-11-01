@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { MESSAGES, contactHref, isWeb, webApps } from '$lib/data/jasa';
+	import { MESSAGES, webApps } from '$lib/data/jasa';
+	import ContactLink from './ContactLink.svelte';
 	import Frame from './Frame.svelte';
 	import { reveal } from './reveal';
 </script>
 
 <section class="apps jz-section jz-wrap" id="webapp" aria-labelledby="webapp-title">
 	<div class="jz-head" use:reveal>
-		<p class="jz-kicker">Web App</p>
 		<h2 class="jz-title" id="webapp-title">Sistem yang mengikuti cara kerjamu.</h2>
 		<p class="jz-lede">
 			Contoh aplikasi yang saya bangun dari masalah nyata. Untuk bisnismu, alurnya kita tentukan
@@ -16,7 +16,6 @@
 
 	<div class="list">
 		{#each webApps as app, i (app.slug)}
-			{@const ask = contactHref(MESSAGES.similar(app.name))}
 			<article class="app" class:app--flip={i % 2 === 1} use:reveal>
 				<div class="app__media">
 					<Frame
@@ -28,7 +27,7 @@
 				</div>
 
 				<div class="app__copy">
-					<p class="jz-kicker">0{i + 1} · {app.kind}</p>
+					<p class="app__kind">{app.kind}</p>
 					<h3 class="app__name">{app.name}</h3>
 					<p class="app__tagline">{app.tagline}</p>
 					{#if app.badge}<p class="app__badge">{app.badge}</p>{/if}
@@ -50,27 +49,14 @@
 						{/each}
 					</ul>
 
-					<ul class="app__stack" aria-label="Teknologi">
-						{#each app.stack as tech}
-							<li>{tech}</li>
-						{/each}
-					</ul>
-
 					<div class="app__links">
+						<ContactLink size="sm" message={MESSAGES.similar(app.name)} />
 						{#if app.demo}
-							<a class="jz-btn jz-btn--sm" href={app.demo} target="_blank" rel="noopener noreferrer"
-								>Buka demo ↗</a
-							>
-						{/if}
-						<a
-							class="jz-btn jz-btn--sm jz-btn--ghost"
-							href={ask}
-							target={isWeb(ask) ? '_blank' : undefined}
-							rel={isWeb(ask) ? 'noopener noreferrer' : undefined}>Tanya yang serupa</a
-						>
-						{#if app.repo}
-							<a class="app__repo" href={app.repo} target="_blank" rel="noopener noreferrer"
-								>Kode di GitHub ↗</a
+							<a
+								class="jz-btn jz-btn--sm jz-btn--ghost"
+								href={app.demo}
+								target="_blank"
+								rel="noopener noreferrer">Buka demo ↗</a
 							>
 						{/if}
 					</div>
@@ -166,19 +152,6 @@
 		height: 0.4rem;
 		background: var(--jz-ink);
 	}
-	.app__stack {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.4rem;
-	}
-	.app__stack li {
-		padding: 0.2rem 0.6rem;
-		border-radius: 999px;
-		background: var(--jz-wash);
-		font-family: var(--jz-mono);
-		font-size: 0.75rem;
-		color: var(--jz-text);
-	}
 	.app__links {
 		display: flex;
 		flex-wrap: wrap;
@@ -186,19 +159,11 @@
 		gap: 0.6rem 0.75rem;
 		margin-top: 0.4rem;
 	}
-	.app__repo {
-		font-size: 0.875rem;
+	.app__kind {
+		font-family: var(--jz-mono);
+		font-size: 0.75rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
 		color: var(--jz-muted);
-		text-decoration: underline;
-		text-decoration-color: var(--jz-rule-strong);
-		text-decoration-thickness: 2px;
-		text-underline-offset: 0.25em;
-		transition:
-			color 150ms ease,
-			text-decoration-color 150ms ease;
-	}
-	.app__repo:hover {
-		color: var(--jz-ink);
-		text-decoration-color: var(--jz-ink);
 	}
 </style>

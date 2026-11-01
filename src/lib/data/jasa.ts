@@ -64,11 +64,9 @@ export type WebApp = {
 	forWho: string;
 	problem: string;
 	features: string[];
-	stack: string[];
 	thumb: string;
 	host: string;
 	demo?: string;
-	repo?: string;
 	badge?: string;
 };
 
@@ -88,10 +86,8 @@ export const webApps: WebApp[] = [
 			'Perubahan langsung muncul di semua perangkat, tanpa refresh',
 			'Jejak audit: entri yang dibatalkan tidak benar-benar dihapus'
 		],
-		stack: ['Laravel', 'Livewire', 'MySQL', 'Laravel Reverb'],
 		thumb: '/preview/image/kasbonin.webp',
 		host: 'kasbon.in',
-		repo: 'https://github.com/itsflaid/kasbon.in'
 	},
 	{
 		slug: 'katalyst',
@@ -108,11 +104,9 @@ export const webApps: WebApp[] = [
 			'Copilot tanya-jawab berbasis data; angka dari rumus, bukan karangan AI',
 			'Stok, diskon terjadwal, dan log aktivitas owner & staff'
 		],
-		stack: ['SvelteKit', 'PostgreSQL', 'Drizzle', 'Better Auth'],
 		thumb: '/preview/image/katalyst.webp',
 		host: 'katalyst-6pk.pages.dev',
 		demo: 'https://katalyst-6pk.pages.dev/',
-		repo: 'https://github.com/itsflaid/katalyst'
 	},
 	{
 		slug: 'de-home-spa',
@@ -128,11 +122,9 @@ export const webApps: WebApp[] = [
 			'Form booking singkat yang terkirim ke admin lewat WhatsApp',
 			'Tanpa login dan tanpa database, jadi ringan dikelola'
 		],
-		stack: ['Next.js', 'TypeScript', 'Groq API', 'Tailwind CSS'],
 		thumb: '/preview/image/de-home-spa.webp',
 		host: 'de-home-spa-v2-uwxp.vercel.app',
 		demo: 'https://de-home-spa-v2-uwxp.vercel.app/',
-		repo: 'https://github.com/FlaidHack/de-home-spa-v2',
 		badge: 'Peringkat 6 — TechnoFest 2026'
 	}
 ];
@@ -160,63 +152,66 @@ export type Plan = {
 	group: string;
 	name: string;
 	for: string;
-	price: string; // kosong = tampil priceNote
 	priceNote: string;
+	specs: [string, string][];
 	items: string[];
-	cta: string;
 	message: string;
-	dark?: boolean;
 };
 
 export const plans: Plan[] = [
 	{
 		group: 'Landing Page',
-		name: 'Ikut template',
-		for: `Pilih satu dari ${landingTemplates.length} template yang tersedia.`,
-		price: '',
+		name: 'Template',
+		for: `Pilih satu dari ${landingTemplates.length} template yang tersedia, lalu disesuaikan dengan bisnismu.`,
 		priceNote: 'Hubungi untuk estimasi',
-		items: [
-			'Logo, warna, foto, dan teks disesuaikan dengan bisnismu',
-			'Tampilan rapi di HP dan desktop',
-			'Tombol WhatsApp, peta lokasi, dan tautan media sosial',
-			'Bantuan setup domain dan hosting',
-			'Revisi sesuai kesepakatan'
+		specs: [
+			['Jenis', 'Website statis'],
+			['Halaman', 'Single atau multipage'],
+			['Desain', 'Dari template']
 		],
-		cta: 'Pilih template',
+		items: [
+			'Logo, warna, foto, dan teks disesuaikan',
+			'Tampilan rapi di HP dan desktop',
+			'Tombol WhatsApp, peta lokasi, dan media sosial',
+			'Bantuan setup domain dan hosting'
+		],
 		message: MESSAGES.landingTemplate
 	},
 	{
 		group: 'Landing Page',
 		name: 'Custom',
 		for: 'Desain dibuat dari nol mengikuti brand dan kebutuhanmu.',
-		price: '',
 		priceNote: 'Sesuai desain dan kebutuhan',
+		specs: [
+			['Jenis', 'Website statis'],
+			['Halaman', 'Single atau multipage'],
+			['Desain', 'Khusus, tanpa template']
+		],
 		items: [
 			'Struktur halaman dan alur konten dirancang bersama',
-			'Desain khusus, tidak memakai template',
 			'Tampilan rapi di HP dan desktop',
 			'Bantuan setup domain dan hosting',
 			'Revisi sesuai kesepakatan'
 		],
-		cta: 'Diskusi desain',
 		message: MESSAGES.landingCustom
 	},
 	{
 		group: 'Web App',
-		name: 'Diskusi dulu',
+		name: 'Custom',
 		for: 'Sistem yang mengikuti alur kerja bisnismu.',
-		price: '',
 		priceNote: 'Estimasi setelah diskusi',
+		specs: [
+			['Jenis', 'Aplikasi web'],
+			['Halaman', 'Sesuai alur kerja'],
+			['Desain', 'Khusus, tanpa template']
+		],
 		items: [
 			'Diskusi alur kerja dan fitur yang benar-benar dipakai',
-			'Desain dan pembuatan sesuai kebutuhan',
 			'Login, database, dan hak akses per peran',
 			'Deploy dan serah terima',
 			'Dukungan setelah launch dibahas di awal'
 		],
-		cta: 'Diskusi kebutuhan',
-		message: MESSAGES.webapp,
-		dark: true
+		message: MESSAGES.webapp
 	}
 ];
 
@@ -224,6 +219,10 @@ export const faqs = [
 	{
 		q: 'Berapa lama pengerjaannya?',
 		a: 'Tergantung ruang lingkup. Landing page dari template jauh lebih cepat daripada web app. Estimasi pastinya saya berikan setelah kita diskusi.'
+	},
+	{
+		q: 'Landing page-nya single page atau multipage?',
+		a: 'Keduanya bisa. Single page cukup untuk kebanyakan usaha kecil. Multipage cocok kalau butuh halaman terpisah, misalnya layanan, tentang, dan kontak. Keduanya statis, jadi cepat dibuka dan murah untuk hosting.'
 	},
 	{
 		q: 'Template bisa disesuaikan?',
