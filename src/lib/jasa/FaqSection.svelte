@@ -1,6 +1,56 @@
 <script lang="ts">
 	import { faqs } from '$lib/data/jasa';
 	import { reveal } from './reveal';
+
+	let opened = $state<boolean[]>(faqs.map(() => false));
+	const running = new Map<HTMLElement, Animation>();
+
+	function toggle(e: MouseEvent, i: number) {
+		e.preventDefault();
+		const details = (e.currentTarget as HTMLElement).parentElement as HTMLDetailsElement;
+		const body = details.querySelector<HTMLElement>('.item__body');
+		if (!body) return;
+
+		running.get(body)?.cancel();
+		const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+		if (!opened[i]) {
+			opened[i] = true;
+			details.open = true;
+			if (reduce) return;
+			const h = body.offsetHeight;
+			running.set(
+				body,
+				body.animate(
+					[
+						{ height: '0px', opacity: 0 },
+						{ height: `${h}px`, opacity: 1 }
+					],
+					{ duration: 340, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
+				)
+			);
+			return;
+		}
+
+		opened[i] = false;
+		if (reduce) {
+			details.open = false;
+			return;
+		}
+		const h = body.offsetHeight;
+		const anim = body.animate(
+			[
+				{ height: `${h}px`, opacity: 1 },
+				{ height: '0px', opacity: 0 }
+			],
+			{ duration: 260, easing: 'ease', fill: 'forwards' }
+		);
+		running.set(body, anim);
+		anim.onfinish = () => {
+			details.open = false;
+			anim.cancel();
+		};
+	}
 </script>
 
 <section class="faq jz-section jz-wrap" id="faq" aria-labelledby="faq-title">
@@ -9,13 +59,15 @@
 	</div>
 
 	<div class="list" use:reveal={60}>
-		{#each faqs as item}
-			<details class="item">
-				<summary>
+		{#each faqs as item, i}
+			<details class="item" class:is-open={opened[i]}>
+				<summary onclick={(e) => toggle(e, i)}>
 					<span>{item.q}</span>
 					<i aria-hidden="true"></i>
 				</summary>
-				<p>{item.a}</p>
+				<div class="item__body">
+					<p>{item.a}</p>
+				</div>
 			</details>
 		{/each}
 	</div>
@@ -65,8 +117,11 @@
 	summary i::after {
 		rotate: 90deg;
 	}
-	details[open] summary i::after {
+	.item.is-open summary i::after {
 		rotate: 0deg;
+	}
+	.item__body {
+		overflow: hidden;
 	}
 	.item p {
 		padding: 0 2rem 1.3rem 0;

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { MESSAGES, webApps } from '$lib/data/jasa';
 	import ContactLink from './ContactLink.svelte';
+	import Icon from './Icon.svelte';
 	import Frame from './Frame.svelte';
 	import { reveal } from './reveal';
 </script>
@@ -56,8 +57,11 @@
 								class="jz-btn jz-btn--sm jz-btn--ghost"
 								href={app.demo}
 								target="_blank"
-								rel="noopener noreferrer">Buka demo ↗</a
+								rel="noopener noreferrer"
 							>
+								<Icon name="external" size="0.95em" />
+								Buka demo
+							</a>
 						{/if}
 					</div>
 				</div>

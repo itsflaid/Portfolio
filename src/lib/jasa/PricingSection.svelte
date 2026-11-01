@@ -50,9 +50,11 @@
 		gap: 1rem;
 		margin-top: clamp(2.5rem, 5vw, 4rem);
 	}
-	@media (min-width: 62rem) {
+	@media (min-width: 48rem) {
 		.plans {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			max-width: 62rem;
+			margin-inline: auto;
 		}
 	}
 	.plan {

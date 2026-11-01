@@ -72,7 +72,15 @@
 		width: 0.5rem;
 		height: 0.5rem;
 		border-radius: 50%;
-		background: var(--jz-rule-strong);
+	}
+	.frame__bar i:nth-child(1) {
+		background: #ff5f57;
+	}
+	.frame__bar i:nth-child(2) {
+		background: #febc2e;
+	}
+	.frame__bar i:nth-child(3) {
+		background: #28c840;
 	}
 	.frame__url {
 		margin-left: 0.5rem;

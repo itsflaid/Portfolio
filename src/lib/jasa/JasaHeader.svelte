@@ -1,21 +1,20 @@
 <script lang="ts">
-	import { CONTACT_LABEL, MESSAGES, contactHref, isWeb } from '$lib/data/jasa';
+	import { MESSAGES } from '$lib/data/jasa';
+	import ContactLink from './ContactLink.svelte';
 
 	const links = [
-		{ label: 'Landing Page', href: '#landing' },
-		{ label: 'Web App', href: '#webapp' },
+		{ label: 'Landing page', href: '#landing' },
+		{ label: 'Aplikasi web', href: '#webapp' },
 		{ label: 'Proses', href: '#proses' },
 		{ label: 'Harga', href: '#harga' },
 		{ label: 'FAQ', href: '#faq' }
 	];
-	const cta = contactHref(MESSAGES.general);
 </script>
 
 <header class="bar">
 	<div class="jz-wrap bar__in">
-		<a class="bar__brand" href="#top" aria-label="Flaid — Jasa Web, ke atas">
+		<a class="bar__brand" href="#top" aria-label="Flaid, ke atas">
 			<span class="bar__mark">FLAID</span>
-			<span class="bar__tag">Jasa Web</span>
 		</a>
 
 		<nav class="bar__nav" aria-label="Bagian halaman">
@@ -26,12 +25,7 @@
 
 		<div class="bar__right">
 			<a class="bar__back" href="/" data-sveltekit-reload>← Portfolio</a>
-			<a
-				class="jz-btn jz-btn--sm"
-				href={cta}
-				target={isWeb(cta) ? '_blank' : undefined}
-				rel={isWeb(cta) ? 'noopener noreferrer' : undefined}>{CONTACT_LABEL}</a
-			>
+			<ContactLink size="sm" message={MESSAGES.general} />
 		</div>
 	</div>
 </header>
@@ -64,13 +58,6 @@
 		font-weight: 800;
 		letter-spacing: 0.04em;
 		color: var(--jz-ink);
-	}
-	.bar__tag {
-		font-family: var(--jz-mono);
-		font-size: 0.6875rem;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--jz-muted);
 	}
 	.bar__nav {
 		display: none;

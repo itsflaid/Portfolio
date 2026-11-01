@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { CONTACT_LABEL, MESSAGES, contactHref, isWeb, webApps } from '$lib/data/jasa';
+	import { MESSAGES, webApps } from '$lib/data/jasa';
+	import ContactLink from './ContactLink.svelte';
 	import Frame from './Frame.svelte';
 
-	const cta = contactHref(MESSAGES.general);
 	const back = webApps.find((a) => a.slug === 'katalyst');
 	const front = webApps.find((a) => a.slug === 'de-home-spa');
 </script>
@@ -10,28 +10,19 @@
 <section class="hero jz-wrap" id="top">
 	<div class="hero__copy">
 		<h1 class="hero__title" data-in="2">
-			Landing page &amp; sistem web<br />
-			<span class="hero__soft">untuk bisnismu.</span>
+			Landing page dari template atau desain custom,
+			<span class="hero__soft">dan aplikasi web yang mengikuti cara kerja bisnismu.</span>
 		</h1>
 
 		<p class="hero__lede" data-in="3">
-			Saya Fadil, fullstack developer. Landing page dari template atau desain custom, dan aplikasi
-			web yang mengikuti cara kerja bisnismu.
+			Saya Fadil, fullstack developer. Ceritakan kebutuhanmu dulu, nanti saya beri gambaran dan
+			estimasi.
 		</p>
 
 		<div class="hero__actions" data-in="4">
-			<a
-				class="jz-btn"
-				href={cta}
-				target={isWeb(cta) ? '_blank' : undefined}
-				rel={isWeb(cta) ? 'noopener noreferrer' : undefined}>{CONTACT_LABEL}</a
-			>
+			<ContactLink message={MESSAGES.general} />
 			<a class="jz-btn jz-btn--ghost" href="#landing">Lihat template</a>
 		</div>
-
-		<p class="hero__note" data-in="5">
-			Ceritakan kebutuhanmu dulu, nanti saya beri gambaran dan estimasi.
-		</p>
 	</div>
 
 	<div class="hero__stage" data-in="3" aria-hidden="true">
@@ -68,8 +59,8 @@
 		gap: clamp(1.1rem, 2.4vh, 1.6rem);
 	}
 	.hero__title {
-		font-size: clamp(2.6rem, min(6vw, 11vh), 5.25rem);
-		line-height: 0.98;
+		font-size: clamp(2rem, min(3.7vw, 7vh), 3.5rem);
+		line-height: 1.04;
 		letter-spacing: -0.045em;
 	}
 	.hero__soft {
@@ -85,10 +76,6 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.75rem;
-	}
-	.hero__note {
-		font-size: 0.875rem;
-		color: var(--jz-muted);
 	}
 
 	.hero__stage {
@@ -121,9 +108,6 @@
 	}
 	[data-in='4'] {
 		animation-delay: 240ms;
-	}
-	[data-in='5'] {
-		animation-delay: 300ms;
 	}
 	@keyframes rise {
 		from {

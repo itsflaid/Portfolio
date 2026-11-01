@@ -16,10 +16,6 @@ export const isWeb = (href: string) => href.startsWith('http');
 export const MESSAGES = {
 	general: 'Halo Fadil, saya tertarik dengan jasa pembuatan website. Boleh saya konsultasi dulu?',
 	landing: 'Halo Fadil, saya butuh landing page untuk bisnis saya. Boleh saya konsultasi dulu?',
-	landingTemplate:
-		'Halo Fadil, saya mau landing page dari template. Boleh saya konsultasi dulu?',
-	landingCustom:
-		'Halo Fadil, saya mau landing page dengan desain custom. Boleh saya konsultasi dulu?',
 	webapp: 'Halo Fadil, saya butuh aplikasi web untuk bisnis saya. Boleh saya konsultasi dulu?',
 	template: (name: string) =>
 		`Halo Fadil, saya tertarik dengan template "${name}". Boleh saya tanya lebih lanjut?`,
@@ -160,45 +156,28 @@ export type Plan = {
 
 export const plans: Plan[] = [
 	{
-		group: 'Landing Page',
-		name: 'Template',
-		for: `Pilih satu dari ${landingTemplates.length} template yang tersedia, lalu disesuaikan dengan bisnismu.`,
+		group: 'Landing page',
+		name: 'Template atau desain custom',
+		for: `Pilih dari ${landingTemplates.length} template yang tersedia, atau minta desain dari nol mengikuti brand-mu. Mau yang mana, kita tentukan lewat chat.`,
 		priceNote: 'Hubungi untuk estimasi',
 		specs: [
 			['Jenis', 'Website statis'],
 			['Halaman', 'Single atau multipage'],
-			['Desain', 'Dari template']
+			['Desain', 'Template atau custom']
 		],
 		items: [
-			'Logo, warna, foto, dan teks disesuaikan',
+			'Logo, warna, foto, dan teks disesuaikan dengan bisnismu',
 			'Tampilan rapi di HP dan desktop',
 			'Tombol WhatsApp, peta lokasi, dan media sosial',
-			'Bantuan setup domain dan hosting'
-		],
-		message: MESSAGES.landingTemplate
-	},
-	{
-		group: 'Landing Page',
-		name: 'Custom',
-		for: 'Desain dibuat dari nol mengikuti brand dan kebutuhanmu.',
-		priceNote: 'Sesuai desain dan kebutuhan',
-		specs: [
-			['Jenis', 'Website statis'],
-			['Halaman', 'Single atau multipage'],
-			['Desain', 'Khusus, tanpa template']
-		],
-		items: [
-			'Struktur halaman dan alur konten dirancang bersama',
-			'Tampilan rapi di HP dan desktop',
 			'Bantuan setup domain dan hosting',
 			'Revisi sesuai kesepakatan'
 		],
-		message: MESSAGES.landingCustom
+		message: MESSAGES.landing
 	},
 	{
-		group: 'Web App',
-		name: 'Custom',
-		for: 'Sistem yang mengikuti alur kerja bisnismu.',
+		group: 'Aplikasi web',
+		name: 'Mengikuti cara kerja bisnismu',
+		for: 'Sistem yang dirancang dari alur kerja usahamu, bukan sebaliknya.',
 		priceNote: 'Estimasi setelah diskusi',
 		specs: [
 			['Jenis', 'Aplikasi web'],
@@ -218,7 +197,7 @@ export const plans: Plan[] = [
 export const faqs = [
 	{
 		q: 'Berapa lama pengerjaannya?',
-		a: 'Tergantung ruang lingkup. Landing page dari template jauh lebih cepat daripada web app. Estimasi pastinya saya berikan setelah kita diskusi.'
+		a: 'Tergantung ruang lingkup. Landing page dari template jauh lebih cepat daripada aplikasi web. Estimasi pastinya saya berikan setelah kita diskusi.'
 	},
 	{
 		q: 'Landing page-nya single page atau multipage?',
@@ -237,7 +216,7 @@ export const faqs = [
 		a: 'Disepakati di awal sebelum pengerjaan dimulai, supaya jelas untuk kedua pihak.'
 	},
 	{
-		q: 'Web app bisa dibuat sesuai bisnis saya?',
+		q: 'Aplikasi web bisa dibuat sesuai bisnis saya?',
 		a: 'Bisa. Contoh di atas lahir dari masalah nyata, misalnya pencatatan utang di warung keluarga. Ceritakan alur kerjamu, nanti kita tentukan fitur yang perlu.'
 	},
 	{
