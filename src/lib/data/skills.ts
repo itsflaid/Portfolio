@@ -29,6 +29,7 @@ import {
   siVercel,
   siGsap,
   siFramer,
+  siFigma,
   siDocker,
   siLaragon,
 } from "simple-icons";
@@ -38,7 +39,6 @@ import {
   groqIcon,
   gptIcon,
   codexIcon,
-  figmaIcon,
   nineRouterIcon,
 } from "./icons";
 import type { SkillIcon } from "./icons";
@@ -56,7 +56,7 @@ export const skillGroups: SkillGroup[] = [
     label: "FRONTEND & DESIGN",
     items: [
       { name: "Next.js", icon: si(siNextdotjs), color: "a", shape: "c" },
-      { name: "Figma", icon: figmaIcon, color: "b", shape: "a" },
+      { name: "Figma", icon: si(siFigma), color: "b", shape: "a" },
       { name: "TypeScript", icon: si(siTypescript), color: "a", shape: "b" },
       { name: "React", icon: si(siReact), color: "a", shape: "a" },
       { name: "SvelteKit", icon: si(siSvelte), color: "b", shape: "a" },

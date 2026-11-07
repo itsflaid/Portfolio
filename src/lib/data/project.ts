@@ -403,8 +403,8 @@ export const projects: Project[] = [
 		repo: 'https://github.com/itsflaid/de-home-spa-v2',
 		caseStudy: {
 			problem: {
-				en: 'Built for Frontend AI Augmented Hackathon TechnoFest 2026. Home massage booking sites typically list dozens of treatments in technical language with no real guidance, and no space to describe symptoms or set a pressure preference. That made it easy to pick the wrong treatment, leave unsatisfied, or just abandon the site — a lost customer for the business and an underused home-service offering.',
-				id: 'dibangun untuk HackathonFrontend AI Augmented pada TechnoFest 2026. Website booking pijat pada umumnya menampilkan puluhan treatment dengan istilah teknis tanpa panduan yang jelas, dan tidak ada ruang untuk menjelaskan keluhan atau menentukan preferensi tekanan. Akibatnya, salah pilih treatment, merasa kurang puas, atau akhirnya meninggalkan situs jadi hal yang mudah terjadi — bisnis kehilangan calon pelanggan dan potensi layanan home service kurang optimal.'
+				en: 'Built for Frontend AI Augmented Hackathon TechnoFest 2026 UMKT Samarinda. Home massage booking sites typically list dozens of treatments in technical language with no real guidance, and no space to describe symptoms or set a pressure preference. That made it easy to pick the wrong treatment, leave unsatisfied, or just abandon the site — a lost customer for the business and an underused home-service offering.',
+				id: 'Dibangun untuk Hackathon Frontend AI Augmented pada TechnoFest 2026 UMKT Samarinda. Website booking pijat pada umumnya menampilkan puluhan treatment dengan istilah teknis tanpa panduan yang jelas, dan tidak ada ruang untuk menjelaskan keluhan atau menentukan preferensi tekanan. Akibatnya, salah pilih treatment, merasa kurang puas, atau akhirnya meninggalkan situs jadi hal yang mudah terjadi — bisnis kehilangan calon pelanggan dan potensi layanan home service kurang optimal.'
 			},
 			solution: {
 				en: 'De Home Spa is a massage-booking landing page pairing AI recommendations with WhatsApp to simplify treatment selection. Users describe what\u2019s bothering them in plain language, and a Groq-powered model recommends a treatment — name, duration, scent, and pressure — along with a quick tip, while also picking up on preferences like soft, normal, or firm pressure automatically. Once a treatment\u2019s chosen, a short form (name, address, schedule, phone, payment method) sends the booking straight to the admin over WhatsApp. An interactive price list covers 26+ treatments across 4 duration options, viewable in a modal with no login or database needed — the whole flow is built responsively with Tailwind CSS, targeting a booking completed in under a minute.',
@@ -457,12 +457,12 @@ export const projects: Project[] = [
 		demo: 'https://katalyst-6pk.pages.dev/',
 		caseStudy: {
 			problem: {
-				en: 'lorem ipsum',
-				id: 'lorem ipsum'
+				en: 'Built for the  3rd PTKIN Islamic Studies, Science, and Research Olympiad (OASE PTKIN III) 2026 in Yogyakarta. Small businesses often record transactions in Excel or manually, but those records do not automatically show which products perform best or what might happen if prices change. For one UMKM partner, business indicators were not routinely analyzed, making it harder to compare product performance and explore pricing scenarios, especially for core products such as rice.',
+				id: 'Dibangun untuk Olimpiade Agama, Sains, dan Riset PTKIN III 2026 di Yogyakarta. Banyak UMKM mencatat transaksi melalui Excel atau secara manual, tetapi catatan tersebut tidak otomatis menunjukkan produk mana yang berkinerja baik atau dampak dari perubahan harga. Pada salah satu mitra UMKM, data usaha belum dianalisis secara rutin untuk membandingkan kinerja produk dan menjajaki skenario keputusan, terutama karena ruang penyesuaian harga produk inti seperti beras cukup terbatas.'
 			},
 			solution: {
-				en: 'lorem ipsum',
-				id: 'lorem ipsum'
+				en: 'Katalyst connects transaction analytics, an AI Copilot, and a what-if simulator in one business decision-support system. Owners can review revenue, costs, profit, and margin by period, ask the Copilot to explain figures grounded in server-side analytical results, and compare pricing scenarios before making a decision. The simulator makes its assumptions visible and does not alter historical transactions, while role-based access separates Owner and Staff permissions. Katalyst supports the owners judgment rather than replacing it.',
+				id: 'Katalyst menghubungkan analitik transaksi, AI Copilot, dan simulator what-if dalam satu sistem pendukung keputusan bisnis. Pemilik dapat meninjau pendapatan, biaya, laba, dan margin berdasarkan periode, meminta Copilot menjelaskan angka yang bersumber dari hasil analitik server, serta membandingkan skenario harga sebelum mengambil keputusan. Simulator menampilkan asumsi yang digunakan tanpa mengubah transaksi historis, sementara pembatasan akses memisahkan hak Owner dan Staff. Katalyst membantu pertimbangan pemilik usaha, bukan menggantikan keputusan mereka'
 			}
 		}
 	},

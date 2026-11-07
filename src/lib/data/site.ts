@@ -6,7 +6,6 @@ export const SITE = {
 	linkedin: 'https://www.linkedin.com/in/muhammad-fadil-1264b82a9',
 	instagram: 'https://www.instagram.com/sebutsajamf?igsh=N2xjdnVobmthdGU0',
 	npm: 'https://www.npmjs.com/~fadilz',
-	tiktok: 'https://www.tiktok.com/@itsflaid',
 	location: 'Kutai Kartanegara, ID',
 	url: 'https://www.flaid.my.id/'
 } as const;
@@ -17,8 +16,8 @@ export const navLinks: NavLink[] = [
 	{ label: 'ABOUT', href: '#about' },
 	{ label: 'PROJECTS', href: '#projects' },
 	{ label: 'SKILLS', href: '#skills' },
-	{ label: 'CONTACT', href: '#contact' },
-	{ label: 'JASA', href: '/jasa' }
+	{ label: 'CONTACT', href: '#contact' }
+	// { label: 'JASA', href: '/jasa' }
 ];
 
 export const socials: NavLink[] = [
@@ -33,5 +32,4 @@ export const sameAs: string[] = [
 	SITE.linkedin,
 	SITE.instagram,
 	SITE.npm,
-	SITE.tiktok,
 ];

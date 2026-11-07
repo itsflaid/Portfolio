@@ -6,9 +6,63 @@
 	import { page } from '$app/stores';
 	import { scrollToTarget, jumpToTop } from '$lib/scroll';
 
-	import { navLinks as quickLinks, socials, SITE } from '$lib/data/site';
+	import { navLinks as quickLinks, SITE } from '$lib/data/site';
+	import { siGithub, siGmail, siInstagram } from 'simple-icons';
 
 	const year = new Date().getFullYear();
+
+	const linkedinPath =
+		'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z';
+
+	const navMeta: Record<string, { icon: string; desc: string }> = {
+		'#about': {
+			icon: 'M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z',
+			desc: 'Who I am'
+		},
+		'#projects': {
+			icon: 'M3 3h8v8H3V3Zm10 0h8v8h-8V3ZM3 13h8v8H3v-8Zm10 0h8v8h-8v-8Z',
+			desc: 'Selected work'
+		},
+		'#skills': {
+			icon: 'M13 2 4 14h6l-1 8 9-12h-6l1-8Z',
+			desc: 'Tools I use'
+		},
+		'#contact': {
+			icon: 'M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2Z',
+			desc: 'Start a conversation'
+		}
+	};
+
+	const channels = [
+		{
+			label: 'EMAIL',
+			value: SITE.email,
+			href: `mailto:${SITE.email}`,
+			path: siGmail.path,
+			external: false
+		},
+		{
+			label: 'GITHUB',
+			value: '@itsflaid',
+			href: SITE.github,
+			path: siGithub.path,
+			external: true
+		},
+		{
+			label: 'LINKEDIN',
+			value: 'Muhammad Fadil',
+			href: SITE.linkedin,
+			path: linkedinPath,
+			external: true
+		},
+		{
+			label: 'INSTAGRAM',
+			value: '@sebutsajamf',
+			href: SITE.instagram,
+			path: siInstagram.path,
+			external: true
+		}
+	];
 
 	function goSection(e: MouseEvent, href: string) {
 		if (!href.startsWith('#')) return;
@@ -81,8 +135,9 @@
 			gsap.set([headingLine1El, headingLine2El], { y: '0%', x: '0rem' });
 			gsap.set(cursorEl, { opacity: 1 });
 			gsap.set(lightContent, { opacity: 1, y: 0 });
-			gsap.set(darkContent, { opacity: isMobile ? 1 : 0 });
+			gsap.set(darkContent, { opacity: 1 });
 			if (!isMobile) {
+				gsap.set('.contact__ending', { display: 'none' });
 				gsap.set(endingCursorEl, { opacity: 1 });
 				gsap.set([endingLine1El, endingLine2El], { y: '0%', x: '0rem' });
 				gsap.set([endingCreditsEl, endingBackEl], { opacity: 1, y: 0 });
@@ -257,25 +312,37 @@
 		<div class="contact__light">
 			<span class="contact__mark contact__mark--light" aria-hidden="true">FLAID</span>
 
-			<div class="contact__light-head" data-reveal-light>
+			<header class="contact__light-head" data-reveal-light>
 				<p class="contact__light-lead">
-					If you have a problem worth solving? let's talk.
+					Have a problem<br />worth solving?
 				</p>
-			</div>
+				<p class="contact__light-sub">Let's talk — I'd love to hear about it.</p>
+			</header>
 
-			<div class="contact__groups">
+			<div class="contact__light-grid">
 				<nav class="contact__group" data-reveal-light aria-label="Menu">
-					<span class="contact__group-label">MENU</span>
-					<ul class="contact__group-list">
-						{#each quickLinks as link, i}
+					<span class="contact__group-label">EXPLORE</span>
+					<ul class="contact__channel-list">
+						{#each quickLinks as link}
 							<li>
 								<a
+									class="contact__channel"
 									href={link.href}
 									data-sveltekit-reload={link.href.startsWith('#') ? undefined : ''}
 									onclick={(e) => goSection(e, link.href)}
 								>
-									<span class="contact__group-index">0{i + 1}</span>
-									<span>{link.label}</span>
+									<span class="contact__channel-icon" aria-hidden="true">
+										<svg viewBox="0 0 24 24">
+											<path d={navMeta[link.href]?.icon} />
+										</svg>
+									</span>
+									<span class="contact__channel-copy">
+										<span class="contact__channel-label">{link.label}</span>
+										<span class="contact__channel-value">{navMeta[link.href]?.desc}</span>
+									</span>
+									<svg class="contact__arrow" viewBox="0 0 24 24" aria-hidden="true">
+										<path d="M7 17 17 7M8 7h9v9" />
+									</svg>
 								</a>
 							</li>
 						{/each}
@@ -283,13 +350,26 @@
 				</nav>
 
 				<div class="contact__group" data-reveal-light>
-					<span class="contact__group-label">CONNECT</span>
-					<ul class="contact__group-list">
-						{#each socials as s, i}
+					<span class="contact__group-label">REACH ME</span>
+					<ul class="contact__channel-list">
+						{#each channels as channel}
 							<li>
-								<a href={s.href} target="_blank" rel="noopener noreferrer">
-									<span class="contact__group-index">0{i + 1}</span>
-									<span>{s.label}</span>
+								<a
+									class="contact__channel"
+									href={channel.href}
+									target={channel.external ? '_blank' : undefined}
+									rel={channel.external ? 'noopener noreferrer' : undefined}
+								>
+									<span class="contact__channel-icon" aria-hidden="true">
+										<svg viewBox="0 0 24 24"><path d={channel.path} /></svg>
+									</span>
+									<span class="contact__channel-copy">
+										<span class="contact__channel-label">{channel.label}</span>
+										<span class="contact__channel-value">{channel.value}</span>
+									</span>
+									<svg class="contact__arrow" viewBox="0 0 24 24" aria-hidden="true">
+										<path d="M7 17 17 7M8 7h9v9" />
+									</svg>
 								</a>
 							</li>
 						{/each}
@@ -297,7 +377,10 @@
 				</div>
 			</div>
 
-			<p class="contact__copy" data-reveal-light>© {year} Muhammad Fadil — FLAID</p>
+			<div class="contact__copy" data-reveal-light>
+				<span>© {year} MUHAMMAD FADIL — FLAID</span>
+				<span>KUTAI KARTANEGARA, ID</span>
+			</div>
 		</div>
 
 		<div class="contact__dark" bind:this={darkEl}>
@@ -307,6 +390,10 @@
 			<span class="contact__mark contact__mark--dark" aria-hidden="true">FLAID</span>
 
 			<div class="contact__dark-content">
+				<span class="contact__dark-status" data-reveal>
+					<i aria-hidden="true"></i>
+					AVAILABLE FOR NEW PROJECTS
+				</span>
 				<h2 class="contact__heading">
 					<span class="line-mask"><span class="line" bind:this={headingLine1El}>LETS</span></span>
 					<span class="line-mask"
@@ -315,9 +402,18 @@
 						></span
 					>
 				</h2>
-				<a class="contact__cta" href="mailto:{SITE.email}" data-reveal
-					>{SITE.email} →</a
-				>
+				<a class="contact__cta" href="mailto:{SITE.email}" data-reveal>
+					<span class="contact__cta-icon" aria-hidden="true">
+						<svg viewBox="0 0 24 24"><path d={siGmail.path} /></svg>
+					</span>
+					<span class="contact__cta-copy">
+						<span class="contact__cta-label">EMAIL ME</span>
+						<span class="contact__cta-value">{SITE.email}</span>
+					</span>
+					<svg class="contact__cta-arrow" viewBox="0 0 24 24" aria-hidden="true">
+						<path d="M7 17 17 7M8 7h9v9" />
+					</svg>
+				</a>
 			</div>
 
 			<div class="contact__ending">
@@ -395,78 +491,168 @@
 		color: var(--black);
 		display: flex;
 		flex-direction: column;
-		gap: clamp(1.75rem, 4vh, 2.5rem);
-		padding: clamp(1.5rem, 4vh, 2.5rem) clamp(2rem, 6vw, 4rem);
+		gap: clamp(1.5rem, 3.5vh, 2.5rem);
+		padding: clamp(1.75rem, 4vh, 2.75rem) clamp(1.75rem, 4vw, 3.5rem);
 		overflow: hidden;
 	}
+	.contact__light::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background-image: radial-gradient(rgba(10, 10, 10, 0.16) 0.7px, transparent 0.7px);
+		background-size: 22px 22px;
+		opacity: 0.35;
+		pointer-events: none;
+		-webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 72%);
+		mask-image: linear-gradient(to bottom, #000 0%, transparent 72%);
+	}
 	.contact__light-head {
+		position: relative;
+		z-index: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 0.6rem;
-		max-width: 26rem;
+		align-items: flex-start;
+		gap: clamp(0.8rem, 1.8vh, 1.15rem);
+		max-width: 32rem;
+		margin-top: clamp(1.5rem, 6vh, 4rem);
 		opacity: 0;
-		margin-top: auto;
 	}
 	.contact__light-lead {
-		font-family: var(--ff-body);
-		font-size: clamp(0.95rem, 1.3vw, 1.05rem);
-		line-height: 1.55;
-		color: var(--ink-soft);
+		margin: 0;
+		font-family: var(--ff-display);
+		font-weight: 400;
+		font-size: clamp(2.2rem, 3.7vw, 3.4rem);
+		line-height: 0.92;
+		letter-spacing: 0.01em;
+		text-transform: uppercase;
 	}
-
-	.contact__groups {
-		display: flex;
-		gap: clamp(2rem, 6vw, 3.5rem);
-		margin-bottom: auto;
+	.contact__light-sub {
+		margin: 0;
+		max-width: 24rem;
+		font-family: var(--ff-body);
+		font-size: clamp(0.9rem, 1.2vw, 1rem);
+		line-height: 1.5;
+		color: var(--gray);
+	}
+	.contact__light-grid {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+		gap: clamp(1.5rem, 3vw, 2.5rem);
+		align-items: start;
+		margin: auto 0;
 	}
 	.contact__group {
-		flex: 1 1 0%;
 		min-width: 0;
 		opacity: 0;
 	}
 	.contact__group-label {
 		display: block;
 		font-family: var(--ff-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.08em;
+		font-size: 0.6rem;
+		letter-spacing: 0.12em;
 		color: var(--gray);
-		margin-bottom: 0.6rem;
+		margin-bottom: 0.7rem;
+		padding-bottom: 0.55rem;
+		border-bottom: 1px solid rgba(10, 10, 10, 0.16);
 	}
-	.contact__group-list {
+	.contact__arrow {
+		flex: 0 0 auto;
+		width: 12px;
+		height: 12px;
+		margin-left: auto;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		opacity: 0;
+		transform: translate(-4px, 4px);
+		transition: opacity 0.2s ease, transform 0.25s ease;
+	}
+	.contact__channel-list {
 		list-style: none;
 		margin: 0;
 		padding: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 0.4rem;
+		gap: 0.3rem;
 	}
-	.contact__group-list a {
-		display: inline-flex;
-		align-items: baseline;
-		gap: 0.55rem;
-		font-family: var(--ff-body);
-		font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+	.contact__channel {
+		display: flex;
+		align-items: center;
+		gap: 0.7rem;
+		padding: 0.5rem 0.6rem;
 		color: var(--black);
-		transition: opacity 0.2s ease;
+		transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
 	}
-	.contact__group-index {
+	.contact__channel:hover {
+		background: var(--black);
+		color: var(--fg-dark);
+		transform: translateY(-1px);
+	}
+	.contact__channel-icon {
+		display: grid;
+		place-items: center;
+		flex: 0 0 auto;
+		width: 2rem;
+		height: 2rem;
+		border: 1px solid rgba(10, 10, 10, 0.18);
+		transition: border-color 0.25s ease;
+	}
+	.contact__channel:hover .contact__channel-icon {
+		border-color: rgba(241, 241, 239, 0.25);
+	}
+	.contact__channel-icon svg {
+		width: 14px;
+		height: 14px;
+		fill: currentColor;
+	}
+	.contact__channel-copy {
+		display: flex;
+		flex-direction: column;
+		gap: 0.1rem;
+		min-width: 0;
+	}
+	.contact__channel-label {
 		font-family: var(--ff-mono);
-		font-size: 0.65rem;
-		color: var(--accent-ph);
+		font-size: 0.53rem;
+		letter-spacing: 0.1em;
+		color: var(--gray);
+		transition: color 0.25s ease;
 	}
-	.contact__group-list a:hover {
-		opacity: 0.55;
+	.contact__channel-value {
+		font-family: var(--ff-body);
+		font-size: 0.78rem;
+		line-height: 1.2;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
-
+	.contact__channel:hover .contact__channel-label {
+		color: var(--gray-light);
+	}
+	.contact__channel .contact__arrow {
+		opacity: 0;
+	}
+	.contact__channel:hover .contact__arrow {
+		opacity: 1;
+		transform: translate(0, 0);
+	}
 	.contact__copy {
+		position: relative;
+		z-index: 1;
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem;
+		padding-top: clamp(0.9rem, 2vh, 1.2rem);
+		border-top: 1px solid rgba(10, 10, 10, 0.14);
 		font-family: var(--ff-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.03em;
+		font-size: 0.58rem;
+		letter-spacing: 0.05em;
 		color: var(--gray);
 		opacity: 0;
-		padding-top: clamp(1rem, 2.5vh, 1.5rem);
-		margin-top: clamp(0.25rem, 1vh, 0.5rem);
-		border-top: 1px solid rgba(10, 10, 10, 0.14);
 	}
 
 	.contact__dark {
@@ -491,16 +677,32 @@
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
-		gap: clamp(1rem, 2.5vh, 1.5rem);
-		max-width: 24rem;
+		gap: clamp(0.9rem, 2vh, 1.35rem);
+		width: min(100%, 28rem);
+	}
+	.contact__dark-status {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-family: var(--ff-mono);
+		font-size: 0.56rem;
+		letter-spacing: 0.1em;
+		color: var(--gray-light);
+	}
+	.contact__dark-status i {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: var(--fg-dark);
+		animation: contact-pulse 2.4s ease-in-out infinite;
 	}
 	.contact__heading {
 		margin: 0;
 		font-family: var(--ff-display);
 		font-weight: 400;
-		line-height: 0.95;
-		letter-spacing: 0.01em;
-		font-size: clamp(2.6rem, 7vw, 5.5rem);
+		line-height: 0.88;
+		letter-spacing: 0.005em;
+		font-size: clamp(3.6rem, 8.5vw, 8rem);
 	}
 	.line-mask {
 		display: block;
@@ -518,19 +720,75 @@
 		animation: contact-blink 1s step-end infinite;
 	}
 	.contact__cta {
+		display: flex;
+		align-items: center;
+		gap: 0.7rem;
+		width: 100%;
+		padding: 0.7rem 0.8rem;
+		border: 1px solid rgba(241, 241, 239, 0.22);
 		font-family: var(--ff-mono);
-		font-size: clamp(0.9rem, 1.2vw, 1rem);
-		letter-spacing: 0.02em;
 		color: var(--fg-dark);
-		border-bottom: 1px solid rgba(241, 241, 239, 0.3);
-		padding-bottom: 0.2rem;
 		opacity: 0;
-		transition: border-color 0.2s ease, opacity 0.2s ease;
+		transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease,
+			transform 0.25s ease;
 	}
 	.contact__cta:hover {
+		background: var(--fg-dark);
+		color: var(--black);
 		border-color: var(--fg-dark);
+		transform: translateY(-2px);
 	}
-
+	.contact__cta-icon {
+		display: grid;
+		place-items: center;
+		flex: 0 0 auto;
+		width: 2rem;
+		height: 2rem;
+		border: 1px solid rgba(241, 241, 239, 0.22);
+		transition: border-color 0.25s ease;
+	}
+	.contact__cta:hover .contact__cta-icon {
+		border-color: rgba(10, 10, 10, 0.25);
+	}
+	.contact__cta-icon svg {
+		width: 14px;
+		height: 14px;
+		fill: currentColor;
+	}
+	.contact__cta-copy {
+		display: flex;
+		flex-direction: column;
+		gap: 0.1rem;
+		min-width: 0;
+	}
+	.contact__cta-label {
+		font-size: 0.52rem;
+		letter-spacing: 0.1em;
+		color: var(--gray);
+		transition: color 0.25s ease;
+	}
+	.contact__cta:hover .contact__cta-label {
+		color: var(--ink-soft);
+	}
+	.contact__cta-value {
+		font-family: var(--ff-body);
+		font-size: 0.8rem;
+		line-height: 1.2;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.contact__cta-arrow {
+		flex: 0 0 auto;
+		width: 14px;
+		height: 14px;
+		margin-left: auto;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
 	.contact__ending {
 		position: absolute;
 		inset: 0;
@@ -686,6 +944,10 @@
 		0%, 100% { opacity: 0.08; }
 		50% { opacity: 0.34; }
 	}
+	@keyframes contact-pulse {
+		0%, 100% { opacity: 1; transform: scale(1); }
+		50% { opacity: 0.45; transform: scale(0.75); }
+	}
 
 	@media (max-width: 860px) {
 		.contact {
@@ -698,31 +960,34 @@
 			display: block;
 		}
 		.contact__dark {
-			position: absolute;
-			top: 0;
-			right: 0;
-			left: 0;
+			position: relative;
+			inset: auto;
 			width: 100%;
-			height: 60vh;
-			bottom: auto;
+			height: auto;
+			min-height: 60vh;
+			padding: clamp(3rem, 10vh, 4.5rem) clamp(1.5rem, 6vw, 2.5rem);
 		}
 		.contact__light {
 			grid-column: 1;
-			margin-top: 60vh;
+			margin-top: 0;
 			min-height: auto;
 			padding: clamp(2rem, 8vh, 3.5rem) clamp(1.5rem, 6vw, 3rem);
 			display: flex;
 			flex-direction: column;
 			justify-content: flex-start;
-			gap: clamp(1.5rem, 4vh, 2rem);
+			gap: clamp(1.75rem, 4vh, 2.5rem);
 		}
-		.contact__groups {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: clamp(1rem, 4vw, 2rem);
+		.contact__light-head {
+			margin-top: 0;
+		}
+		.contact__light-grid {
+			grid-template-columns: 1fr;
+			gap: clamp(1.5rem, 4vh, 2rem);
+			margin: 0;
 		}
 		.contact__copy {
 			text-align: left;
+			flex-wrap: wrap;
 		}
 		.contact__ending {
 			display: none;
@@ -747,6 +1012,9 @@
 		.cursor {
 			animation: none;
 			opacity: 1;
+		}
+		.contact__dark-status i {
+			animation: none;
 		}
 		.contact__dots i {
 			animation: none;

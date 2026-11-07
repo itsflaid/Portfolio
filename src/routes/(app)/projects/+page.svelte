@@ -9,7 +9,6 @@
   import TechModal from "$lib/components/modals/TechModal.svelte";
   import { allProjects } from "$lib/data/project";
   import { SITE } from "$lib/data/site";
-  import { smallerBuilds } from "$lib/data/builds";
   import { registerCaseStudyClose } from "$lib/caseStudy";
   import { registerTechModalClose } from "$lib/techModal";
   import { setupPreviewVideos, type PreviewController } from "$lib/preview";
@@ -28,7 +27,6 @@
   let outroLine1El: HTMLElement;
   let outroLine2El: HTMLElement;
   let outroSubEl: HTMLElement;
-  let outroListEl: HTMLElement;
   let outroCtaEl: HTMLElement;
   let activeIndex = 0;
   let dots = [0, 1, 2, 3, 4, 5, 6, 7, 8];
@@ -54,7 +52,7 @@
       gsap.set([headLine1El, headLine2El], { y: "0%" });
       gsap.set(headCursorEl, { opacity: 1 });
       gsap.set([outroLine1El, outroLine2El], { y: "0%" });
-      gsap.set([outroSubEl, outroListEl, outroCtaEl], { opacity: 1 });
+      gsap.set([outroSubEl, outroCtaEl], { opacity: 1 });
       gsap.set(cards, { opacity: 1, xPercent: 0 });
       gsap.set(cards.map((el) => el.querySelectorAll(".project__media, .project__info")).flat(), {
         opacity: 1,
@@ -114,12 +112,6 @@
         { opacity: 0, y: 10 },
         { opacity: 1, y: 0, duration: 0.4, ease: "power1.out" },
         0.3,
-      )
-      .fromTo(
-        outroListEl,
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 0.4, ease: "power1.out" },
-        0.4,
       )
       .fromTo(
         outroCtaEl,
@@ -292,17 +284,6 @@
       <p class="outro__sub" bind:this={outroSubEl}>
         Coursework, experiments, and quick projects — all on GitHub.
       </p>
-      <div class="outro__list-group" bind:this={outroListEl}>
-        <ul class="outro__list">
-          {#each smallerBuilds as build}
-            <li>
-              <a href={build.href} target="_blank" rel="noopener noreferrer"
-                >{build.name} <span>· {build.stack}</span></a
-              >
-            </li>
-          {/each}
-        </ul>
-      </div>
       <a
         class="outro__cta-ghost"
         href={SITE.github}
@@ -473,46 +454,6 @@
     color: var(--gray);
     max-width: 52ch;
   }
-  .outro__list-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.6rem;
-  }
-  .outro__list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    font-family: var(--ff-body);
-    font-weight: 400;
-    font-size: 0.9rem;
-    letter-spacing: 0.01em;
-    color: var(--gray);
-  }
-  .outro__list li {
-    display: flex;
-    align-items: center;
-  }
-  .outro__list li span {
-    color: var(--accent-ph);
-    margin-left: 0.3rem;
-  }
-  .outro__list li:not(:last-child)::after {
-    content: "|";
-    margin: 0 0.9rem;
-    color: var(--accent-ph);
-  }
-  .outro__list li a {
-    display: inline-flex;
-    align-items: center;
-    color: inherit;
-    text-decoration: none;
-    transition: opacity 0.2s ease;
-  }
-  .outro__list li a:hover { opacity: 0.6; }
   .outro__cta-ghost {
     display: inline-flex;
     align-items: center;

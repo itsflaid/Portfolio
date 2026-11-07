@@ -113,7 +113,7 @@
 		<a href="#projects" onclick={(e) => go(e, '#projects')}>Projects</a>
 		<a href="#skills" onclick={(e) => go(e, '#skills')}>Skills</a>
 		<a href="#contact" onclick={(e) => go(e, '#contact')}>Contact</a>
-		<a href="/jasa" data-sveltekit-reload>Jasa</a>
+		<!-- <a href="/jasa" data-sveltekit-reload>Jasa</a> -->
 	</div>
 	<button
 		class="nav__burger"

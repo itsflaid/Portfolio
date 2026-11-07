@@ -142,13 +142,9 @@
 					<ul class="skills__items">
 						{#each group.items as item}
 							<li class="skills__chip">
-								<span class="skills__ico" class:skills__ico--color={!!item.icon.svg}>
+								<span class="skills__ico">
 									<svg viewBox={item.icon.viewBox ?? '0 0 24 24'} aria-hidden="true">
-										{#if item.icon.svg}
-											{@html item.icon.svg}
-										{:else}
-											<path d={item.icon.path} fill-rule="evenodd" />
-										{/if}
+										<path d={item.icon.path} />
 									</svg>
 								</span>
 								{item.name}
@@ -311,14 +307,10 @@
 		width: 0.95rem;
 		height: 0.95rem;
 	}
-	.skills__ico:not(.skills__ico--color) svg path {
+	.skills__ico svg path {
 		fill: currentColor;
 	}
-	.skills__ico--color {
-		background: #fff;
-		box-shadow: inset 0 0 0 1px rgba(10, 10, 10, 0.12);
-	}
-	.skills__chip:hover .skills__ico:not(.skills__ico--color) {
+	.skills__chip:hover .skills__ico {
 		background: rgba(241, 241, 239, 0.14);
 	}
 
