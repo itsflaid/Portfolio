@@ -152,43 +152,43 @@
 			return;
 		}
 
-		gsap.set(darkEl, { xPercent: 100 });
-
-		const tl = gsap.timeline({
-			scrollTrigger: {
-				trigger: contactEl,
-				start: 'top 75%',
-				end: 'top 5%',
-				scrub: 1
-			}
-		});
-
-		tl.fromTo(darkEl, { xPercent: 100 }, { xPercent: 0, ease: 'none' }, 0);
-
-		tl.fromTo(
-			darkContent,
-			{ opacity: 0, y: 24 },
-			{ opacity: 1, y: 0, stagger: 0.1, ease: 'power2.out' },
-			0.3
-		);
-
-		tl.fromTo(
-			headingLine1El,
-			{ y: '105%', x: '1.4rem' },
-			{ y: '0%', x: '0rem', duration: 0.7, ease: 'power3.out' },
-			0.35
-		);
-		tl.fromTo(
-			headingLine2El,
-			{ y: '105%', x: '-1.4rem' },
-			{ y: '0%', x: '0rem', duration: 0.7, ease: 'power3.out' },
-			0.5
-		);
-		tl.to(cursorEl, { opacity: 1, duration: 0.2 }, 0.95);
+		const addDarkEntry = (tl: gsap.core.Timeline) => {
+			gsap.set(darkEl, { xPercent: 100 });
+			tl.fromTo(darkEl, { xPercent: 100 }, { xPercent: 0, ease: 'none' }, 0);
+			tl.fromTo(
+				darkContent,
+				{ opacity: 0, y: 24 },
+				{ opacity: 1, y: 0, stagger: 0.1, ease: 'power2.out' },
+				0.3
+			);
+			tl.fromTo(
+				headingLine1El,
+				{ y: '105%', x: '1.4rem' },
+				{ y: '0%', x: '0rem', duration: 0.7, ease: 'power3.out' },
+				0.35
+			);
+			tl.fromTo(
+				headingLine2El,
+				{ y: '105%', x: '-1.4rem' },
+				{ y: '0%', x: '0rem', duration: 0.7, ease: 'power3.out' },
+				0.5
+			);
+			tl.to(cursorEl, { opacity: 1, duration: 0.2 }, 0.95);
+		};
 
 		const mm = gsap.matchMedia();
 
 		mm.add('(min-width: 861px)', () => {
+			const tl = gsap.timeline({
+				scrollTrigger: {
+					trigger: contactEl,
+					start: 'top 75%',
+					end: 'top 5%',
+					scrub: 1
+				}
+			});
+			addDarkEntry(tl);
+
 			tl.fromTo(
 				lightContent,
 				{ opacity: 0, y: 20 },
@@ -238,12 +238,24 @@
 			);
 
 			return () => {
+				tl.scrollTrigger?.kill();
+				tl.kill();
 				curtain.scrollTrigger?.kill();
 				curtain.kill();
 			};
 		});
 
 		mm.add('(max-width: 860px)', () => {
+			const darkTl = gsap.timeline({
+				scrollTrigger: {
+					trigger: darkEl,
+					start: 'top 92%',
+					end: 'top 30%',
+					scrub: 1
+				}
+			});
+			addDarkEntry(darkTl);
+
 			lightContent.forEach((el) => {
 				const t = gsap.timeline({
 					scrollTrigger: {
@@ -293,14 +305,14 @@
 			);
 
 			return () => {
+				darkTl.scrollTrigger?.kill();
+				darkTl.kill();
 				mobileEndingTl.scrollTrigger?.kill();
 				mobileEndingTl.kill();
 			};
 		});
 
 		return () => {
-			tl.scrollTrigger?.kill();
-			tl.kill();
 			mm.revert();
 		};
 	});
