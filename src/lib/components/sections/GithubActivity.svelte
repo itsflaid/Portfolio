@@ -150,13 +150,17 @@
 
 			await tick();
 
-			if (loadError) return;
+			if (loadError) {
+				ScrollTrigger.refresh();
+				return;
+			}
 
 			const cells = gsap.utils.toArray<HTMLElement>(heatmapEl.querySelectorAll('.heatmap__cell'));
 			const rows = gsap.utils.toArray<HTMLElement>(statsEl.querySelectorAll('.stats__row'));
 			const bars = gsap.utils.toArray<HTMLElement>(monthlyEl.querySelectorAll('.monthly__bar'));
 
 			lockMonthlyWidth();
+			ScrollTrigger.refresh();
 
 			if (reduceMotion) {
 				gsap.set([line1El, line2El], { y: '0%', x: '0rem' });

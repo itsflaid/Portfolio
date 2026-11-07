@@ -95,10 +95,6 @@
 						<span class="hero__cta-label">THE PROJECTS</span>
 						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v14m0 0-5-5m5 5 5-5" /></svg>
 					</a>
-					<a class="hero__cta-item" href="/jasa" data-sveltekit-reload data-cursor-text="OPEN">
-						<span class="hero__cta-label">JASA WEBSITE</span>
-						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" /></svg>
-					</a>
 				</nav>
 			</div>
 		</div>
