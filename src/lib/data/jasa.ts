@@ -16,6 +16,7 @@ export const isWeb = (href: string) => href.startsWith('http');
 export const MESSAGES = {
 	general: 'Halo Fadil, saya tertarik dengan jasa pembuatan website. Boleh saya konsultasi dulu?',
 	landing: 'Halo Fadil, saya butuh landing page untuk bisnis saya. Boleh saya konsultasi dulu?',
+	cms: 'Halo Fadil, saya butuh website yang isinya bisa saya ubah sendiri. Boleh saya konsultasi dulu?',
 	webapp: 'Halo Fadil, saya butuh aplikasi web untuk bisnis saya. Boleh saya konsultasi dulu?',
 	template: (name: string) =>
 		`Halo Fadil, saya tertarik dengan template "${name}". Boleh saya tanya lebih lanjut?`,
@@ -157,7 +158,7 @@ export const plans: Plan[] = [
 	{
 		name: 'Website usaha',
 		for: `Landing page dari ${landingTemplates.length} template atau desain custom. Mau yang mana, kita tentukan lewat chat.`,
-		priceNote: 'Hubungi untuk estimasi',
+		priceNote: 'Mulai Rp300 rb',
 		specs: [
 			['Jenis', 'Website statis'],
 			['Halaman', 'Single atau multipage'],
@@ -173,18 +174,37 @@ export const plans: Plan[] = [
 		message: MESSAGES.landing
 	},
 	{
+		name: 'Website dengan admin',
+		for: 'Website yang isinya bisa kamu ubah sendiri tanpa hubungi developer. Cocok untuk katalog produk, blog, dan galeri.',
+		priceNote: 'Rp500 rb – Rp2 jt',
+		specs: [
+			['Jenis', 'Website dinamis'],
+			['Konten', 'Produk, artikel, atau galeri'],
+			['Admin', 'Panel kelola konten']
+		],
+		items: [
+			'Tambah, ubah, dan hapus produk atau artikel sendiri',
+			'Login admin yang aman',
+			'Tampilan rapi di HP dan desktop',
+			'Pesanan langsung masuk ke WhatsApp',
+			'Panduan singkat cara pakai admin'
+		],
+		message: MESSAGES.cms
+	},
+	{
 		name: 'Sistem digital untuk usaha',
 		for: 'Aplikasi web yang mengikuti cara kerja bisnismu, bukan sebaliknya.',
-		priceNote: 'Estimasi setelah diskusi',
+		priceNote: 'Mulai Rp2 jt',
 		specs: [
 			['Jenis', 'Aplikasi web'],
-			['Halaman', 'Sesuai alur kerja'],
-			['Desain', 'Khusus, tanpa template']
+			['Fitur', 'Sesuai alur kerja'],
+			['Akses', 'Login dan multi-pengguna']
 		],
 		items: [
 			'Diskusi alur kerja dan fitur yang benar-benar dipakai',
 			'Login, database, dan hak akses per peran',
-			'Deploy dan serah terima',
+			'Dashboard dan laporan sederhana',
+			'Deploy dan setup domain',
 			'Dukungan setelah launch dibahas di awal'
 		],
 		message: MESSAGES.webapp
