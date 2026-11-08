@@ -51,9 +51,14 @@
 	}
 	@media (min-width: 48rem) {
 		.plans {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-			max-width: 62rem;
+			max-width: 36rem;
 			margin-inline: auto;
+		}
+	}
+	@media (min-width: 64rem) {
+		.plans {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			max-width: none;
 		}
 	}
 	.plan {
