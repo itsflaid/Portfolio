@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { LandingTemplate } from '$lib/data/jasa';
+	import type { WebTemplate } from '$lib/data/jasa';
 	import TemplateCard from './TemplateCard.svelte';
 
-	let { items, dir }: { items: LandingTemplate[]; dir: 'left' | 'right' } = $props();
+	let { items, dir }: { items: WebTemplate[]; dir: 'left' | 'right' } = $props();
 
 	const SPEED = 36; // px per detik
 
@@ -28,7 +28,7 @@
 	});
 </script>
 
-<div class="row" role="group" aria-label="Template landing page, geser otomatis. Arahkan kursor untuk menjeda.">
+<div class="row" role="group" aria-label="Template web, geser otomatis. Arahkan kursor untuk menjeda.">
 	<div class="track track--{dir}" style:--dur="{dur}s">
 		{#each Array(copies) as _, copy (copy)}
 			<div

@@ -2,7 +2,7 @@
 	import { SITE } from '$lib/data/site';
 	import JasaHeader from '$lib/jasa/JasaHeader.svelte';
 	import JasaHero from '$lib/jasa/JasaHero.svelte';
-	import LandingSection from '$lib/jasa/LandingSection.svelte';
+	import TemplateSection from '$lib/jasa/TemplateSection.svelte';
 	import WebAppsSection from '$lib/jasa/WebAppsSection.svelte';
 	import ProcessSection from '$lib/jasa/ProcessSection.svelte';
 	import PricingSection from '$lib/jasa/PricingSection.svelte';
@@ -13,7 +13,7 @@
 
 	const pageTitle = 'Jasa Pembuatan Website & Aplikasi Web — Flaid';
 	const pageDescription =
-		'Jasa pembuatan landing page dan aplikasi web untuk bisnis. Pilih dari template siap pakai atau bangun sistem sesuai alur kerja usahamu. Oleh Muhammad Fadil (Flaid).';
+		'Jasa pembuatan website dan aplikasi web untuk bisnis. Pilih dari template siap pakai atau bangun sistem sesuai alur kerja usahamu. Oleh Muhammad Fadil (Flaid).';
 	const canonical = `${SITE.url}jasa`;
 
 	const serviceLd = {
@@ -22,7 +22,7 @@
 		name: 'Flaid — Jasa Pembuatan Website',
 		url: canonical,
 		areaServed: 'ID',
-		serviceType: ['Pembuatan landing page', 'Pengembangan aplikasi web'],
+		serviceType: ['Pembuatan website', 'Pengembangan aplikasi web'],
 		provider: { '@type': 'Person', name: SITE.name, url: SITE.url }
 	};
 </script>
@@ -46,7 +46,7 @@
 
 <main>
 	<JasaHero />
-	<LandingSection templates={data.templates} />
+	<TemplateSection templates={data.templates} />
 	<WebAppsSection />
 	<ProcessSection />
 	<PricingSection />
