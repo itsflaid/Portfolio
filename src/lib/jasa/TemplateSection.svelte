@@ -1,25 +1,23 @@
 <script lang="ts">
-	import { MESSAGES, type LandingTemplate } from '$lib/data/jasa';
+	import { MESSAGES, type WebTemplate } from '$lib/data/jasa';
 	import ContactLink from './ContactLink.svelte';
 	import MarqueeRow from './MarqueeRow.svelte';
 	import { reveal } from './reveal';
 
-	let { templates }: { templates: LandingTemplate[] } = $props();
+	let { templates }: { templates: WebTemplate[] } = $props();
 
 	const half = $derived(Math.ceil(templates.length / 2));
 	const top = $derived(templates.slice(0, half));
 	const bottom = $derived(templates.slice(half));
 </script>
 
-<section class="landing jz-section" id="landing" aria-labelledby="landing-title">
+<section class="template jz-section" id="template" aria-labelledby="template-title">
 	<div class="jz-wrap">
 		<div class="jz-head" use:reveal>
-			<h2 class="jz-title" id="landing-title">
-				{templates.length} template, siap kamu pakai.
-			</h2>
+			<h2 class="jz-title" id="template-title">Pilih gaya, bukan sekadar template.</h2>
 			<p class="jz-lede">
-				Pilih yang paling dekat dengan bisnismu. Logo, warna, foto, dan teks disesuaikan, kamu
-				tinggal kirim bahannya.
+				Tiap template punya karakter desain sendiri. Pilih yang paling cocok dengan kesan yang ingin
+				dibangun usahamu, isinya kita sesuaikan.
 			</p>
 		</div>
 	</div>
@@ -38,7 +36,7 @@
 </section>
 
 <style>
-	.landing {
+	.template {
 		overflow: hidden;
 	}
 	.rows {

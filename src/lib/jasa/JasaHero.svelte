@@ -15,13 +15,13 @@
 		</h1>
 
 		<p class="hero__lede" data-in="3">
-			Saya Fadil, fullstack developer. Landing page dari template atau desain custom, dan aplikasi
+			Saya Fadil, fullstack developer. Website dari template atau desain custom, dan aplikasi
 			web yang mengikuti cara kerja bisnismu.
 		</p>
 
 		<div class="hero__actions" data-in="4">
 			<ContactLink label="Konsultasi usahamu" message={MESSAGES.general} />
-			<a class="jz-btn jz-btn--ghost" href="#landing">Lihat template</a>
+			<a class="jz-btn jz-btn--ghost" href="#template">Lihat template</a>
 		</div>
 	</div>
 
