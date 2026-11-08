@@ -15,7 +15,7 @@ export const isWeb = (href: string) => href.startsWith('http');
 
 export const MESSAGES = {
 	general: 'Halo Fadil, saya tertarik dengan jasa pembuatan website. Boleh saya konsultasi dulu?',
-	landing: 'Halo Fadil, saya butuh landing page untuk bisnis saya. Boleh saya konsultasi dulu?',
+	landing: 'Halo Fadil, saya butuh website untuk bisnis saya. Boleh saya konsultasi dulu?',
 	cms: 'Halo Fadil, saya butuh website yang isinya bisa saya ubah sendiri. Boleh saya konsultasi dulu?',
 	webapp: 'Halo Fadil, saya butuh aplikasi web untuk bisnis saya. Boleh saya konsultasi dulu?',
 	template: (name: string) =>
@@ -24,33 +24,108 @@ export const MESSAGES = {
 		`Halo Fadil, saya tertarik dengan aplikasi seperti ${name}. Boleh saya konsultasi kebutuhan saya?`
 };
 
-export type LandingTemplate = {
+export type TemplateKind = 'Katalog produk' | 'Menu & pesanan' | 'Jasa' | 'Company profile';
+
+export type WebTemplate = {
 	slug: string;
 	name: string;
-	niche: string;
+	kind: TemplateKind;
+	pages: string;
+	desc: string;
 	thumb: string;
 	demo?: string;
 };
 
-const tpl = (slug: string, name: string, niche: string, demo = ''): LandingTemplate => ({
+const tpl = (
+	slug: string,
+	name: string,
+	kind: TemplateKind,
+	pages: string,
+	desc: string,
+	demo = ''
+): WebTemplate => ({
 	slug,
 	name,
-	niche,
-	thumb: `/jasa/landing/${slug}.webp`,
+	kind,
+	pages,
+	desc,
+	thumb: `/jasa/template/${slug}.webp`,
 	demo
 });
 
-// nama & niche masih placeholder. Screenshot: static/jasa/landing/<slug>.webp
-// 4 pertama masuk baris atas, sisanya baris bawah
-export const landingTemplates: LandingTemplate[] = [
-	tpl('toko', 'Toko & Warung', 'Usaha retail'),
-	tpl('kuliner', 'Kuliner & Cafe', 'Makanan & minuman'),
-	tpl('salon', 'Salon & Barbershop', 'Perawatan'),
-	tpl('kesehatan', 'Klinik & Spa', 'Kesehatan & wellness'),
-	tpl('kursus', 'Bimbel & Kursus', 'Pendidikan'),
-	tpl('studio', 'Fotografi & Studio', 'Kreatif'),
-	tpl('properti', 'Properti & Kontraktor', 'Konstruksi'),
-	tpl('event', 'Event & Undangan', 'Acara')
+// Screenshot: static/jasa/template/<slug>.webp. Isi demo dengan URL live tiap template.
+// Lima pertama masuk baris atas, sisanya baris bawah.
+export const webTemplates: WebTemplate[] = [
+	tpl(
+		'monokrom',
+		'Monokrom Editorial',
+		'Katalog produk',
+		'2 halaman',
+		'Hitam putih dengan serif elegan, foto jadi pusat perhatian. Kesan mahal dan tenang.'
+	),
+	tpl(
+		'dark-premium',
+		'Dark Premium',
+		'Jasa',
+		'1 halaman',
+		'Latar gelap dengan aksen hangat. Kesan eksklusif untuk layanan yang menjual kualitas.'
+	),
+	tpl(
+		'organik',
+		'Organik Hangat',
+		'Katalog produk',
+		'1 halaman',
+		'Krem dan hijau zaitun, serif klasik, ruang lega. Tenang dan alami.'
+	),
+	tpl(
+		'segar',
+		'Segar & Berani',
+		'Katalog produk',
+		'1 halaman',
+		'Hijau pekat dengan aksen lime dan huruf tebal. Energik dan langsung menarik perhatian.'
+	),
+	tpl(
+		'pastel',
+		'Ceria Pastel',
+		'Jasa',
+		'1 halaman',
+		'Warna pastel dan huruf bulat. Ramah, hangat, dan terasa aman.'
+	),
+	tpl(
+		'kertas',
+		'Kertas Editorial',
+		'Menu & pesanan',
+		'3 halaman',
+		'Tekstur kertas, serif italic, nuansa majalah. Pelanggan pilih menu lalu pesan lewat WhatsApp.'
+	),
+	tpl(
+		'industrial',
+		'Industrial Minimal',
+		'Company profile',
+		'5 halaman',
+		'Abu-abu netral, foto hitam putih, sudut miring dan aksen oranye. Tegas dan modern.'
+	),
+	tpl(
+		'olive',
+		'Olive Klasik',
+		'Company profile',
+		'1 halaman',
+		'Krem dengan hijau olive dan serif. Rapi, tenang, dan berkelas.'
+	),
+	tpl(
+		'kopi',
+		'Cokelat Hangat',
+		'Katalog produk',
+		'4 halaman',
+		'Krem dan cokelat kopi dengan serif editorial. Hangat dan berkarakter.'
+	),
+	tpl(
+		'handmade',
+		'Hangat Handmade',
+		'Katalog produk',
+		'3 halaman',
+		'Krem dan terakota dengan sentuhan tulisan tangan. Akrab dan terasa rumahan.'
+	)
 ];
 
 export type WebApp = {
@@ -133,7 +208,7 @@ export const processSteps = [
 	},
 	{
 		title: 'Pilih & rancang',
-		text: 'Pilih template atau desain custom untuk landing page, atau tentukan alur aplikasinya. Lalu sepakati ruang lingkup.'
+		text: 'Pilih template atau desain custom untuk website, atau tentukan alur aplikasinya. Lalu sepakati ruang lingkup.'
 	},
 	{
 		title: 'Pembuatan',
@@ -157,7 +232,7 @@ export type Plan = {
 export const plans: Plan[] = [
 	{
 		name: 'Website usaha',
-		for: `Landing page dari ${landingTemplates.length} template atau desain custom. Mau yang mana, kita tentukan lewat chat.`,
+		for: `Website dari ${webTemplates.length} template atau desain custom. Mau yang mana, kita tentukan lewat chat.`,
 		priceNote: 'Mulai Rp300 rb',
 		specs: [
 			['Jenis', 'Website statis'],
@@ -214,10 +289,10 @@ export const plans: Plan[] = [
 export const faqs = [
 	{
 		q: 'Berapa lama pengerjaannya?',
-		a: 'Tergantung ruang lingkup. Landing page dari template jauh lebih cepat daripada aplikasi web. Estimasi pastinya saya berikan setelah kita diskusi.'
+		a: 'Tergantung ruang lingkup. Website dari template jauh lebih cepat daripada aplikasi web. Estimasi pastinya saya berikan setelah kita diskusi.'
 	},
 	{
-		q: 'Landing page-nya single page atau multipage?',
+		q: 'Website-nya single page atau multipage?',
 		a: 'Keduanya bisa. Single page cukup untuk kebanyakan usaha kecil. Multipage cocok kalau butuh halaman terpisah, misalnya layanan, tentang, dan kontak. Keduanya statis, jadi cepat dibuka dan murah untuk hosting.'
 	},
 	{

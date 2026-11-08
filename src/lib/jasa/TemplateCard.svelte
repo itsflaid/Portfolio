@@ -1,24 +1,25 @@
 <script lang="ts">
-	import { MESSAGES, type LandingTemplate } from '$lib/data/jasa';
+	import { MESSAGES, type WebTemplate } from '$lib/data/jasa';
 	import ContactLink from './ContactLink.svelte';
 	import Icon from './Icon.svelte';
 	import Frame from './Frame.svelte';
 
-	let { template }: { template: LandingTemplate } = $props();
+	let { template }: { template: WebTemplate } = $props();
 </script>
 
 <article class="card">
 	<Frame
 		src={template.thumb}
 		url={`template/${template.slug}`}
-		alt={`Template landing page ${template.name}`}
+		alt={`Template web ${template.name}`}
 		fallback={template.name}
 		eager
 	/>
 	<div class="card__body">
 		<div class="card__text">
 			<h3 class="card__name">{template.name}</h3>
-			<p class="card__niche">{template.niche}</p>
+			<p class="card__niche">{template.kind} · {template.pages}</p>
+			<p class="card__desc">{template.desc}</p>
 		</div>
 		<div class="card__actions">
 			{#if template.demo}
@@ -58,6 +59,14 @@
 		letter-spacing: 0.05em;
 		text-transform: uppercase;
 		color: var(--jz-muted);
+	}
+	.card__desc {
+		margin-top: 0.5rem;
+		font-size: 0.875rem;
+		line-height: 1.5;
+		color: var(--jz-muted);
+		white-space: normal;
+		text-wrap: pretty;
 	}
 	.card__actions {
 		display: flex;
