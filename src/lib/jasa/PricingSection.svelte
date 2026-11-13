@@ -15,7 +15,7 @@
 
 	<div class="plans">
 		{#each plans as plan, i (plan.name)}
-			<article class="plan" use:reveal={i * 80}>
+			<article class="plan" class:plan--featured={i === 1} use:reveal={i * 80}>
 				<h3 class="plan__name">{plan.name}</h3>
 				<p class="plan__for">{plan.for}</p>
 
@@ -36,7 +36,7 @@
 
 				<div class="plan__foot">
 					<p class="plan__price">{plan.priceNote}</p>
-					<ContactLink message={plan.message} />
+					<ContactLink tone={i === 1 ? 'light' : 'solid'} message={plan.message} />
 				</div>
 			</article>
 		{/each}
@@ -70,6 +70,34 @@
 		border-radius: var(--jz-radius-lg);
 		background: var(--jz-surface);
 		box-shadow: var(--jz-shadow);
+	}
+	/* paket tengah: latar gelap sebagai penanda, tanpa efek glow */
+	.plan--featured {
+		border-color: var(--jz-night);
+		background: var(--jz-night);
+		box-shadow: none;
+		color: var(--jz-night-text);
+	}
+	.plan--featured .plan__name {
+		color: #fff;
+	}
+	.plan--featured .plan__for {
+		color: var(--jz-night-muted);
+	}
+	.plan--featured .plan__specs {
+		border-color: var(--jz-night-rule);
+	}
+	.plan--featured .plan__specs div + div {
+		border-color: var(--jz-night-rule);
+	}
+	.plan--featured .plan__specs dt {
+		color: var(--jz-night-muted);
+	}
+	.plan--featured .plan__items li::before {
+		color: var(--jz-night-muted);
+	}
+	.plan--featured .plan__price {
+		color: #fff;
 	}
 	.plan__name {
 		font-size: clamp(1.6rem, 2.8vw, 2rem);

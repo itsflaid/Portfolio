@@ -7,7 +7,8 @@
 		url = '',
 		ratio = '16 / 10',
 		fallback = '',
-		eager = false
+		eager = false,
+		chrome = true
 	}: {
 		src?: string;
 		alt?: string;
@@ -15,6 +16,7 @@
 		ratio?: string;
 		fallback?: string;
 		eager?: boolean;
+		chrome?: boolean;
 	} = $props();
 
 	let failed = $state(false);
@@ -27,10 +29,12 @@
 </script>
 
 <div class="frame">
-	<div class="frame__bar" aria-hidden="true">
-		<i></i><i></i><i></i>
-		{#if url}<span class="frame__url">{url}</span>{/if}
-	</div>
+	{#if chrome}
+		<div class="frame__bar" aria-hidden="true">
+			<i></i><i></i><i></i>
+			{#if url}<span class="frame__url">{url}</span>{/if}
+		</div>
+	{/if}
 	<div class="frame__view" style:aspect-ratio={ratio}>
 		{#if src && !failed}
 			<img

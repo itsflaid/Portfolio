@@ -24,13 +24,12 @@ export const MESSAGES = {
 		`Halo Fadil, saya tertarik dengan aplikasi seperti ${name}. Boleh saya konsultasi kebutuhan saya?`
 };
 
-export type TemplateKind = 'Katalog produk' | 'Menu & pesanan' | 'Jasa' | 'Company profile';
+export type TemplateKind = 'Jasa' | 'Company profile' | 'Katalog produk/menu';
 
 export type WebTemplate = {
 	slug: string;
 	name: string;
 	kind: TemplateKind;
-	pages: string;
 	desc: string;
 	thumb: string;
 	demo?: string;
@@ -40,14 +39,12 @@ const tpl = (
 	slug: string,
 	name: string,
 	kind: TemplateKind,
-	pages: string,
 	desc: string,
 	demo = ''
 ): WebTemplate => ({
 	slug,
 	name,
 	kind,
-	pages,
 	desc,
 	thumb: `/jasa/template/${slug}.webp`,
 	demo
@@ -57,74 +54,70 @@ const tpl = (
 // Lima pertama masuk baris atas, sisanya baris bawah.
 export const webTemplates: WebTemplate[] = [
 	tpl(
-		'monokrom',
-		'Monokrom Editorial',
-		'Katalog produk',
-		'2 halaman',
-		'Hitam putih dengan serif elegan, foto jadi pusat perhatian. Kesan mahal dan tenang.'
-	),
-	tpl(
-		'dark-premium',
-		'Dark Premium',
+		'dapur-rasa',
+		'Dapur Rasa',
 		'Jasa',
-		'1 halaman',
-		'Latar gelap dengan aksen hangat. Kesan eksklusif untuk layanan yang menjual kualitas.'
+		'Untuk katering dan usaha makanan. Foto menu besar, paket harga, dan tombol minta penawaran.',
+		'https://fresh-katalog.netlify.app/'
 	),
 	tpl(
-		'organik',
-		'Organik Hangat',
-		'Katalog produk',
-		'1 halaman',
-		'Krem dan hijau zaitun, serif klasik, ruang lega. Tenang dan alami.'
+		'warung-citarasa',
+		'Warung Citarasa',
+		'Katalog produk/menu',
+		'Untuk warung makan dan kuliner. Menu digital dengan pesanan langsung ke WhatsApp.',
+		'https://citarasa-katalog.netlify.app/'
 	),
 	tpl(
-		'segar',
-		'Segar & Berani',
-		'Katalog produk',
-		'1 halaman',
-		'Hijau pekat dengan aksen lime dan huruf tebal. Energik dan langsung menarik perhatian.'
-	),
-	tpl(
-		'pastel',
-		'Ceria Pastel',
+		'washbro',
+		'WashBro',
 		'Jasa',
-		'1 halaman',
-		'Warna pastel dan huruf bulat. Ramah, hangat, dan terasa aman.'
+		'Untuk cuci mobil, motor, dan detailing. Paket harga dan reservasi lewat WhatsApp.',
+		'https://kilap-pencucian.netlify.app/'
 	),
 	tpl(
-		'kertas',
-		'Kertas Editorial',
-		'Menu & pesanan',
-		'3 halaman',
-		'Tekstur kertas, serif italic, nuansa majalah. Pelanggan pilih menu lalu pesan lewat WhatsApp.'
+		'mono-fashion',
+		'Mono Fashion',
+		'Katalog produk/menu',
+		'Untuk toko fashion. Katalog lookbook dengan panduan ukuran dan tanya stok.',
+		'https://fashion-katalog.netlify.app/'
 	),
 	tpl(
-		'industrial',
-		'Industrial Minimal',
+		'rumi-botanical',
+		'Rumi Botanical Studio',
+		'Katalog produk/menu',
+		'Untuk studio taman dan landscape. Portofolio proyek dengan nuansa hijau yang tenang.',
+		'https://botani-katalog.netlify.app/'
+	),
+	tpl(
+		'taman-mentari',
+		'Taman Mentari',
+		'Jasa',
+		'Untuk daycare dan pendidikan anak. Program, biaya, jadwal, dan form kunjungan.',
+		'https://flaidhack.github.io/template-web-jasa-daycare/'
+	),
+	tpl(
+		'archity',
+		'Archity',
 		'Company profile',
-		'5 halaman',
-		'Abu-abu netral, foto hitam putih, sudut miring dan aksen oranye. Tegas dan modern.'
+		'Untuk studio arsitektur dan interior. Portofolio proyek dengan tampilan lega dan elegan.'
 	),
 	tpl(
-		'olive',
-		'Olive Klasik',
+		'forma',
+		'Forma',
 		'Company profile',
-		'1 halaman',
-		'Krem dengan hijau olive dan serif. Rapi, tenang, dan berkelas.'
+		'Untuk firma arsitektur. Sorotan proyek, layanan, tim, dan statistik yang meyakinkan.'
 	),
 	tpl(
-		'kopi',
-		'Cokelat Hangat',
-		'Katalog produk',
-		'4 halaman',
-		'Krem dan cokelat kopi dengan serif editorial. Hangat dan berkarakter.'
+		'graphic-studio',
+		'Graphic Studio',
+		'Jasa',
+		'Untuk studio kreatif dan agensi. Portofolio karya dengan layout yang berani.'
 	),
 	tpl(
-		'handmade',
-		'Hangat Handmade',
-		'Katalog produk',
-		'3 halaman',
-		'Krem dan terakota dengan sentuhan tulisan tangan. Akrab dan terasa rumahan.'
+		'dapur-hangat',
+		'Dapur Hangat',
+		'Katalog produk/menu',
+		'Untuk toko kue dan camilan. Katalog produk dengan foto close-up dan tombol pesan.'
 	)
 ];
 

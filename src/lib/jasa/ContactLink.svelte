@@ -11,7 +11,7 @@
 		message: string;
 		label?: string;
 		size?: 'md' | 'sm';
-		tone?: 'solid' | 'light';
+		tone?: 'solid' | 'light' | 'ghost';
 	} = $props();
 
 	const href = $derived(contactHref(message));
@@ -21,6 +21,7 @@
 	class="jz-btn"
 	class:jz-btn--sm={size === 'sm'}
 	class:jz-btn--light={tone === 'light'}
+	class:jz-btn--ghost={tone === 'ghost'}
 	{href}
 	target={isWeb(href) ? '_blank' : undefined}
 	rel={isWeb(href) ? 'noopener noreferrer' : undefined}

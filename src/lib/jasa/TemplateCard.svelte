@@ -1,98 +1,173 @@
 <script lang="ts">
-	import { MESSAGES, type WebTemplate } from '$lib/data/jasa';
+	import { MESSAGES, type TemplateKind, type WebTemplate } from '$lib/data/jasa';
 	import ContactLink from './ContactLink.svelte';
 	import Icon from './Icon.svelte';
 	import Frame from './Frame.svelte';
 
 	let { template }: { template: WebTemplate } = $props();
+
+	const KIND_ICON: Record<TemplateKind, 'briefcase' | 'building' | 'bag'> = {
+		Jasa: 'briefcase',
+		'Company profile': 'building',
+		'Katalog produk/menu': 'bag'
+	};
 </script>
 
 <article class="card">
-	<Frame
-		src={template.thumb}
-		url={`template/${template.slug}`}
-		alt={`Template web ${template.name}`}
-		fallback={template.name}
-		eager
-	/>
+	{#if template.demo}
+		<a
+			class="card__preview"
+			href={template.demo}
+			target="_blank"
+			rel="noopener noreferrer"
+			aria-label={`Lihat demo ${template.name} di tab baru`}
+		>
+			<Frame
+				src={template.thumb}
+				alt={`Template web ${template.name}`}
+				fallback={template.name}
+				ratio="2 / 1"
+				chrome={false}
+			/>
+		</a>
+	{:else}
+		<Frame
+			src={template.thumb}
+			alt={`Template web ${template.name}`}
+			fallback={template.name}
+			ratio="2 / 1"
+			chrome={false}
+		/>
+	{/if}
+
 	<div class="card__body">
+		<p class="card__kind">
+			<Icon name={KIND_ICON[template.kind]} size="1em" />
+			{template.kind}
+		</p>
 		<div class="card__text">
 			<h3 class="card__name">{template.name}</h3>
-			<p class="card__niche">{template.kind} · {template.pages}</p>
 			<p class="card__desc">{template.desc}</p>
 		</div>
 		<div class="card__actions">
 			{#if template.demo}
-				<a class="card__demo" href={template.demo} target="_blank" rel="noopener noreferrer">
+				<a
+					class="jz-btn jz-btn--sm"
+					href={template.demo}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
 					<Icon name="external" size="0.95em" />
-					Demo
+					Lihat demo
 				</a>
 			{:else}
-				<span class="card__soon">Demo menyusul</span>
+				<span class="jz-btn jz-btn--sm card__soon" aria-disabled="true">Demo menyusul</span>
 			{/if}
-			<ContactLink size="sm" label="Tertarik" message={MESSAGES.template(template.name)} />
+			<ContactLink
+				size="sm"
+				tone="ghost"
+				label="Tertarik"
+				message={MESSAGES.template(template.name)}
+			/>
 		</div>
 	</div>
 </article>
 
 <style>
 	.card {
-		display: grid;
-		gap: 0.85rem;
-		width: clamp(15.5rem, 28vw, 21rem);
-		flex: 0 0 auto;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		width: 100%;
+		height: 100%;
+	}
+	.card__preview {
+		display: block;
+	}
+	.card__preview :global(.frame) {
+		transition:
+			transform 200ms var(--jz-ease),
+			border-color 150ms ease;
+	}
+	.card__preview:hover :global(.frame) {
+		transform: translateY(-2px);
+		border-color: var(--jz-rule-strong);
 	}
 	.card__body {
-		display: grid;
-		gap: 0.85rem;
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		gap: 0.75rem;
 		padding-inline: 0.15rem;
 	}
-	.card__name {
-		font-size: 1.05rem;
-		line-height: 1.2;
-		letter-spacing: -0.02em;
-	}
-	.card__niche {
-		margin-top: 0.15rem;
+	.card__kind {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
 		font-family: var(--jz-mono);
 		font-size: 0.6875rem;
 		letter-spacing: 0.05em;
 		text-transform: uppercase;
 		color: var(--jz-muted);
 	}
+	.card__kind :global(svg) {
+		flex: 0 0 auto;
+		color: var(--jz-ink);
+		opacity: 0.7;
+	}
+	.card__text {
+		display: grid;
+		gap: 0.3rem;
+	}
+	.card__name {
+		font-size: 1.05rem;
+		line-height: 1.2;
+		letter-spacing: -0.02em;
+	}
 	.card__desc {
-		margin-top: 0.5rem;
+		display: -webkit-box;
+		overflow: hidden;
 		font-size: 0.875rem;
 		line-height: 1.5;
 		color: var(--jz-muted);
-		white-space: normal;
 		text-wrap: pretty;
+		line-clamp: 2;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
 	}
 	.card__actions {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 0.75rem;
-		font-size: 0.875rem;
-		white-space: nowrap;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.5rem;
+		margin-top: auto;
+		padding-top: 0.15rem;
 	}
-	.card__demo {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-		font-weight: 500;
-		color: var(--jz-ink);
-		text-decoration: underline;
-		text-decoration-color: var(--jz-rule-strong);
-		text-decoration-thickness: 2px;
-		text-underline-offset: 0.25em;
-		transition: text-decoration-color 150ms ease;
+	.card__actions :global(.jz-btn) {
+		width: 100%;
+		min-height: 2.75rem;
+		padding-inline: 0.75rem;
+		font-size: 0.8125rem;
 	}
-	.card__demo:hover {
-		text-decoration-color: var(--jz-ink);
+	@media (max-width: 39.99rem) {
+		.card__desc {
+			line-clamp: 3;
+			-webkit-line-clamp: 3;
+		}
 	}
 	.card__soon {
-		font-size: 0.8125rem;
-		color: var(--jz-muted);
+		opacity: 0.45;
+		cursor: default;
+	}
+	.card__soon:hover {
+		transform: none;
+		background: var(--jz-ink);
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.card__preview :global(.frame) {
+			transition: none;
+		}
+		.card__preview:hover :global(.frame) {
+			transform: none;
+		}
 	}
 </style>
