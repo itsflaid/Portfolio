@@ -19,9 +19,7 @@ export const MESSAGES = {
 	cms: 'Halo Fadil, saya butuh website yang isinya bisa saya ubah sendiri. Boleh saya konsultasi dulu?',
 	webapp: 'Halo Fadil, saya butuh aplikasi web untuk bisnis saya. Boleh saya konsultasi dulu?',
 	template: (name: string) =>
-		`Halo Fadil, saya tertarik dengan template "${name}". Boleh saya tanya lebih lanjut?`,
-	similar: (name: string) =>
-		`Halo Fadil, saya tertarik dengan aplikasi seperti ${name}. Boleh saya konsultasi kebutuhan saya?`
+		`Halo Fadil, saya tertarik dengan template "${name}". Boleh saya tanya lebih lanjut?`
 };
 
 export type TemplateKind = 'Jasa' | 'Company profile' | 'Katalog produk/menu';
@@ -119,79 +117,6 @@ export const webTemplates: WebTemplate[] = [
 		'Katalog produk/menu',
 		'Untuk toko kue dan camilan. Katalog produk dengan foto close-up dan tombol pesan.'
 	)
-];
-
-export type WebApp = {
-	slug: string;
-	name: string;
-	kind: string;
-	tagline: string;
-	forWho: string;
-	problem: string;
-	features: string[];
-	thumb: string;
-	host: string;
-	demo?: string;
-	badge?: string;
-};
-
-export const webApps: WebApp[] = [
-	{
-		slug: 'kasbonin',
-		name: 'Kasbon.in',
-		kind: 'Pencatatan utang warung',
-		tagline: 'Buku kasbon warung, didigitalkan — real-time dan transparan.',
-		forWho: 'Warung atau toko yang dijaga bergantian oleh beberapa orang.',
-		problem:
-			'Catatan utang tercecer di buku, chat, dan ingatan. Tiap penjaga harus tanya-tanya dulu saat pelanggan mau bayar.',
-		features: [
-			'Banyak akun dalam satu warung, dengan peran owner dan staff',
-			'Catat utang cepat; harga boleh diisi belakangan',
-			'Bayar sebagian atau lunas, lengkap dengan riwayatnya',
-			'Perubahan langsung muncul di semua perangkat, tanpa refresh',
-			'Jejak audit: entri yang dibatalkan tidak benar-benar dihapus'
-		],
-		thumb: '/preview/image/kasbonin.webp',
-		host: 'kasbon.in',
-	},
-	{
-		slug: 'katalyst',
-		name: 'Katalyst',
-		kind: 'Pendukung keputusan bisnis',
-		tagline: 'Lihat untung-rugi sebenarnya, bukan cuma omzet.',
-		forWho: 'UMKM yang mencatat penjualan harian dan ingin menentukan harga dengan data.',
-		problem:
-			'Omzet kelihatan besar, tapi untung sebenarnya tidak jelas, dan keputusan harga sering hanya berdasarkan perasaan.',
-		features: [
-			'Dashboard: omzet, profit, margin, tren, dan produk terlaris',
-			'Kasir multi-produk dengan struk yang bisa diaudit',
-			'Simulator harga: geser harga, diskon, dan modal, lihat dampaknya',
-			'Copilot tanya-jawab berbasis data; angka dari rumus, bukan karangan AI',
-			'Stok, diskon terjadwal, dan log aktivitas owner & staff'
-		],
-		thumb: '/preview/image/katalyst.webp',
-		host: 'katalyst-6pk.pages.dev',
-		demo: 'https://katalyst-6pk.pages.dev/',
-	},
-	{
-		slug: 'de-home-spa',
-		name: 'De Home Spa',
-		kind: 'Booking layanan + rekomendasi AI',
-		tagline: 'Pelanggan ceritakan keluhannya, AI pilihkan treatment, booking langsung ke WhatsApp admin.',
-		forWho: 'Bisnis jasa home service yang menerima pesanan lewat WhatsApp.',
-		problem:
-			'Puluhan pilihan treatment dengan istilah teknis membuat pelanggan bingung, salah pilih, atau pergi sebelum memesan.',
-		features: [
-			'Rekomendasi treatment dari keluhan dengan bahasa sehari-hari',
-			'Pricelist interaktif untuk 26+ treatment dan 4 pilihan durasi',
-			'Form booking singkat yang terkirim ke admin lewat WhatsApp',
-			'Tanpa login dan tanpa database, jadi ringan dikelola'
-		],
-		thumb: '/preview/image/de-home-spa.webp',
-		host: 'de-home-spa-v2-uwxp.vercel.app',
-		demo: 'https://de-home-spa-v2-uwxp.vercel.app/',
-		badge: 'Peringkat 6 — TechnoFest 2026'
-	}
 ];
 
 export const processSteps = [
@@ -302,10 +227,24 @@ export const faqs = [
 	},
 	{
 		q: 'Aplikasi web bisa dibuat sesuai bisnis saya?',
-		a: 'Bisa. Contoh di atas lahir dari masalah nyata, misalnya pencatatan utang di warung keluarga. Ceritakan alur kerjamu, nanti kita tentukan fitur yang perlu.'
+		a: 'Bisa. Ceritakan alur kerjamu, nanti kita tentukan fitur yang perlu.'
 	},
 	{
 		q: 'Kalau ada masalah setelah website online?',
 		a: 'Hubungi saya lewat chat. Bentuk dukungan setelah launch kita bahas di awal.'
 	}
+];
+
+// Hero carousel /jasa. Isi 8 slide agar putarannya mulus. pos = object-position untuk crop portrait.
+export type HeroSlide = { src: string; alt: string; pos?: string };
+
+export const heroSlides: HeroSlide[] = [
+	{ src: '/jasa/template/dapur-hangat.webp', alt: 'Template Dapur Hangat', pos: '20% 0' },
+	{ src: '/jasa/hero/fadil.webp', alt: 'Potret Fadil' },
+	{ src: '/preview/image/katalyst.webp', alt: 'Dashboard aplikasi Katalyst', pos: '50% 0' },
+	{ src: '/jasa/template/dapur-rasa.webp', alt: 'Template Dapur Rasa', pos: '40% 0' },
+	{ src: '/jasa/hero/presentasi.webp', alt: 'Fadil mempresentasikan aplikasi De Home Spa' },
+	{ src: '/jasa/template/washbro.webp', alt: 'Template WashBro', pos: '0 0' },
+	{ src: '/jasa/template/rumi-botanical.webp', alt: 'Template Rumi Botanical', pos: '0 0' },
+	{ src: '/jasa/template/taman-mentari.webp', alt: 'Template Taman Mentari', pos: '50% 0' }
 ];

@@ -3,7 +3,7 @@
 	import JasaHeader from '$lib/jasa/JasaHeader.svelte';
 	import JasaHero from '$lib/jasa/JasaHero.svelte';
 	import TemplateSection from '$lib/jasa/TemplateSection.svelte';
-	import WebAppsSection from '$lib/jasa/WebAppsSection.svelte';
+	import AboutSection from '$lib/jasa/AboutSection.svelte';
 	import ProcessSection from '$lib/jasa/ProcessSection.svelte';
 	import PricingSection from '$lib/jasa/PricingSection.svelte';
 	import FaqSection from '$lib/jasa/FaqSection.svelte';
@@ -47,7 +47,7 @@
 <main>
 	<JasaHero />
 	<TemplateSection templates={data.templates} />
-	<WebAppsSection />
+	<AboutSection />
 	<ProcessSection />
 	<PricingSection />
 	<FaqSection />

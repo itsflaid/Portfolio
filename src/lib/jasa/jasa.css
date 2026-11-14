@@ -1,13 +1,15 @@
 /* Halaman /jasa. Semua scoped di bawah .jz */
 .jz {
-	--jz-paper: #f5f4f2;
-	--jz-surface: #ffffff;
+	--jz-paper: #fff8ed;
+	--jz-surface: #fffdf8;
 	--jz-ink: #141311;
-	--jz-text: #3a3834;
-	--jz-muted: #77736b;
-	--jz-rule: #e4e1db;
-	--jz-rule-strong: #d2cec5;
-	--jz-wash: #edebe6;
+	--jz-text: #3a362e;
+	--jz-muted: #7a7366;
+	--jz-rule: #e6dccb;
+	--jz-rule-strong: #d8ccb8;
+	--jz-wash: #f1e7db;
+	--jz-taupe: #bfab93;
+	--jz-olive: #67735d;
 	--jz-night: #12110f;
 	--jz-night-2: #1b1a17;
 	--jz-night-rule: rgba(255, 255, 255, 0.1);
@@ -16,6 +18,7 @@
 	--jz-ok: #4ade80;
 
 	--jz-sans: 'Hanken Grotesk', system-ui, sans-serif;
+	--jz-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
 	--jz-mono: 'JetBrains Mono', 'Courier New', monospace;
 
 	--jz-max: 76rem;
@@ -38,7 +41,7 @@
 	overflow-x: clip;
 }
 body:has(.jz) {
-	background: #f5f4f2;
+	background: #fff8ed;
 }
 html:has(.jz) {
 	scroll-padding-top: calc(4.25rem + 1rem);

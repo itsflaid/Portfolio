@@ -52,16 +52,16 @@
 		<div class="card__actions">
 			{#if template.demo}
 				<a
-					class="jz-btn jz-btn--sm"
+					class="card__demo"
 					href={template.demo}
 					target="_blank"
 					rel="noopener noreferrer"
 				>
-					<Icon name="external" size="0.95em" />
 					Lihat demo
+					<Icon name="external" size="0.9em" />
 				</a>
 			{:else}
-				<span class="jz-btn jz-btn--sm card__soon" aria-disabled="true">Demo menyusul</span>
+				<span class="card__soon">Demo menyusul</span>
 			{/if}
 			<ContactLink
 				size="sm"
@@ -136,17 +136,72 @@
 		-webkit-line-clamp: 2;
 	}
 	.card__actions {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 0.5rem;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem 1rem;
 		margin-top: auto;
-		padding-top: 0.15rem;
+		padding-top: 0.9rem;
+		border-top: 1px solid var(--jz-rule);
 	}
-	.card__actions :global(.jz-btn) {
-		width: 100%;
-		min-height: 2.75rem;
-		padding-inline: 0.75rem;
+	.card__demo {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.45rem;
+		min-height: 2.45rem;
+		padding: 0 1.05rem;
+		border: 1px solid var(--jz-ink);
+		border-radius: 999px;
+		background: var(--jz-ink);
+		color: #fff;
+		font: 500 0.8125rem var(--jz-sans);
+		white-space: nowrap;
+		transition:
+			background 150ms ease,
+			transform 180ms var(--jz-ease);
+	}
+	.card__demo:hover {
+		background: #000;
+		transform: translateY(-1px);
+	}
+	.card__demo :global(svg) {
+		opacity: 0.75;
+		transition: transform 180ms var(--jz-ease);
+	}
+	.card__demo:hover :global(svg) {
+		transform: translate(1px, -1px);
+	}
+	.card__soon {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		font-family: var(--jz-mono);
+		font-size: 0.6875rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--jz-muted);
+	}
+	.card__soon::before {
+		content: '';
+		width: 0.4rem;
+		height: 0.4rem;
+		border-radius: 50%;
+		background: var(--jz-taupe);
+	}
+	.card__actions :global(.jz-btn--ghost) {
+		min-height: 2.45rem;
+		padding: 0 0.2rem;
+		border-color: transparent;
+		background: transparent;
+		color: var(--jz-muted);
 		font-size: 0.8125rem;
+	}
+	.card__actions :global(.jz-btn--ghost:hover) {
+		border-color: transparent;
+		background: transparent;
+		color: var(--jz-ink);
+		transform: none;
 	}
 	@media (max-width: 39.99rem) {
 		.card__desc {
@@ -154,19 +209,19 @@
 			-webkit-line-clamp: 3;
 		}
 	}
-	.card__soon {
-		opacity: 0.45;
-		cursor: default;
-	}
-	.card__soon:hover {
-		transform: none;
-		background: var(--jz-ink);
-	}
 	@media (prefers-reduced-motion: reduce) {
 		.card__preview :global(.frame) {
 			transition: none;
 		}
 		.card__preview:hover :global(.frame) {
+			transform: none;
+		}
+		.card__demo,
+		.card__demo :global(svg) {
+			transition: none;
+		}
+		.card__demo:hover,
+		.card__demo:hover :global(svg) {
 			transform: none;
 		}
 	}

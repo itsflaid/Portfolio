@@ -4,7 +4,7 @@
 
 	const links = [
 		{ label: 'Website usaha', href: '#template' },
-		{ label: 'Sistem digital', href: '#webapp' },
+		{ label: 'Tentang', href: '#tentang' },
 		{ label: 'Proses', href: '#proses' },
 		{ label: 'Harga', href: '#harga' },
 		{ label: 'FAQ', href: '#faq' }
