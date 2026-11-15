@@ -18,6 +18,8 @@ export const MESSAGES = {
 	landing: 'Halo Fadil, saya butuh website untuk bisnis saya. Boleh saya konsultasi dulu?',
 	cms: 'Halo Fadil, saya butuh website yang isinya bisa saya ubah sendiri. Boleh saya konsultasi dulu?',
 	webapp: 'Halo Fadil, saya butuh aplikasi web untuk bisnis saya. Boleh saya konsultasi dulu?',
+	katalyst:
+		'Halo Fadil, saya lihat studi kasus Katalyst dan butuh sistem serupa untuk usaha saya. Boleh saya konsultasi dulu?',
 	template: (name: string) =>
 		`Halo Fadil, saya tertarik dengan template "${name}". Boleh saya tanya lebih lanjut?`
 };

@@ -5,6 +5,8 @@
 	import Icon from './Icon.svelte';
 	import { reveal } from './reveal';
 
+	let { message = MESSAGES.general }: { message?: string } = $props();
+
 	const year = new Date().getFullYear();
 </script>
 
@@ -15,7 +17,7 @@
 			Satu pesan singkat cukup. Saya balas dengan gambaran dan estimasi, tanpa kewajiban lanjut.
 		</p>
 		<div class="cta__actions">
-			<ContactLink tone="light" label="Konsultasi usahamu" message={MESSAGES.general} />
+			<ContactLink tone="light" label="Konsultasi usahamu" {message} />
 			<a class="jz-btn jz-btn--line" href={`mailto:${SITE.email}`}>
 				<Icon name="mail" />
 				{SITE.email}

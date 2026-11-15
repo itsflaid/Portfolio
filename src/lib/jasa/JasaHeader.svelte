@@ -2,6 +2,9 @@
 	import { MESSAGES } from '$lib/data/jasa';
 	import ContactLink from './ContactLink.svelte';
 
+	// awalan untuk tautan anchor saat dipakai di subhalaman, misalnya '/jasa'
+	let { base = '' }: { base?: string } = $props();
+
 	const links = [
 		{ label: 'Layanan', href: '#layanan' },
 		{ label: 'Template', href: '#template' },
@@ -13,13 +16,13 @@
 
 <header class="bar">
 	<div class="jz-wrap bar__in">
-		<a class="bar__brand" href="#top" aria-label="Flaid, ke atas">
+		<a class="bar__brand" href={`${base}#top`} aria-label="Flaid, ke atas">
 			<span class="bar__mark">FLAID</span>
 		</a>
 
 		<nav class="bar__nav" aria-label="Bagian halaman">
 			{#each links as link}
-				<a href={link.href}>{link.label}</a>
+				<a href={`${base}${link.href}`}>{link.label}</a>
 			{/each}
 		</nav>
 

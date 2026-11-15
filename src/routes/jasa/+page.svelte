@@ -5,6 +5,7 @@
 	import JasaHeader from '$lib/jasa/JasaHeader.svelte';
 	import JasaHero from '$lib/jasa/JasaHero.svelte';
 	import LayananPertanyaan from '$lib/jasa/layanan/LayananPertanyaan.svelte';
+	import StudiKasusTeaser from '$lib/jasa/StudiKasusTeaser.svelte';
 	import TemplateSection from '$lib/jasa/TemplateSection.svelte';
 	import ProcessSection from '$lib/jasa/ProcessSection.svelte';
 	import PricingSection from '$lib/jasa/PricingSection.svelte';
@@ -196,6 +197,7 @@
 <main>
 	<JasaHero />
 	<LayananPertanyaan />
+	<StudiKasusTeaser />
 	<TemplateSection templates={data.templates} />
 	<ProcessSection />
 	<PricingSection />

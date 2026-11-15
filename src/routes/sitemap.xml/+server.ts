@@ -5,6 +5,7 @@ export const prerender = true;
 const pages = [
 	{ path: '', changefreq: 'monthly', priority: '1.0' },
 	{ path: 'jasa', changefreq: 'monthly', priority: '0.9' },
+	{ path: 'jasa/studi-kasus/katalyst', changefreq: 'monthly', priority: '0.6' },
 	{ path: 'projects', changefreq: 'monthly', priority: '0.7' }
 ];
 

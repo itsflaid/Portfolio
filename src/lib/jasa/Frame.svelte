@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, type Snippet } from 'svelte';
 
 	let {
 		src = '',
@@ -8,7 +8,8 @@
 		ratio = '16 / 10',
 		fallback = '',
 		eager = false,
-		chrome = true
+		chrome = true,
+		children
 	}: {
 		src?: string;
 		alt?: string;
@@ -17,6 +18,7 @@
 		fallback?: string;
 		eager?: boolean;
 		chrome?: boolean;
+		children?: Snippet;
 	} = $props();
 
 	let failed = $state(false);
@@ -36,7 +38,9 @@
 		</div>
 	{/if}
 	<div class="frame__view" style:aspect-ratio={ratio}>
-		{#if src && !failed}
+		{#if children}
+			{@render children()}
+		{:else if src && !failed}
 			<img
 				bind:this={img}
 				{src}
