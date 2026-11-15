@@ -1,4 +1,3 @@
-/* Skills shown on the portfolio. Shared by the normal and neo layouts. */
 import {
   siTailwindcss,
   siTypescript,

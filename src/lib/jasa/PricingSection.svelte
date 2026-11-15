@@ -6,7 +6,7 @@
 
 <section class="harga jz-section jz-wrap" id="harga" aria-labelledby="harga-title">
 	<div class="jz-head" use:reveal>
-		<h2 class="jz-title" id="harga-title">Jelas dari awal.</h2>
+		<h2 class="jz-title" id="harga-title">Harga jasa pembuatan website, jelas dari awal.</h2>
 		<p class="jz-lede">
 			Biaya mengikuti ruang lingkup. Setelah diskusi, kamu menerima estimasi tertulis sebelum
 			pengerjaan dimulai.

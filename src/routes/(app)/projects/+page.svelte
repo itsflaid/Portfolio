@@ -9,6 +9,7 @@
   import TechModal from "$lib/components/modals/TechModal.svelte";
   import { allProjects } from "$lib/data/project";
   import { SITE } from "$lib/data/site";
+  import { SITE_URL, OG_IMAGE, absoluteUrl, serializeJsonLd } from "$lib/seo";
   import { registerCaseStudyClose } from "$lib/caseStudy";
   import { registerTechModalClose } from "$lib/techModal";
   import { setupPreviewVideos, type PreviewController } from "$lib/preview";
@@ -16,7 +17,18 @@
   const pageTitle = "Projects Archive — Muhammad Fadil (Flaid)";
   const pageDescription =
     "The full project archive of Muhammad Fadil / Flaid — DevMap, Katalyst, ChatMe, DevNote, DailyFit, Mufadz Portal, De Home Spa, Kasbon.in, plus smaller builds.";
-  const canonical = `${SITE.url}projects`;
+  const canonical = absoluteUrl("projects");
+
+  const collectionLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": `${canonical}#webpage`,
+    url: canonical,
+    name: pageTitle,
+    description: pageDescription,
+    isPartOf: { "@id": `${SITE_URL}#website` },
+    inLanguage: "en",
+  };
 
   let pageEl: HTMLElement;
   let headEl: HTMLElement;
@@ -219,11 +231,21 @@
   <link rel="canonical" href={canonical} />
 
   <meta property="og:type" content="website" />
+  <meta property="og:locale" content="en_US" />
   <meta property="og:title" content={pageTitle} />
   <meta property="og:description" content={pageDescription} />
   <meta property="og:url" content={canonical} />
-  <meta property="og:image" content="{SITE.url}og-image.png" />
+  <meta property="og:image" content={OG_IMAGE.url} />
+  <meta property="og:image:width" content={String(OG_IMAGE.width)} />
+  <meta property="og:image:height" content={String(OG_IMAGE.height)} />
+  <meta property="og:image:alt" content={OG_IMAGE.alt} />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={pageTitle} />
+  <meta name="twitter:description" content={pageDescription} />
+  <meta name="twitter:image" content={OG_IMAGE.url} />
+  <meta name="twitter:image:alt" content={OG_IMAGE.alt} />
+
+  {@html `<script type="application/ld+json">${serializeJsonLd(collectionLd)}</script>`}
 </svelte:head>
 
 <Nav />

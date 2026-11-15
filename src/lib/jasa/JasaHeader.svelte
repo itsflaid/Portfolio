@@ -3,8 +3,7 @@
 	import ContactLink from './ContactLink.svelte';
 
 	const links = [
-		{ label: 'Website usaha', href: '#template' },
-		{ label: 'Tentang', href: '#tentang' },
+		{ label: 'Template', href: '#template' },
 		{ label: 'Proses', href: '#proses' },
 		{ label: 'Harga', href: '#harga' },
 		{ label: 'FAQ', href: '#faq' }
@@ -61,7 +60,7 @@
 	}
 	.bar__nav {
 		display: none;
-		gap: 1.6rem;
+		gap: clamp(0.9rem, 1.8vw, 1.4rem);
 	}
 	.bar__nav a {
 		font-size: 0.9375rem;

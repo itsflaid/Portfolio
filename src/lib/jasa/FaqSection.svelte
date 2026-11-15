@@ -55,7 +55,7 @@
 
 <section class="faq jz-section jz-wrap" id="faq" aria-labelledby="faq-title">
 	<div class="jz-head" use:reveal>
-		<h2 class="jz-title" id="faq-title">Pertanyaan yang sering muncul.</h2>
+		<h2 class="jz-title" id="faq-title">Pertanyaan seputar jasa pembuatan website.</h2>
 	</div>
 
 	<div class="list" use:reveal={60}>

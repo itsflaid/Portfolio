@@ -106,6 +106,8 @@
 					<img
 						src={s.src}
 						alt={s.alt}
+						width="800"
+						height="1138"
 						draggable="false"
 						decoding="async"
 						loading={i > 0 && i < slides.length - 1 ? 'eager' : 'lazy'}

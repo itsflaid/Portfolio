@@ -48,8 +48,7 @@ const tpl = (
 	demo
 });
 
-// Screenshot: static/jasa/template/<slug>.webp. Isi demo dengan URL live tiap template.
-// Lima pertama masuk baris atas, sisanya baris bawah.
+// Screenshot: static/jasa/template/<slug>.webp. Isi `demo` dengan URL website live tiap template.
 export const webTemplates: WebTemplate[] = [
 	tpl(
 		'dapur-rasa',
@@ -97,25 +96,48 @@ export const webTemplates: WebTemplate[] = [
 		'archity',
 		'Archity',
 		'Company profile',
-		'Untuk studio arsitektur dan interior. Portofolio proyek dengan tampilan lega dan elegan.'
+		'Untuk studio arsitektur dan interior. Portofolio proyek dengan tampilan lega dan elegan.',
+		'https://companypro2.netlify.app/'
 	),
 	tpl(
 		'forma',
 		'Forma',
 		'Company profile',
-		'Untuk firma arsitektur. Sorotan proyek, layanan, tim, dan statistik yang meyakinkan.'
+		'Untuk firma arsitektur. Sorotan proyek, layanan, tim, dan statistik yang meyakinkan.',
+		'https://template-companypro.netlify.app/'
 	),
 	tpl(
 		'graphic-studio',
 		'Graphic Studio',
 		'Jasa',
-		'Untuk studio kreatif dan agensi. Portofolio karya dengan layout yang berani.'
+		'Untuk studio kreatif dan agensi. Portofolio karya dengan layout yang berani.',
+		'https://fotostudio-gra.netlify.app/'
 	),
 	tpl(
 		'dapur-hangat',
 		'Dapur Hangat',
 		'Katalog produk/menu',
-		'Untuk toko kue dan camilan. Katalog produk dengan foto close-up dan tombol pesan.'
+		'Untuk toko kue dan camilan. Katalog produk dengan foto close-up dan tombol pesan.',
+		'https://kuekueraya.netlify.app/'
+	),
+	tpl(
+		'arsfa-cloth',
+		'Arsfa Clothing',
+		'Katalog produk/menu',
+		'Untuk toko fashion dan apparel. Katalog koleksi dengan palet earthy dan tombol tanya lewat WhatsApp.'
+	),
+	tpl(
+		'kue-raya',
+		'Kue Raya',
+		'Katalog produk/menu',
+		'Untuk toko kue kering dan hampers. Katalog produk dengan nuansa Lebaran yang hangat.'
+	),
+	tpl(
+		'yucoffe',
+		'YuCoffee',
+		'Katalog produk/menu',
+		'Untuk kedai kopi. Menu digital dengan kategori, promo, dan pesanan langsung ke WhatsApp.',
+		'https://yucoffe.netlify.app/'
 	)
 ];
 
@@ -201,6 +223,61 @@ export const plans: Plan[] = [
 			'Dukungan setelah launch dibahas di awal'
 		],
 		message: MESSAGES.webapp
+	}
+];
+
+// Urutannya dipakai untuk memasangkan layanan dengan paket dan harga di /jasa.
+export type Service = {
+	name: string;
+	tag: string;
+	desc: string;
+	for: string;
+	priceNote: string;
+	items: string[];
+};
+
+export const services: Service[] = [
+	{
+		name: 'Website usaha',
+		tag: 'Profil & landing page',
+		desc: 'Website untuk memperkenalkan usaha, membangun kepercayaan, dan mengarahkan calon pelanggan ke WhatsApp.',
+		for: 'UMKM, jasa lokal, personal brand, dan usaha yang baru mulai online.',
+		priceNote: 'Mulai Rp300 rb',
+		items: [
+			'1–5 halaman: beranda, tentang, layanan/produk, dan kontak',
+			'Desain dari template siap pakai atau custom',
+			'Tombol WhatsApp, peta lokasi, dan media sosial',
+			'SEO dasar: judul, deskripsi, heading, dan sitemap',
+			'Bantuan setup domain, hosting, dan email'
+		]
+	},
+	{
+		name: 'Website dengan admin',
+		tag: 'Katalog & konten',
+		desc: 'Website yang isinya bisa kamu kelola sendiri, tanpa perlu menghubungi developer setiap kali ada perubahan.',
+		for: 'Toko, katering, kedai, studio, dan usaha dengan katalog atau konten yang sering berubah.',
+		priceNote: 'Rp500 rb – Rp2 jt',
+		items: [
+			'Panel admin untuk produk, menu, artikel, atau galeri',
+			'Login admin dan upload gambar',
+			'Pencarian/filter dan tombol pesan langsung ke WhatsApp',
+			'Halaman detail produk yang ramah SEO',
+			'Panduan singkat mengelola konten'
+		]
+	},
+	{
+		name: 'Sistem digital untuk usaha',
+		tag: 'Aplikasi web',
+		desc: 'Aplikasi web untuk mencatat, mengelola, dan mengotomasi proses bisnis yang sudah berjalan.',
+		for: 'Usaha yang butuh sistem internal, booking, kasir, dashboard, atau laporan.',
+		priceNote: 'Mulai Rp2 jt',
+		items: [
+			'Dashboard, login, dan hak akses per peran',
+			'Database dan alur kerja sesuai kebutuhan bisnis',
+			'Laporan sederhana dan ekspor data',
+			'Integrasi WhatsApp, pembayaran, atau layanan lain',
+			'Deploy, setup domain, dan pendampingan setelah launch'
+		]
 	}
 ];
 

@@ -28,7 +28,7 @@
 	<div class="jz-wrap">
 		<div class="head" use:reveal>
 			<p class="eyebrow">Template siap pakai</p>
-			<h2 class="jz-title" id="template-title">Pilih yang paling dekat dengan usahamu.</h2>
+			<h2 class="jz-title" id="template-title">Pilih template website yang paling dekat dengan usahamu.</h2>
 			<p class="lede">
 				Lihat contohnya dulu. Kalau sudah cocok, logo, warna, foto, dan teksnya kita sesuaikan
 				dengan bisnismu.

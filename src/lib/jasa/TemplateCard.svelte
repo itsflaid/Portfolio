@@ -20,7 +20,7 @@
 			href={template.demo}
 			target="_blank"
 			rel="noopener noreferrer"
-			aria-label={`Lihat demo ${template.name} di tab baru`}
+			aria-label={`Lihat website ${template.name} di tab baru`}
 		>
 			<Frame
 				src={template.thumb}
@@ -57,11 +57,11 @@
 					target="_blank"
 					rel="noopener noreferrer"
 				>
-					Lihat demo
+					Lihat website
 					<Icon name="external" size="0.9em" />
 				</a>
 			{:else}
-				<span class="card__soon">Demo menyusul</span>
+				<span class="card__soon">Website segera hadir</span>
 			{/if}
 			<ContactLink
 				size="sm"

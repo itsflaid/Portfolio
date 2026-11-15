@@ -5,7 +5,7 @@
 
 <section class="proses jz-section jz-wrap" id="proses" aria-labelledby="proses-title">
 	<div class="jz-head" use:reveal>
-		<h2 class="jz-title" id="proses-title">Dari obrolan sampai online.</h2>
+		<h2 class="jz-title" id="proses-title">Dari obrolan sampai website online.</h2>
 	</div>
 
 	<ol class="steps">
