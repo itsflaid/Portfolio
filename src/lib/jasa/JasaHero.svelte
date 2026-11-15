@@ -22,14 +22,13 @@
 <section class="hero" id="top">
 	<div class="jz-wrap hero__copy">
 		<h1 class="hero__title" data-in="2">
-			<span class="hero__serif">Jasa pembuatan website</span>
-			<span class="hero__bold">agar usahamu lebih mudah ditemukan pelanggan.</span>
+			<span class="hero__serif">Bantu usahamu lebih </span>
+			<span class="hero__bold">mudah ditemukan dan dihubungi pelanggan.</span>
 		</h1>
 
 		<p class="hero__lede" data-in="3">
-			Saya Fadil, fullstack developer di Kalimantan Timur. Saya bantu usaha di seluruh Indonesia
-			punya website dari template atau desain custom, plus aplikasi web yang mengikuti cara kerja
-			bisnisnya.
+			Saya Fadil, fullstack developer. Website dari template atau desain custom, dan aplikasi web
+			yang mengikuti cara kerja bisnismu.
 		</p>
 
 		<div class="hero__actions" data-in="4">

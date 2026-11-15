@@ -3,6 +3,7 @@
 	import ContactLink from './ContactLink.svelte';
 
 	const links = [
+		{ label: 'Layanan', href: '#layanan' },
 		{ label: 'Template', href: '#template' },
 		{ label: 'Proses', href: '#proses' },
 		{ label: 'Harga', href: '#harga' },
