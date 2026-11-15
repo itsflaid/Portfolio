@@ -15,7 +15,7 @@ const extra = [
 		shifts: ['single atau multipage', 'template atau desain custom', 'bahan yang sudah siap']
 	},
 	{
-		question: 'Isi websitemu sering berubah?',
+		question: 'Sering ganti harga atau foto produk?',
 		outcome: 'Harga, foto, dan artikel kamu ubah sendiri, tanpa menunggu developer.',
 		shifts: ['jenis konten', 'ada tidaknya fitur pesanan', 'jumlah halaman']
 	},
