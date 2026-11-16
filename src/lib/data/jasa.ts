@@ -79,11 +79,11 @@ export const webTemplates: WebTemplate[] = [
 		'https://fashion-katalog.netlify.app/'
 	),
 	tpl(
-		'rumi-botanical',
-		'Rumi Botanical Studio',
-		'Katalog produk/menu',
-		'Untuk studio taman dan landscape. Portofolio proyek dengan nuansa hijau yang tenang.',
-		'https://botani-katalog.netlify.app/'
+		'jelajah-nusa',
+		'Jelajah Nusa',
+		'Jasa',
+		'Untuk agen travel dan open trip. Paket wisata, jadwal keberangkatan, dan tombol pesan.',
+		'https://template-jasa.netlify.app/'
 	),
 	tpl(
 		'taman-mentari',
@@ -121,6 +121,20 @@ export const webTemplates: WebTemplate[] = [
 		'https://kuekueraya.netlify.app/'
 	),
 	tpl(
+		'rumi-botanical',
+		'Rumi Botanical Studio',
+		'Katalog produk/menu',
+		'Untuk studio taman dan landscape. Portofolio proyek dengan nuansa hijau yang tenang.',
+		'https://botani-katalog.netlify.app/'
+	),
+	tpl(
+		'yucoffe',
+		'YuCoffee',
+		'Katalog produk/menu',
+		'Untuk kedai kopi. Menu digital dengan kategori, promo, dan pesanan langsung ke WhatsApp.',
+		'https://yucoffe.netlify.app/'
+	),
+	tpl(
 		'arsfa-cloth',
 		'Arsfa Clothing',
 		'Katalog produk/menu',
@@ -131,13 +145,6 @@ export const webTemplates: WebTemplate[] = [
 		'Kue Raya',
 		'Katalog produk/menu',
 		'Untuk toko kue kering dan hampers. Katalog produk dengan nuansa Lebaran yang hangat.'
-	),
-	tpl(
-		'yucoffe',
-		'YuCoffee',
-		'Katalog produk/menu',
-		'Untuk kedai kopi. Menu digital dengan kategori, promo, dan pesanan langsung ke WhatsApp.',
-		'https://yucoffe.netlify.app/'
 	)
 ];
 
