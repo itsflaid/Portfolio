@@ -1,6 +1,6 @@
 <script lang="ts">
+	import { planAnchor } from '$lib/data/jasa';
 	import { services } from '$lib/data/layanan';
-	import ContactLink from '../ContactLink.svelte';
 </script>
 
 <section class="lay jz-section" id="layanan" aria-labelledby="layanan-title">
@@ -37,7 +37,7 @@
 
 						<p class="item__shift">Harga bergeser menurut {s.shifts.join(', ')}.</p>
 
-						<ContactLink message={s.message} />
+						<a class="jz-btn" href={`#${planAnchor(s.name)}`}>Lihat paket dan harga</a>
 					</div>
 				</li>
 			{/each}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { plans } from '$lib/data/jasa';
+	import { planAnchor, plans } from '$lib/data/jasa';
 	import ContactLink from './ContactLink.svelte';
 	import { reveal } from './reveal';
 </script>
@@ -15,7 +15,12 @@
 
 	<div class="plans">
 		{#each plans as plan, i (plan.name)}
-			<article class="plan" class:plan--featured={i === 1} use:reveal={i * 80}>
+			<article
+				class="plan"
+				class:plan--featured={i === 1}
+				id={planAnchor(plan.name)}
+				use:reveal={i * 80}
+			>
 				<h3 class="plan__name">{plan.name}</h3>
 				<p class="plan__for">{plan.for}</p>
 
