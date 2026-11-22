@@ -437,7 +437,6 @@
   }
   .project__btn:hover { transform: translateY(-2px); }
 
-  /* Desktop-only: right-aligned text when media is on the right (reversed). */
   @media (min-width: 901px) {
     .project--reverse .project__info {
       align-items: flex-end;

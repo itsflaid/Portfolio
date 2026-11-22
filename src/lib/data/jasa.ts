@@ -236,7 +236,7 @@ export const plans: Plan[] = [
 	}
 ];
 
-// Urutannya dipakai untuk memasangkan layanan dengan paket dan harga di /jasa.
+// Urutan harus sama dengan `plans`: dipakai untuk memasangkan layanan dengan paket dan harga di /jasa.
 export type Service = {
 	name: string;
 	tag: string;
@@ -322,7 +322,7 @@ export const faqs = [
 	}
 ];
 
-// Hero carousel /jasa. Isi 8 slide agar putarannya mulus. pos = object-position untuk crop portrait.
+// Isi 8 slide agar putaran carousel mulus. pos = object-position untuk crop gambar portrait.
 export type HeroSlide = { src: string; alt: string; pos?: string };
 
 export const heroSlides: HeroSlide[] = [

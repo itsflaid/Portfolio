@@ -1,8 +1,4 @@
-/**
- * Shared hover/scroll video-preview behavior for project cards.
- * Mirrors the logic in the homepage Featured Projects section so any page
- * rendering `.media__pan` cards behaves identically.
- */
+/** Preview video (hover/scroll) kartu proyek. Mencari elemen `.media__pan` di dalam container. */
 export type PreviewController = {
 	pause: () => void;
 	resume: () => void;

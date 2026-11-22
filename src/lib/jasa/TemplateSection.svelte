@@ -7,8 +7,8 @@
 
 	let { templates }: { templates: WebTemplate[] } = $props();
 
-	// Lazy native baru mulai download saat gambar hampir kelihatan, jadi kartu sempat muncul kosong.
-	// Section ini disiapkan lebih awal: begitu pengunjung mendekat, semua gambar langsung diunduh.
+	// Lazy loading bawaan browser baru mengunduh saat gambar hampir terlihat, jadi kartu sempat kosong.
+	// Begitu section mendekati viewport, semua gambar dipaksa eager.
 	let section: HTMLElement | undefined = $state();
 	let warm = $state(false);
 

@@ -1,4 +1,3 @@
-/* Smaller builds shown at the end of the project archive. */
 export type SmallBuild = { name: string; stack: string; href: string };
 
 export const smallerBuilds: SmallBuild[] = [

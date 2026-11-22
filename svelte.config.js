@@ -8,8 +8,8 @@ const config = {
 		adapter: adapter(),
 		prerender: {
 			handleMissingId: 'ignore',
-			// /resume.pdf is not committed to the repo; the Resume links must not break the build.
-			// Every other 404 still fails the build.
+			// /resume.pdf tidak ikut di-commit, jadi link Resume tidak boleh membuat build gagal.
+			// 404 lainnya tetap menggagalkan build.
 			handleHttpError: ({ path, message }) => {
 				if (path === '/resume.pdf') return;
 				throw new Error(message);

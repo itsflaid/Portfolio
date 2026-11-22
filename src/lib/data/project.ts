@@ -517,10 +517,8 @@ export const projects: Project[] = [
 
 ];
 
-/** All projects in archive display order (best-first). */
 export const allProjects: Project[] = [...projects].sort((a, b) => a.order - b.order);
 
-/** Curated homepage selection, in featured order. */
 export const featuredProjects: Project[] = projects
 	.filter((p) => p.featured)
 	.sort((a, b) => (a.featuredOrder ?? 0) - (b.featuredOrder ?? 0));

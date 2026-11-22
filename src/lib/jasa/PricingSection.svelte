@@ -76,7 +76,6 @@
 		background: var(--jz-surface);
 		box-shadow: var(--jz-shadow);
 	}
-	/* paket tengah: latar gelap sebagai penanda, tanpa efek glow */
 	.plan--featured {
 		border-color: var(--jz-night);
 		background: var(--jz-night);

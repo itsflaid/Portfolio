@@ -42,15 +42,12 @@
 			return;
 		}
 
-		// Posisi awal tirai diatur di JS (bukan CSS transform) supaya tidak
-		// konflik dengan cache transform GSAP — kalau pakai CSS translateX %,
-		// nilainya terbaca sebagai px dan panel stuck di luar layar.
+		// Posisi awal tirai diatur lewat GSAP, bukan CSS transform. Dengan translateX
+		// berbasis % di CSS, GSAP membaca nilainya sebagai px dan panel macet di luar layar.
 		gsap.set(panelLeftEl, { xPercent: -101, x: 0 });
 		gsap.set(panelRightEl, { xPercent: 101, x: 0 });
 
-		// 1) Tirai: scrub mengikuti scroll — scroll turun = menutup,
-		//    scroll naik = membuka. Reversible + infinite (masuk-keluar).
-		//    Kedua panel 50.5% (overlap 1%) supaya tidak ada celah di tengah.
+		// Lebar tiap panel 50.5% agar keduanya overlap dan tidak ada celah di tengah.
 		const curtainTween = gsap.to([panelLeftEl, panelRightEl], {
 			xPercent: 0,
 			ease: 'none',
@@ -62,9 +59,7 @@
 			}
 		});
 
-		// 2) Konten: baru muncul setelah tirai MENUTUP PENUH (scrub tirai
-		//    selesai di 'top 30%', konten mulai di 'top 25%'), hilang lagi
-		//    saat scroll kembali ke atas (play / reverse = infinite).
+		// Start konten harus setelah end tirai, supaya konten baru muncul saat tirai sudah menutup penuh.
 		const contentTl = gsap.timeline({
 			scrollTrigger: {
 				trigger: sectionEl,
