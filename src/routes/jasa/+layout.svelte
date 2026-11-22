@@ -4,7 +4,7 @@
 
 	let { children } = $props();
 
-	// reveal hanya aktif kalau JS jalan
+	// Class jz--js baru dipasang setelah hydrate, jadi tanpa JS konten tetap terlihat (lihat .rv di jasa.css).
 	let js = $state(false);
 	onMount(() => (js = true));
 </script>

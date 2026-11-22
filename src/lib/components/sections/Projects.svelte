@@ -598,7 +598,7 @@
     50%      { opacity: 0.32; }
   }
 
-  /* ---- Mobile: layout tetap seperti versi pre-redesign, tidak diubah. ---- */
+  /* Mobile sengaja tetap memakai layout sebelum redesign. */
   @media (max-width: 900px) {
     .projects {
       padding-top: clamp(2.5rem, 6vh, 4rem);

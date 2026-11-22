@@ -42,10 +42,8 @@
 
 		lenis.on('scroll', ScrollTrigger.update);
 
-		// Batas waktu (ms) maksimum yang boleh "dilihat" Lenis dalam satu tick.
-		// Kalau main thread stall lebih lama dari ini, kelebihannya dibuang,
-		// bukan diteruskan ke Lenis — animasi cuma lanjut normal begitu frame
-		// jalan lagi, bukan "bayar utang" loncat jauh sekaligus.
+		// Batas delta per tick (ms) yang diteruskan ke Lenis. Kalau main thread macet
+		// lebih lama, sisanya dibuang supaya scroll tidak meloncat jauh saat frame kembali jalan.
 		const MAX_RAF_STEP_MS = 50;
 		let virtualTime = 0;
 		let lastRealTime = 0;
