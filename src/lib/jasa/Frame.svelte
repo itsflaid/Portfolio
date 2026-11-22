@@ -20,11 +20,14 @@
 	} = $props();
 
 	let failed = $state(false);
+	let loaded = $state(false);
 	let img: HTMLImageElement | undefined = $state();
 
-	// error bisa kejadian sebelum hydration, jadi cek lagi saat mount
+	// load/error bisa kejadian sebelum hydration, jadi cek lagi saat mount
 	onMount(() => {
-		if (img && img.complete && img.naturalWidth === 0) failed = true;
+		if (!img || !img.complete) return;
+		if (img.naturalWidth === 0) failed = true;
+		else loaded = true;
 	});
 </script>
 
@@ -41,9 +44,11 @@
 				bind:this={img}
 				{src}
 				{alt}
+				class:is-loaded={loaded}
 				loading={eager ? 'eager' : 'lazy'}
 				decoding="async"
 				draggable="false"
+				onload={() => (loaded = true)}
 				onerror={() => (failed = true)}
 			/>
 		{:else}
@@ -107,6 +112,15 @@
 		object-fit: cover;
 		object-position: top center;
 		user-select: none;
+		transition: opacity 400ms var(--jz-ease);
+	}
+	:global(.jz--js) img:not(.is-loaded) {
+		opacity: 0;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		img {
+			transition: none;
+		}
 	}
 	.frame__ph {
 		display: grid;

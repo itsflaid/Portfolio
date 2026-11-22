@@ -3,8 +3,13 @@
 	import ContactLink from './ContactLink.svelte';
 	import Icon from './Icon.svelte';
 	import Frame from './Frame.svelte';
+	import { reveal } from './reveal';
 
-	let { template }: { template: WebTemplate } = $props();
+	let {
+		template,
+		index = 0,
+		eager = false
+	}: { template: WebTemplate; index?: number; eager?: boolean } = $props();
 
 	const KIND_ICON: Record<TemplateKind, 'briefcase' | 'building' | 'bag'> = {
 		Jasa: 'briefcase',
@@ -13,7 +18,7 @@
 	};
 </script>
 
-<article class="card">
+<article class="card" use:reveal={(index % 3) * 70}>
 	{#if template.demo}
 		<a
 			class="card__preview"
@@ -28,6 +33,7 @@
 				fallback={template.name}
 				ratio="2 / 1"
 				chrome={false}
+				{eager}
 			/>
 		</a>
 	{:else}
@@ -37,6 +43,7 @@
 			fallback={template.name}
 			ratio="2 / 1"
 			chrome={false}
+			{eager}
 		/>
 	{/if}
 

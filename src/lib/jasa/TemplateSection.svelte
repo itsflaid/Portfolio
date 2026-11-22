@@ -1,10 +1,34 @@
 <script lang="ts">
 	import { MESSAGES, type TemplateKind, type WebTemplate } from '$lib/data/jasa';
+	import { onMount } from 'svelte';
 	import ContactLink from './ContactLink.svelte';
 	import TemplateCard from './TemplateCard.svelte';
 	import { reveal } from './reveal';
 
 	let { templates }: { templates: WebTemplate[] } = $props();
+
+	// Lazy native baru mulai download saat gambar hampir kelihatan, jadi kartu sempat muncul kosong.
+	// Section ini disiapkan lebih awal: begitu pengunjung mendekat, semua gambar langsung diunduh.
+	let section: HTMLElement | undefined = $state();
+	let warm = $state(false);
+
+	onMount(() => {
+		if (!section || typeof IntersectionObserver === 'undefined') {
+			warm = true;
+			return;
+		}
+		const io = new IntersectionObserver(
+			(entries) => {
+				if (entries.some((e) => e.isIntersecting)) {
+					warm = true;
+					io.disconnect();
+				}
+			},
+			{ rootMargin: '2400px 0px' }
+		);
+		io.observe(section);
+		return () => io.disconnect();
+	});
 
 	const KINDS: Array<TemplateKind | 'Semua'> = [
 		'Semua',
@@ -24,7 +48,12 @@
 	}
 </script>
 
-<section class="template jz-section" id="template" aria-labelledby="template-title">
+<section
+	bind:this={section}
+	class="template jz-section"
+	id="template"
+	aria-labelledby="template-title"
+>
 	<div class="jz-wrap">
 		<div class="head" use:reveal>
 			<p class="eyebrow">Template siap pakai</p>
@@ -54,12 +83,12 @@
 			<p class="count" aria-live="polite">Menampilkan {filtered.length} template</p>
 		</div>
 
-		<div class="grid" id="template-grid" use:reveal={120}>
-			{#each filtered as template (template.slug)}
-				<TemplateCard {template} />
+		<div class="grid" id="template-grid">
+			{#each filtered as template, i (template.slug)}
+				<TemplateCard {template} index={i} eager={warm} />
 			{/each}
 
-			<div class="cta" style="--cta-span: {ctaSpan}">
+			<div class="cta" style="--cta-span: {ctaSpan}" use:reveal>
 				<p class="cta__eyebrow">Tidak ada yang pas?</p>
 				<h3 class="cta__title">Template bisa diubah, atau saya buatkan dari nol.</h3>
 				<p class="cta__text">
